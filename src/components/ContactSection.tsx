@@ -1,23 +1,54 @@
 import React from 'react';
-import { GridSection } from './Layout';
 
-export default function ContactSection() {
+type ContactProps = {
+  settings?: {
+    studioName?: string;
+    address?: string;
+    email?: string;
+    phone?: string;
+    instagram?: string;
+  };
+};
+
+export default function ContactSection({ settings }: ContactProps) {
+  if (!settings) return null;
+
   return (
-    <GridSection id="contact">
-      <h2 className="text-sm font-semibold uppercase tracking-widest mb-fm-1 text-gray-500 mt-fm-4">Contact</h2>
-      {/* Rent, venstrestilt teksthierarki */}
-      <div className="flex flex-col gap-fm-1 border-t border-black pt-fm-1">
-        <h3 className="text-lg font-medium mb-fm-1">Arkitektkontor AS</h3>
-        <div className="mb-fm-1">
-          <p>Storgata 1</p>
-          <p>0150 Oslo</p>
-          <p>Norge</p>
-        </div>
-        <div className="mt-fm-1">
-          <p><a href="mailto:hello@arkitektkontor.no" className="hover:underline">hello@arkitektkontor.no</a></p>
-          <p><a href="tel:+4712345678" className="hover:underline">+47 12 34 56 78</a></p>
-        </div>
+    <div className="flex flex-col text-black max-w-[1025px]">
+      {/* Blokk 1: Studio og Adresse */}
+      <div className="whitespace-pre-line">
+        <p className="m-0">{settings.studioName}</p>
+        <p className="m-0">{settings.address}</p>
       </div>
-    </GridSection>
+
+      {/* Blanklinje */}
+      <div className="h-[37px] w-full" aria-hidden="true" />
+
+      {/* Blokk 2: E-post og Telefon */}
+      <div className="flex flex-col">
+        {settings.email && (
+          <p className="m-0">
+            <a href={`mailto:${settings.email}`}>{settings.email}</a>
+          </p>
+        )}
+        {settings.phone && (
+          <p className="m-0">
+            <a href={`tel:${settings.phone.replace(/\s+/g, '')}`}>{settings.phone}</a>
+          </p>
+        )}
+      </div>
+
+      {/* Blanklinje */}
+      <div className="h-[37px] w-full" aria-hidden="true" />
+
+      {/* Blokk 3: Instagram */}
+      {settings.instagram && (
+        <p className="m-0">
+          <a href={settings.instagram} target="_blank" rel="noopener noreferrer">
+            Instagram
+          </a>
+        </p>
+      )}
+    </div>
   );
 }

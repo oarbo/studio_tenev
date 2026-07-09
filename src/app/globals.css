@@ -1,26 +1,42 @@
+@import url("https://use.typekit.net/qvj5iro.css");
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "neue-haas-unica", sans-serif;
+  --text-base: 29px;
+  --text-base--line-height: 37px;
+  --spacing-fm: 1.25rem;
+  --spacing-fm-1: 1.25rem;
+  --spacing-fm-2: 2.5rem;
+  --spacing-fm-3: 3.75rem;
+  --spacing-fm-4: 5rem;
+  --spacing-fm-5: 6.25rem;
+  --spacing-fm-6: 7.5rem;
+  --spacing-fm-7: 8.75rem;
+  --spacing-fm-8: 10rem;
+  --spacing-fm-9: 11.25rem;
+  --spacing-side-padding: 6.25rem;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --fm: 1.25rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html, body {
+  font-family: "neue-haas-unica", sans-serif !important;
+  font-weight: 400;
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+h1, h2, h3, h4, h5, h6, strong, b {
+  font-weight: 400;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+* {
+  --tw-font-weight: 400;
+}
+
+.px-side-padding {
+  padding-left: 6.25rem;
+  padding-right: 6.25rem;
 }

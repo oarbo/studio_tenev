@@ -14,7 +14,13 @@ export const getAllDataQuery = `
     _id,
     title,
     "slug": slug.current,
-    completionYear,
+    buildYear,
+    status,
+    location,
+    client,
+    contractor,
+    photographer,
+    size,
     "coverImage": coverImage.asset->url,
     "coverImageAlt": coverImage.alt,
     gallery[] {
@@ -26,6 +32,7 @@ export const getAllDataQuery = `
   "news": *[_type == "news"] | order(date desc) {
     _id,
     title,
+    summary,
     date,
     link,
     "image": image.asset->url
@@ -33,10 +40,24 @@ export const getAllDataQuery = `
   "about": *[_type == "about"][0] {
     body
   },
-  "people": *[_type == "person"] | order(name asc) {
-    _id,
-    name,
-    role
+  "people": *[_type == "people"][0] {
+    bio,
+    team,
+    collaborators
+  },
+  "applications": *[_type == "applications"][0] {
+    text
+  },
+  "siteSettings": *[_type == "siteSettings"][0] {
+    ...,
+    heroItem->{
+      _type,
+      _id,
+      title,
+      "slug": slug.current,
+      "coverImage": coverImage.asset->url,
+      "coverImageAlt": coverImage.alt
+    }
   }
 }
 `;
