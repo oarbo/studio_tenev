@@ -31,6 +31,15 @@ export const newsType = defineType({
       },
     }),
     defineField({
+      name: 'autoplayVideo',
+      title: 'Autoplay Video (MP4)',
+      type: 'file',
+      description: 'Last opp en kort, lydløs video som skal spilles automatisk i gridet.',
+      options: {
+        accept: 'video/mp4'
+      }
+    }),
+    defineField({
       name: 'link',
       title: 'External Link',
       type: 'url',

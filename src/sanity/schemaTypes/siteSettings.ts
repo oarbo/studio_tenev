@@ -13,38 +13,49 @@ export default defineType({
       readOnly: true,
       hidden: true,
     }),
+
     defineField({
-      name: 'heroItem',
-      title: 'Hero Content (Forsidebilde)',
-      description: 'Velg ett prosjekt eller én nyhetssak som skal vises stort på forsiden.',
-      type: 'reference',
-      to: [{ type: 'project' }, { type: 'news' }],
+      name: 'heroImage',
+      title: 'Hero Bilde (Forside)',
+      type: 'image',
+      description: 'Dette brukes som fallback hvis karusellen er tom.',
+      options: {
+        hotspot: true,
+      },
     }),
     defineField({
-      name: 'studioName',
-      title: 'Studio Navn',
-      type: 'string',
+      name: 'landingCarousel',
+      title: 'Karusell på forsiden',
+      description: 'Velg prosjektene som skal rotere på den store karusellen helt øverst på forsiden.',
+      type: 'array',
+      of: [
+        { type: 'reference', to: [{ type: 'project' }] }
+      ],
     }),
     defineField({
-      name: 'address',
-      title: 'Adresse',
-      type: 'text',
-      rows: 3,
+      name: 'featuredContent',
+      title: 'Forside-innhold (Grid)',
+      description: 'Velg og sorter prosjekter og nyheter som skal vises på forsiden. Layouten genereres automatisk basert på rekkefølge (Chipperfield-mønster).',
+      type: 'array',
+      of: [
+        { type: 'reference', to: [{ type: 'project' }, { type: 'news' }] }
+      ],
     }),
     defineField({
-      name: 'email',
-      title: 'E-post',
-      type: 'string',
+      name: 'selectedWorks',
+      title: 'Utvalgte prosjekter (Work-siden)',
+      description: 'Velg prosjektene som skal vises i karusellen øverst på "Work"-siden.',
+      type: 'array',
+      of: [
+        { type: 'reference', to: [{ type: 'project' }] }
+      ],
     }),
     defineField({
-      name: 'phone',
-      title: 'Telefon',
-      type: 'string',
-    }),
-    defineField({
-      name: 'instagram',
-      title: 'Instagram URL',
-      type: 'url',
+      name: 'showGridOverlay',
+      title: 'Vis Grid & Spacing (Hjelpeverktøy)',
+      description: 'Slå på for å vise hjelpelinjer for grid og avstander på nettsiden (Gjelder for alle).',
+      type: 'boolean',
+      initialValue: false,
     }),
   ],
 })

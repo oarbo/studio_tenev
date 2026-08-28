@@ -1,22 +1,23 @@
 import React, { ReactNode } from 'react';
-import Link from 'next/link';
-import FooterNav from './FooterNav';
+import Header from './Header';
+import Footer from './Footer';
 
 interface LayoutProps {
   children: ReactNode;
+  noPadding?: boolean;
+  hideHeader?: boolean;
+  stickyHeader?: boolean;
+  projectTitle?: ReactNode | string;
 }
 
-export default function Layout({ children }: LayoutProps) {
-
+export default function Layout({ children, noPadding = false, hideHeader = false, stickyHeader = false, projectTitle }: LayoutProps) {
   return (
-    <div className="min-h-screen text-base bg-white text-black relative w-full min-w-0">
-      <header className="fixed top-0 left-0 p-side-padding py-fm-1 z-60 bg-transparent">
-        <Link href="/" className="font-medium whitespace-nowrap">Studio Tenev</Link>
-      </header>
-      <main className="pt-fm-4 w-full min-w-0">
+    <div className="flex flex-col min-h-screen text-[1rem] bg-white text-black relative w-full min-w-0">
+      {!hideHeader && <Header sticky={stickyHeader} projectTitle={projectTitle} />}
+      <main className={`${noPadding || hideHeader ? '' : 'pt-35 pb-35'} w-full min-w-0 grow`}>
         {children}
       </main>
-      <FooterNav />
+      <Footer />
     </div>
   );
 }

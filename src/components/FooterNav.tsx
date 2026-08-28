@@ -16,22 +16,32 @@ export default function FooterNav() {
       {isOpen && (
         <ul className="flex flex-col gap-1">
           <li>
-            <Link href="#selected-projects" onClick={closeMenu} className={hoverClass}>
+            <Link href="/projects" onClick={closeMenu} className={hoverClass}>
               Projects
             </Link>
           </li>
           <li>
-            <Link href="#about" onClick={closeMenu} className={hoverClass}>
+            <Link href="/news" onClick={closeMenu} className={hoverClass}>
+              News
+            </Link>
+          </li>
+          <li>
+            <Link href="/about" onClick={closeMenu} className={hoverClass}>
               About
             </Link>
           </li>
           <li>
-            <Link href="#people" onClick={closeMenu} className={hoverClass}>
+            <Link href="/people" onClick={closeMenu} className={hoverClass}>
               People
             </Link>
           </li>
           <li>
-            <Link href="#contact" onClick={closeMenu} className={hoverClass}>
+            <Link href="/applications" onClick={closeMenu} className={hoverClass}>
+              Applications
+            </Link>
+          </li>
+          <li>
+            <Link href="/contact" onClick={closeMenu} className={hoverClass}>
               Contact
             </Link>
           </li>
