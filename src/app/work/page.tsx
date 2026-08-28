@@ -43,7 +43,7 @@ export default async function ProjectsPage(props: { searchParams: Promise<{ view
   const selectedTag = searchParams.tag || 'All';
 
   // Extract unique tags from the 'use' field across all projects
-  const uniqueTags = Array.from(new Set(
+  const uniqueTags: string[] = Array.from(new Set<string>(
     projects.flatMap((p: ProjectData) => p.use || [])
   )).sort();
 
