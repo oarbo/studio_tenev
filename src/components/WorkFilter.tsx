@@ -15,12 +15,13 @@ export default function WorkFilter({ items }: WorkFilterProps) {
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [sortDir, setSortDir] = useState<SortDirection>('desc'); // 'desc' default for date (nyeste øverst)
 
-  const handleSortClick = (option: SortOption) => {
-    if (sortBy === option) {
+  const handleSortClick = (option: string) => {
+    const validOption = option as SortOption;
+    if (sortBy === validOption) {
       setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
-      setSortBy(option);
-      setSortDir(option === 'date' ? 'desc' : 'asc');
+      setSortBy(validOption);
+      setSortDir(validOption === 'date' ? 'desc' : 'asc');
     }
   };
 
