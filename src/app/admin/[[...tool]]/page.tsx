@@ -13,7 +13,16 @@ const Studio = dynamic(() => import('./Studio'), { ssr: false })
 
 export const dynamic = 'force-static'
 
-export { metadata, viewport } from 'next-sanity/studio'
+export const metadata = {
+  title: 'Sanity Studio',
+  robots: 'noindex'
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
 
 export default function StudioPage() {
   return <Studio />
