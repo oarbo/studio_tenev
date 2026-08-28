@@ -7,9 +7,7 @@
  * https://github.com/sanity-io/next-sanity
  */
 
-import dynamic from 'next/dynamic'
-
-const Studio = dynamic(() => import('./Studio'), { ssr: false })
+import StudioWrapper from './StudioWrapper'
 
 export const dynamic = 'force-static'
 
@@ -25,5 +23,6 @@ export const viewport = {
 }
 
 export default function StudioPage() {
-  return <Studio />
+  return <StudioWrapper />
 }
+
