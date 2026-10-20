@@ -1,46 +1,33 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Layout from '@/components/Layout';
-import IndexSection from '@/components/IndexSection';
-import { client, getSiteSettingsQuery } from '@/sanity/client';
+import { client, getSiteSettingsQuery, getProjectCreditsQuery } from '@/sanity/client';
+import ImprintContent from '@/components/ImprintContent';
 
 export const revalidate = 60;
 
+export const metadata: Metadata = {
+  title: 'Imprint and Privacy policy — Studio Tenev',
+  alternates: {
+    canonical: '/imprint-and-privacy-policy',
+  },
+};
+
 export default async function ImprintPage() {
-  const siteSettings = await client.fetch(getSiteSettingsQuery).catch(() => null);
+  const [siteSettings, credits] = await Promise.all([
+    client.fetch(getSiteSettingsQuery).catch(() => null),
+    client.fetch(getProjectCreditsQuery).catch(() => []),
+  ]);
 
   return (
-    <Layout>
-      <IndexSection id="imprint">
-        <div className="max-w-3xl prose prose-p:text-base prose-p:leading-[37px] prose-h2:font-normal prose-h2:text-[30px] prose-h2:mt-fm-2 text-black">
-          <h2>Imprint</h2>
-          <p>
-            Studio Tenev<br />
-            {siteSettings?.address && (
-              <span className="whitespace-pre-wrap">{siteSettings.address}</span>
-            )}
-          </p>
-          <p>
-            {siteSettings?.contactEmail && (
-              <>Email: {siteSettings.contactEmail}<br /></>
-            )}
-            {siteSettings?.contactPhone && (
-              <>Phone: {siteSettings.contactPhone}</>
-            )}
-          </p>
-
-          <h2>Privacy Policy</h2>
-          <p>
-            This website does not collect any personal data without your explicit consent. 
-            If you sign up for our newsletter, your email address will be stored securely 
-            and used solely for the purpose of sending you updates about Studio Tenev. 
-            You can unsubscribe at any time.
-          </p>
-          <p>
-            We use essential cookies to ensure the basic functionality of the website. 
-            No third-party tracking cookies are used.
-          </p>
-        </div>
-      </IndexSection>
+    <Layout noPadding>
+      <ImprintContent
+        studioName={siteSettings?.studioName}
+        address={siteSettings?.address}
+        contactEmail={siteSettings?.contactEmail}
+        contactPhone={siteSettings?.contactPhone}
+        credits={credits}
+      />
     </Layout>
   );
 }

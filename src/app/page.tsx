@@ -1,7 +1,6 @@
 import React from 'react';
 import Layout from '@/components/Layout';
 import HomeGrid from '@/components/HomeGrid';
-import HeroLanding from '@/components/HeroLanding';
 import { client, getFrontpageQuery } from '@/sanity/client';
 
 export const revalidate = 60; 
@@ -13,15 +12,11 @@ export default async function Page() {
   const featuredContent = siteSettings?.featuredContent || [];
 
   return (
-    <Layout noPadding>
+    <Layout>
       <div id="home-container" className="w-full">
-        <HeroLanding 
-          carousel={siteSettings.landingCarousel} 
-          fallbackImageUrl={siteSettings.heroImageUrl} 
-        />
-        
+        <h1 className="sr-only">Studio Tenev — Arkitekt Bergen</h1>
         {featuredContent.length > 0 && (
-          <div id="main-content" className="pt-fm-4">
+          <div id="main-content">
             <HomeGrid items={featuredContent} />
           </div>
         )}

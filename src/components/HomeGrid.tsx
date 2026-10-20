@@ -1,18 +1,27 @@
 'use client';
 import React from 'react';
 import type { TypedObject } from '@portabletext/types';
-import SanityImage from './SanityImage';
+import SanityImage, { SanityHotspot } from './SanityImage';
 import Link from 'next/link';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 export interface GridItemRef {
   _id: string;
   _type: 'project' | 'news';
   title: string;
+  titleEn?: string;
+  tag?: string;
   date?: string;
   slug?: string;
   summary?: string;
+  summaryEn?: string;
   link?: string;
-  image?: { url: string; aspectRatio: number };
+  image?: {
+    url: string;
+    aspectRatio: number;
+    lqip?: string;
+    hotspot?: SanityHotspot;
+  };
   videoUrl?: string;
   body?: TypedObject | TypedObject[];
   gallery?: { url: string; alt?: string }[];
@@ -22,87 +31,130 @@ export interface GridItemRef {
   client?: string;
   contractor?: string;
   size?: { value: number; unit: string };
-  coverImage?: string; // used for ProjectModal fallback
+  coverImage?: string;
 }
 
 export default function HomeGrid({ items }: { items: GridItemRef[] }) {
+  const { locale, translateTag } = useLanguage();
 
   if (!items || items.length === 0) return null;
 
-  const getGridClasses = (index: number) => {
-    return 'col-span-4 md:col-span-6';
+  const getGridClasses = (index: number, aspectRatio: number) => {
+    const p = index % 6;
+    const isPortrait = aspectRatio < 1;
+
+    switch(p) {
+      case 0: 
+        return isPortrait 
+          ? 'col-span-4 md:col-span-6 md:col-start-4' 
+          : 'col-span-4 md:col-span-8 md:col-start-3'; // Centered large
+      case 1: return 'col-span-4 md:col-span-5 md:col-start-1 md:mt-12'; // Left
+      case 2: return 'col-span-4 md:col-span-5 md:col-start-8 md:mt-[15vw]'; // Right, pushed down
+      case 3: 
+        return isPortrait 
+          ? 'col-span-4 md:col-span-4 md:col-start-5' 
+          : 'col-span-4 md:col-span-8 md:col-start-3'; // Centered medium
+      case 4: return 'col-span-4 md:col-span-5 md:col-start-2 md:mt-[12vw]'; // Left, pushed down
+      case 5: return 'col-span-4 md:col-span-4 md:col-start-9 md:mt-12'; // Right
+      default: return 'col-span-4 md:col-span-12';
+    }
   };
 
   return (
-    <>
-      <ol className="grid grid-cols-4 md:grid-cols-12 gap-fm w-full px-side-padding pb-[15vw]">
-        {items.map((item, index) => {
-          if (!item) return null;
+    <ol className="grid grid-cols-4 md:grid-cols-12 gap-x-fm-1 gap-y-16 md:gap-y-32 w-full px-side-padding pb-[15vw] pt-12">
+      {items.map((item, index) => {
+        if (!item) return null;
 
-          const getBoxPattern = (idx: number) => {
-            const p = idx % 5;
-            // All images are centered, but we vary the inset to give them different scales/margins
-            switch(p) {
-              case 0: return { inset: 'inset-[5%]', objectFit: 'contain' };
-              case 1: return { inset: 'inset-[15%]', objectFit: 'contain' };
-              case 2: return { inset: 'inset-y-[5%] inset-x-[15%]', objectFit: 'contain' };
-              case 3: return { inset: 'inset-y-[15%] inset-x-[5%]', objectFit: 'contain' };
-              case 4: return { inset: 'inset-[10%]', objectFit: 'contain' };
-              default: return { inset: 'inset-0', objectFit: 'contain' };
-            }
-          };
-          const pattern = getBoxPattern(index);
+        let href = '';
+        let isExternal = false;
+        
+        if (item._type === 'project') {
+          href = item.slug ? `/work/${item.slug}` : `/work#project-${item._id}`;
+        } else {
+          if (item.link) {
+            href = item.link;
+            isExternal = item.link.startsWith('http');
+          } else {
+            href = `/news#news-${item._id}`;
+          }
+        }
 
-          const href = item._type === 'project'
-            ? (item.slug ? `/work/${item.slug}` : `/work#project-${item._id}`)
-            : `/news#news-${item._id}`;
+        const aspectRatio = item.image?.aspectRatio || (item.videoUrl ? 1.77 : 1);
+        const imgWidth = 1200;
+        const imgHeight = Math.round(imgWidth / aspectRatio);
+        const gridClass = getGridClasses(index, aspectRatio);
+        const isFirstItem = index === 0;
 
-          const aspectRatio = item.image?.aspectRatio || (item.videoUrl ? 1.77 : 1);
-          const imgWidth = 1000;
-          const imgHeight = Math.round(imgWidth / aspectRatio);
-
-          const content = (
-            <figure className="relative block w-full aspect-[5/4] media-box">
-              <div className={`absolute ${pattern.inset} flex items-center justify-center`}>
-                <Link href={href} className="relative flex max-w-full max-h-full group/link focus:outline-none cursor-pointer">
-                  {/* Image Layer */}
-                  {item.videoUrl ? (
-                    <video src={item.videoUrl} autoPlay muted loop playsInline className="max-w-full max-h-full w-auto h-auto object-contain" />
-                  ) : item.image?.url ? (
+        return (
+          <li key={item._id || index} className={`${gridClass} block`}>
+            <figure className="block w-full">
+              <Link 
+                href={href} 
+                prefetch={!isExternal}
+                className="block group/link focus:outline-none cursor-pointer"
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+              >
+                {/* Media Layer (Video or Image) */}
+                {item.videoUrl ? (
+                  <div className="relative inline-block max-w-full overflow-hidden">
+                    <video
+                      src={item.videoUrl}
+                      preload="metadata"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="block max-w-full h-auto max-h-[70vh] object-contain"
+                    />
+                  </div>
+                ) : item.image?.url ? (
+                  <div className="relative w-full overflow-hidden bg-gray-50" style={{ aspectRatio }}>
                     <SanityImage 
                       src={item.image.url} 
                       alt={item.title} 
                       width={imgWidth}
                       height={imgHeight}
-                      className="max-w-full max-h-full w-auto h-auto object-contain"
-                      sizes="(max-width: 768px) 100vw, 50vw" 
+                      lqip={item.image.lqip}
+                      hotspot={item.image.hotspot}
+                      loading={isFirstItem ? 'eager' : 'lazy'}
+                      fetchPriority={isFirstItem ? 'high' : undefined}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      sizes="(max-width: 768px) 100vw, 60vw" 
                     />
-                  ) : null}
-                  
-                  {/* Hover Title Layer */}
-                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center opacity-0 group-hover/link:opacity-100 transition-opacity duration-300 pointer-events-none">
-                    <div className="bg-white px-2 pt-[3px] pb-1 flex flex-col items-center justify-center max-w-[90%]">
-                      {item.date && (
-                        <div className="text-[1rem] leading-[1.3] text-black mb-1">
-                          {new Date(item.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-                        </div>
-                      )}
-                      <h2 className="m-0 text-[1rem] leading-[1.3] text-black text-center line-clamp-2" style={{ fontWeight: 600 }}>{item.title}</h2>
-                    </div>
                   </div>
-                </Link>
-              </div>
+                ) : null}
+                
+                {/* Text Layer (Below Image) */}
+                <div className="mt-4 flex flex-col items-start justify-start">
+                  {/* Meta info ABOVE title */}
+                  <div className="text-[0.875rem] leading-[1.3] text-black mb-2 flex flex-row flex-wrap gap-x-4">
+                    <span>
+                      {item._type === 'news'
+                        ? (item.tag ? translateTag(item.tag) : (locale === 'en' ? 'News' : 'Nyhet'))
+                        : (locale === 'en' ? 'Project' : 'Prosjekt')}
+                    </span>
+                    {item._type === 'news' && item.date && (
+                      <span>
+                        {new Date(item.date).toLocaleDateString(locale === 'en' ? 'en-GB' : 'no-NO', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Title */}
+                  <h2 className="m-0 text-[1.33rem] leading-[1.3] text-black font-normal">
+                    {(locale === 'en' && item.titleEn) ? item.titleEn : item.title}
+                  </h2>
+                </div>
+              </Link>
             </figure>
-          );
-
-          return (
-            <li key={item._id || index} className="col-span-4 md:col-span-6 block">
-              {content}
-            </li>
-          );
-        })}
-      </ol>
-
-    </>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

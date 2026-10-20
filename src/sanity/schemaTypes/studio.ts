@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity';
+import { TranslateStringInput, TranslateTextInput, TranslateBlockInput } from '../components/TranslateInputs';
 
 export default defineType({
   name: 'studio',
@@ -25,17 +26,47 @@ export default defineType({
           type: 'object',
           name: 'textBlock',
           title: 'Tekstblokk',
+          fieldsets: [
+            {
+              name: 'titleGroup',
+              title: 'Tittel / Overskrift (Valgfri)',
+              options: { columns: 2 }
+            },
+            {
+              name: 'textGroup',
+              title: 'Tekst',
+              options: { columns: 2 }
+            }
+          ],
           fields: [
             defineField({
               name: 'title',
-              title: 'Tittel / Overskrift (Valgfri)',
+              title: 'Norsk',
               type: 'string',
-              description: 'Hvis du fyller ut tittel, får den overskriftsformatering. La stå tom om du kun ønsker tekst.'
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
+            }),
+            defineField({
+              name: 'titleEn',
+              title: 'Engelsk',
+              type: 'string',
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
             }),
             defineField({
               name: 'text',
-              title: 'Tekst',
+              title: 'Norsk',
               type: 'array',
+              fieldset: 'textGroup',
+              components: { input: TranslateBlockInput },
+              of: [{ type: 'block' }]
+            }),
+            defineField({
+              name: 'textEn',
+              title: 'Engelsk',
+              type: 'array',
+              fieldset: 'textGroup',
+              components: { input: TranslateBlockInput },
               of: [{ type: 'block' }]
             })
           ],
@@ -60,6 +91,13 @@ export default defineType({
           type: 'object',
           name: 'imageBlock',
           title: 'Bildeblokk',
+          fieldsets: [
+            {
+              name: 'captionGroup',
+              title: 'Bildetekst / Caption (vises på hover)',
+              options: { columns: 2 }
+            }
+          ],
           fields: [
             defineField({
               name: 'image',
@@ -69,8 +107,17 @@ export default defineType({
             }),
             defineField({
               name: 'caption',
-              title: 'Bildetekst / Caption (vises på hover)',
-              type: 'string'
+              title: 'Norsk',
+              type: 'string',
+              fieldset: 'captionGroup',
+              components: { input: TranslateStringInput },
+            }),
+            defineField({
+              name: 'captionEn',
+              title: 'Engelsk',
+              type: 'string',
+              fieldset: 'captionGroup',
+              components: { input: TranslateStringInput },
             }),
             defineField({
               name: 'size',
@@ -104,6 +151,13 @@ export default defineType({
           type: 'object',
           name: 'videoBlock',
           title: 'Videoblokk (Autoplay MP4)',
+          fieldsets: [
+            {
+              name: 'captionGroup',
+              title: 'Videotekst / Caption (vises på hover)',
+              options: { columns: 2 }
+            }
+          ],
           fields: [
             defineField({
               name: 'video',
@@ -114,8 +168,17 @@ export default defineType({
             }),
             defineField({
               name: 'caption',
-              title: 'Bildetekst / Caption (vises på hover)',
-              type: 'string'
+              title: 'Norsk',
+              type: 'string',
+              fieldset: 'captionGroup',
+              components: { input: TranslateStringInput },
+            }),
+            defineField({
+              name: 'captionEn',
+              title: 'Engelsk',
+              type: 'string',
+              fieldset: 'captionGroup',
+              components: { input: TranslateStringInput },
             }),
             defineField({
               name: 'size',
@@ -203,40 +266,45 @@ export default defineType({
         {
           type: 'object',
           name: 'teamBlock',
-          title: 'Team / Personer',
+          title: 'Ansatte / Employees (Navneliste)',
           fields: [
             defineField({
               name: 'title',
               title: 'Seksjonstittel',
               type: 'string',
-              initialValue: 'Team'
+              initialValue: 'People'
+            }),
+            defineField({
+              name: 'items',
+              title: 'Navn (ett navn per linje)',
+              type: 'array',
+              of: [{ type: 'string' }]
             }),
             defineField({
               name: 'members',
-              title: 'Medlemmer',
+              title: 'Medlemmer (Bakoverkompatibel)',
               type: 'array',
+              hidden: ({ parent }) => !parent?.members || parent.members.length === 0,
               of: [
                 {
                   type: 'object',
                   fields: [
                     defineField({ name: 'name', title: 'Navn', type: 'string' }),
-                    defineField({ name: 'title', title: 'Tittel / Rolle', type: 'string' }),
-                    defineField({ name: 'image', title: 'Bilde', type: 'image', options: { hotspot: true } })
                   ],
                   preview: {
-                    select: { title: 'name', subtitle: 'title', media: 'image' }
+                    select: { title: 'name' }
                   }
                 }
               ]
             })
           ],
           preview: {
-            select: { title: 'title', members: 'members' },
+            select: { title: 'title', items: 'items', members: 'members' },
             prepare(selection) {
-              const count = selection.members ? selection.members.length : 0;
+              const count = (selection.items?.length || 0) + (selection.members?.length || 0);
               return {
-                title: selection.title || 'Team',
-                subtitle: `${count} personer`
+                title: selection.title || 'People',
+                subtitle: `${count} navn`
               }
             }
           }
@@ -244,17 +312,17 @@ export default defineType({
         {
           type: 'object',
           name: 'peopleListBlock',
-          title: 'Samarbeidspartnere & Medarbeidere (Liste)',
+          title: 'Tidligere ansatte / Navneliste',
           fields: [
             defineField({
               name: 'title',
-              title: 'Seksjonstittel',
+              title: 'Seksjonstittel (f.eks. Former Employees)',
               type: 'string',
-              initialValue: 'Collaborators & Team'
+              initialValue: 'Former Employees'
             }),
             defineField({
               name: 'items',
-              title: 'Liste over navn / partnere',
+              title: 'Navn (ett navn per linje)',
               type: 'array',
               of: [{ type: 'string' }]
             })
@@ -264,8 +332,8 @@ export default defineType({
             prepare(selection) {
               const count = selection.items ? selection.items.length : 0;
               return {
-                title: selection.title || 'Samarbeidspartnere',
-                subtitle: `${count} oppføringer`
+                title: selection.title || 'Former Employees',
+                subtitle: `${count} navn`
               }
             }
           }
@@ -274,19 +342,50 @@ export default defineType({
           type: 'object',
           name: 'applicationsBlock',
           title: 'Jobbsøknader / Applications',
+          fieldsets: [
+            {
+              name: 'titleGroup',
+              title: 'Tittel',
+              options: { columns: 2 }
+            },
+            {
+              name: 'textGroup',
+              title: 'Informasjonstekst om søknader',
+              options: { columns: 2 }
+            }
+          ],
           fields: [
             defineField({
               name: 'title',
-              title: 'Seksjonstittel',
+              title: 'Norsk',
               type: 'string',
-              initialValue: 'Applications'
+              initialValue: 'Søknader',
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
+            }),
+            defineField({
+              name: 'titleEn',
+              title: 'Engelsk',
+              type: 'string',
+              initialValue: 'Applications',
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
             }),
             defineField({
               name: 'text',
-              title: 'Informasjonstekst om søknader',
+              title: 'Norsk',
               type: 'text',
               rows: 3,
-              description: 'f.eks. "We are always interested in hearing from talented architects and designers..."'
+              fieldset: 'textGroup',
+              components: { input: TranslateTextInput },
+            }),
+            defineField({
+              name: 'textEn',
+              title: 'Engelsk',
+              type: 'text',
+              rows: 3,
+              fieldset: 'textGroup',
+              components: { input: TranslateTextInput },
             })
           ],
           preview: {

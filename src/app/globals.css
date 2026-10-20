@@ -1,51 +1,76 @@
-@import url("https://use.typekit.net/qvj5iro.css");
 @import "tailwindcss";
 
 @theme {
   --font-sans: "neue-haas-unica", sans-serif;
-  /* Spacing tokens basert på rem — skalerer automatisk med vw root font-size */
-  --spacing-fm-1: 1.4rem;   /* 1 linjehøyde */
-  --spacing-fm-2: 2.8rem;   /* 2 linjehøyder */
-  --spacing-fm-3: 4.2rem;
-  --spacing-fm-4: 5.6rem;
-  --spacing-fm-5: 7rem;     /* ~5 blanke linjer */
-  --spacing-fm-6: 8.4rem;
-  --spacing-fm-7: 9.8rem;
-  --spacing-fm-8: 11.2rem;
-  --spacing-fm-9: 12.6rem;
+  /* Spacing tokens basert på rem (proporsjonalt med 1.45 linjehøyde) */
+  --spacing-fm: 1.45rem;    /* Standard horisontal/vertikal grunnenhet */
+  --spacing-fm-1: 1.45rem;  /* 1 linjehøyde */
+  --spacing-fm-2: 2.9rem;   /* 2 linjehøyder */
+  --spacing-fm-3: 4.35rem;
+  --spacing-fm-4: 5.8rem;
+  --spacing-fm-5: 7.25rem;  /* ~5 blanke linjer */
+  --spacing-fm-6: 8.7rem;
+  --spacing-fm-7: 10.15rem;
+  --spacing-fm-8: 11.6rem;
+  --spacing-fm-9: 13.05rem;
   --spacing-side-padding: 2rem;
 }
 
 /* -------------------------------------------------------
-   ROOT FONT-SIZE: Skalerer flytende med vinduet (Nick Hill)
-   Alle rem/em-verdier skalerer automatisk med dette.
+   TYPOGRAFI & BREAKPOINTS (Zak Group / PSL modell)
+   Faste steg per breakpoint (+1px skrift med proporsjonal linjeavstand)
+   Breakpoints: 768px (sm), 992px (md), 1280px (lg), 1600px (xl)
    ------------------------------------------------------- */
 
 html {
   box-sizing: border-box;
-  /* clamp(min, fluid, max):
-     Capper på 22px for å gi NHG samme visuelle tyngde som Arial på store skjermer */
-  font-size: clamp(17px, 1.3vw, 22px);
+  font-size: 18px;
+  /* Forhindrer layout-hopp når vertikal scrollbar aktiveres/deaktiveres (Win, Mac, alle nettlesere) */
+  overflow-y: scroll;
+}
+
+@supports (scrollbar-gutter: stable) {
+  html {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
 }
 
 *, *::before, *::after {
   box-sizing: inherit;
 }
 
-@media (max-width: 767px) {
+@media (min-width: 768px) {
   html {
-    font-size: clamp(15px, 4.5vw, 18px);
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 992px) {
+  html {
+    font-size: 21px;
+  }
+}
+
+@media (min-width: 1280px) {
+  html {
+    font-size: 22px;
+  }
+}
+
+@media (min-width: 1600px) {
+  html {
+    font-size: 23px;
   }
 }
 
 /* -------------------------------------------------------
-   CSS-VARIABLER: Flytende spacing basert på font-størrelse
+   CSS-VARIABLER: Typografi og layout tokens
    ------------------------------------------------------- */
 
 :root {
-  /* 1.4 line-height (redusert fra 1.4444) */
-  --line-height: 1.4;
-  --fm: calc(1em * var(--line-height));  /* Nick Hill: 1 linjehøyde */
+  --line-height: 1.45;
+  --fm: calc(1em * var(--line-height));  /* 1 linjehøyde */
   --fm-half: calc(0.5 * var(--fm));
   --fm-1: calc(1 * var(--fm));
   --fm-2: calc(2 * var(--fm));
@@ -54,8 +79,9 @@ html {
   --fm-5: calc(5 * var(--fm));           /* Blokkavstand: ~5 linjehøyder */
   --fm-6: calc(6 * var(--fm));
   --fm-8: calc(8 * var(--fm));
-  /* Tekstmål: 34rem = abyme .text-content--large + mellomting */
-  --text-width-desktop: 34rem;
+  /* Tekstmål: proporsjonalt skalert med skriftstørrelsen (39rem ~ 819px ved 21px skrift, ~75–82 tegn per linje) */
+  --text-width-desktop: 39rem;
+  --container-wide: 57rem;
   --secondary-color: rgba(0, 0, 0, 0.62);
   --color: #000;
   --background-color: #fff;
@@ -78,30 +104,69 @@ h1, h2, h3, h4, h5, h6, strong, b {
   font-weight: 400;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
 /* -------------------------------------------------------
-   TYPOGRAFI: Avsnitt
+   TYPOGRAFI: Avsnitt og orddeling
    ------------------------------------------------------- */
 
 p {
   margin-top: 0;
   margin-bottom: 0;
   text-indent: 0;
+  text-wrap: pretty;
+}
+
+li, blockquote {
+  text-wrap: pretty;
+}
+
+/* Automatisk orddeling (hyphenation) for brødtekst */
+p,
+li,
+blockquote,
+.news-content,
+.prose,
+.text-measure,
+.text-measure-left {
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+}
+
+/* Unngå orddeling på overskrifter, navigasjon, knapper og koder */
+h1, h2, h3, h4, h5, h6,
+nav,
+button,
+.no-hyphens,
+code,
+pre {
+  -webkit-hyphens: manual;
+  -ms-hyphens: manual;
+  hyphens: manual;
 }
 
 /* -------------------------------------------------------
    TEKSTMÅL: Midtstilt kolonne med begrenset linjelengde
-   75ch = ~75 tegn per linje — litt luftigere enn minimums-
-   anbefalingen, men naturlig for arkitektur-/designsider.
-   margin: 0 auto sentrerer boksen uavhengig av grid.
    ------------------------------------------------------- */
 
-/* Hjelpeklasse — bruk direkte på tekstcontainere */
 .text-measure {
   max-width: var(--text-width-desktop);
-  width: 100%;              /* sørger for at den ikke blir smalere enn innholdet */
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
-  align-self: center;       /* fungerer i flex-col: sentrerer på tverraksen */
+  align-self: center;
+}
+
+.text-measure-left {
+  max-width: var(--text-width-desktop);
+  width: 100%;
+  margin-left: 0;
+  margin-right: auto;
+  align-self: flex-start;
 }
 
 /* Prosa og nyhetsinnhold */
@@ -109,10 +174,6 @@ p {
 .news-content {
   max-width: var(--text-width-desktop);
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  align-self: center;
-  /* Ingen font-size-override — arver kroppsstørrelse (1rem) */
 }
 
 /* Frittstående avsnitt utenfor grid-kontekst */
@@ -121,7 +182,7 @@ p {
 .prose blockquote,
 .news-content p,
 .news-content li {
-  max-width: 100%; /* arver fra forelder — ingen dobbel cap */
+  max-width: 100%;
 }
 
 /* Redaksjonell tekst: 2em innrykk fra og med 2. paragraf */
@@ -140,6 +201,20 @@ article p {
   margin-bottom: 0 !important;
 }
 
+/* Zak Group Content Wrapper modeller */
+.cw {
+  width: 100%;
+  max-width: var(--text-width-desktop);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cw--wide {
+  width: 100%;
+  max-width: var(--container-wide);
+  margin-left: auto;
+  margin-right: auto;
+}
 
 .px-side-padding {
   padding-left: 1rem;
@@ -148,33 +223,44 @@ article p {
 
 @media (min-width: 768px) {
   .px-side-padding {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .px-side-padding {
     padding-left: 2rem;
     padding-right: 2rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .px-side-padding {
-    /* 3.75rem = abyme-mønsteret: generaus sidemargin som gir
-       bilder rom å puste uten full-bleed effekt */
-    padding-left: 3.75rem;
-    padding-right: 3.75rem;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .px-side-padding {
+    padding-left: 3rem;
+    padding-right: 3rem;
   }
 }
 
 /* -------------------------------------------------------
-   BILDESTØRRELSER (abyme-inspirert):
-   Bilder sentreres med margin: auto.
-   "Full" er ikke 100% lenger, men ~79% av skjermbredden, slik Abyme gjør det.
+   BILDESTØRRELSER (Zak Group / container-basert)
    ------------------------------------------------------- */
-.img-size-full    { width: 79%;    margin-left: auto; margin-right: auto; }
-.img-size-large   { width: 66.66%; margin-left: auto; margin-right: auto; }
-.img-size-medium  { width: 50%;    margin-left: auto; margin-right: auto; }
-.img-size-small   { width: 33.33%; margin-left: auto; margin-right: auto; }
-.img-size-xsmall  { width: 25%;    margin-left: auto; margin-right: auto; }
+.img-size-full    { width: 100%; max-width: var(--container-wide); margin-left: auto; margin-right: auto; }
+.img-size-large   { width: 100%; max-width: var(--container-wide); margin-left: auto; margin-right: auto; }
+.img-size-medium  { width: 100%; max-width: var(--container-wide); margin-left: auto; margin-right: auto; }
+.img-size-small   { width: 100%; max-width: var(--text-width-desktop); margin-left: auto; margin-right: auto; }
+.img-size-xsmall  { width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; }
 
 /* Full-bleed: bryter ut av px-side-padding */
-.img-size-bleed {
+.img-size-bleed,
+.full-bleed-block {
   width: 100vw;
   position: relative;
   left: 50%;
@@ -185,50 +271,21 @@ article p {
 
 /* Global toppmarg for sidetitler og innhold som starter fra toppen av siden */
 .pt-content-top {
-  padding-top: 8.75rem; /* ~5 blanklinjer ved basis font-size, skalerer med vw */
+  padding-top: 8.75rem;
 }
 
-.full-bleed-block {
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+/* -------------------------------------------------------
+   KARUSELL-PEKERE (<, +, >) SOM PÅ PSL
+   Minimalistiske arkitektoniske cursors for bildekaruseller
+   ------------------------------------------------------- */
+.cursor-carousel-prev {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpolyline points='30 12 18 24 30 36'/%3E%3C/g%3E%3Cg stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpolyline points='30 12 18 24 30 36'/%3E%3C/g%3E%3C/svg%3E") 24 24, pointer;
 }
 
-/* Chipperfield Asymmetric Grid (1-2-1-2) */
-.cf-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--spacing-fm, 1.25rem);
-  width: 100%;
-  padding-bottom: 15vw;
+.cursor-carousel-center {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cline x1='24' y1='12' x2='24' y2='36'/%3E%3Cline x1='12' y1='24' x2='36' y2='24'/%3E%3C/g%3E%3Cg stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cline x1='24' y1='12' x2='24' y2='36'/%3E%3Cline x1='12' y1='24' x2='36' y2='24'/%3E%3C/g%3E%3C/svg%3E") 24 24, pointer;
 }
 
-.cf-item {
-  grid-column: span 4; /* Mobile default */
-}
-
-@media (min-width: 768px) {
-  .cf-grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 2rem; /* Litt større gap på desktop for å matche Chipperfield */
-  }
-  
-  .cf-item--center {
-    grid-column: 3 / span 8;
-  }
-  
-  .cf-item--left {
-    grid-column: 1 / span 5;
-  }
-  
-  .cf-item--right {
-    grid-column: 8 / span 5;
-  }
-  
-  .cf-item--offset {
-    margin-top: 15vw;
-  }
+.cursor-carousel-next {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpolyline points='18 12 30 24 18 36'/%3E%3C/g%3E%3Cg stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpolyline points='18 12 30 24 18 36'/%3E%3C/g%3E%3C/svg%3E") 24 24, pointer;
 }

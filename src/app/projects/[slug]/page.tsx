@@ -1,4 +1,10 @@
-import ProjectDetailPage from '../../work/[slug]/page';
+import { permanentRedirect } from 'next/navigation';
 
-export const revalidate = 60;
-export default ProjectDetailPage;
+export default async function LegacyProjectRedirectPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  permanentRedirect(`/work/${slug}`);
+}

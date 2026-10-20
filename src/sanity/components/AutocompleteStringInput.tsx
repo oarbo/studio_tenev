@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState, useMemo } from 'react';
 import { StringInputProps, set, unset, useClient, useFormValue } from 'sanity';
 import { TextInput, Popover, Menu, MenuItem, Box, Text, Button } from '@sanity/ui';
 
+import { apiVersion } from '../env';
+
 // Innebygd SVG-pil for stabilitet
 const ChevronIcon = () => (
   <svg viewBox="0 0 25 25" fill="none" width="1em" height="1em" stroke="currentColor" strokeWidth="1.2">
@@ -11,7 +13,7 @@ const ChevronIcon = () => (
 
 export default function AutocompleteStringInput(props: StringInputProps) {
   const { value, onChange, schemaType, path, id } = props;
-  const client = useClient({ apiVersion: '2023-05-01' });
+  const client = useClient({ apiVersion });
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -19,13 +21,14 @@ export default function AutocompleteStringInput(props: StringInputProps) {
   const documentType = useFormValue(['_type']) as string;
 
   useEffect(() => {
+    let isMounted = true;
     const fetchSuggestions = async () => {
       if (!fieldName || !documentType) return;
       
       const query = `array::unique(*[_type == '${documentType}' && defined(${fieldName})].${fieldName})`;
       try {
         const results = await client.fetch(query);
-        if (Array.isArray(results)) {
+        if (isMounted && Array.isArray(results)) {
           setSuggestions(results.filter(Boolean));
         }
       } catch (error) {
@@ -33,7 +36,11 @@ export default function AutocompleteStringInput(props: StringInputProps) {
       }
     };
     fetchSuggestions();
-  }, [client, fieldName, documentType]);
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fieldName, documentType]);
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {

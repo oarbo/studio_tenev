@@ -17,6 +17,6 @@ export const structure: StructureResolver = (S) =>
         ),
       S.divider(),
       ...S.documentTypeListItems().filter(
-        (listItem) => !['siteSettings', 'studio', 'people', 'applications'].includes(listItem.getId() as string)
+        (listItem) => !['siteSettings', 'studio'].includes(listItem.getId() as string)
       ),
     ])
