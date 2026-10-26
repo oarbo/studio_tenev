@@ -97,6 +97,7 @@ interface ContentBlock {
   title?: string;
   titleEn?: string;
   isDrawings?: boolean;
+  singleSlide?: boolean;
   items?: CarouselMediaItem[];
   images?: (SlideshowImage & { filename?: string })[];
   columnsCount?: string;
@@ -113,6 +114,7 @@ interface ProjectData {
   completionYear?: number;
   buildYear?: number;
   location?: string;
+  country?: string;
   type?: string | string[];
   use?: string | string[];
   status?: string;
@@ -120,6 +122,8 @@ interface ProjectData {
   client?: string;
   contractor?: string;
   photographer?: string;
+  imageCreditType?: string;
+  renderingFirm?: string;
   size?: { value: number; unit: string };
   coverImage?: string;
   coverImageFilename?: string;
@@ -251,26 +255,6 @@ export default async function ProjectDetailPage({
     )
   );
 
-  const metadataFields: { label: string; value: string }[] = [];
-  if (dateStr) metadataFields.push({ label: 'Date', value: dateStr });
-  if (project.location) metadataFields.push({ label: 'Location', value: project.location });
-  if (project.client) metadataFields.push({ label: 'Client', value: project.client });
-  if (combinedTypeTags.length > 0) {
-    metadataFields.push({
-      label: 'Type',
-      value: combinedTypeTags.join(', '),
-    });
-  }
-  if (project.status) metadataFields.push({ label: 'Status', value: project.status });
-  if (project.size?.value) {
-    metadataFields.push({
-      label: 'Size',
-      value: `${project.size.value}\u00A0${(project.size.unit || 'm²').trim()}`,
-    });
-  }
-  if (project.contractor) metadataFields.push({ label: 'Contractor', value: project.contractor });
-  if (project.photographer) metadataFields.push({ label: 'Photographer', value: project.photographer });
-
   // Helper renderer for Data Table (Metadata Block)
   const renderMetadataBlock = (key?: string, style?: React.CSSProperties) => (
     <ProjectMetadataBlock
@@ -281,6 +265,7 @@ export default async function ProjectDetailPage({
       projectTitleEn={project.titleEn}
       dateStr={dateStr}
       location={project.location}
+      country={project.country}
       client={project.client}
       typeTags={combinedTypeTags}
       status={project.status}
@@ -288,6 +273,8 @@ export default async function ProjectDetailPage({
       size={project.size}
       contractor={project.contractor}
       photographer={project.photographer}
+      imageCreditType={project.imageCreditType}
+      renderingFirm={project.renderingFirm}
     />
   );
 
@@ -395,13 +382,20 @@ export default async function ProjectDetailPage({
     }
   }
 
-  const hasExplicitMetadataBlock = Boolean(
-    project.contentBlocks?.some((b) => !b.disabled && b._type === 'metadataBlock')
+  // Filter out disabled blocks and any legacy metadataBlock from sidebygger
+  const activeBlocks = (project.contentBlocks || []).filter(
+    (b) => !b.disabled && b._type !== 'metadataBlock'
   );
+
+  const firstTextBlock = activeBlocks.find(
+    (b) => b._type === 'textBlock' && (b.text || b.title || b.textEn || b.titleEn)
+  );
+  const hasTextBlock = Boolean(firstTextBlock);
 
   const renderGridBlock = (block: ContentBlock) => {
     /* Tekstblokk */
     if (block._type === 'textBlock' && (block.text || block.title || block.textEn || block.titleEn)) {
+      const isMainTextBlock = block._key === firstTextBlock?._key;
       return (
         <div key={block._key} className="md:col-start-3 md:col-span-8 text-[1rem] text-black">
           <ProjectLocalizedTextBlock
@@ -409,6 +403,7 @@ export default async function ProjectDetailPage({
             titleEn={block.titleEn}
             text={block.text}
             textEn={block.textEn}
+            metadataNode={isMainTextBlock ? renderMetadataBlock('main-text-metadata') : undefined}
           />
         </div>
       );
@@ -455,6 +450,7 @@ export default async function ProjectDetailPage({
               muted 
               loop 
               playsInline 
+              preload="auto"
               className="w-full h-full object-cover overflow-hidden" 
             />
           </div>
@@ -522,7 +518,7 @@ export default async function ProjectDetailPage({
                 return (
                   <div key={col._key} className="flex flex-col">
                     <div className="relative w-full bg-gray-100 aspect-video">
-                      <video src={col.videoUrl} autoPlay muted loop playsInline className="w-full h-full object-cover overflow-hidden" />
+                      <video src={col.videoUrl} autoPlay muted loop playsInline preload="auto" className="w-full h-full object-cover overflow-hidden" />
                     </div>
                     {(col.caption || col.captionEn) && (
                       <ProjectLocalizedCaption caption={col.caption} captionEn={col.captionEn} />
@@ -547,15 +543,19 @@ export default async function ProjectDetailPage({
       );
     }
 
-    /* Prosjekt-metadata (Tabell) */
+    /* Prosjekt-metadata (Dersom prosjektet ikke har noen tekstblokk i sidebyggeren) */
     if (block._type === 'metadataBlock') {
-      return renderMetadataBlock(block._key);
+      return (
+        <div key={block._key} className="md:col-start-3 md:col-span-8 text-[1rem] text-black">
+          <div className="text-measure">
+            {renderMetadataBlock(block._key)}
+          </div>
+        </div>
+      );
     }
 
     return null;
   };
-
-  const activeBlocks = (project.contentBlocks || []).filter((b) => !b.disabled);
 
   type SectionItem =
     | { type: 'grid'; id: string; blocks: ContentBlock[] }
@@ -576,7 +576,7 @@ export default async function ProjectDetailPage({
     }
   }
 
-  if (!hasExplicitMetadataBlock && project.contentBlocks && project.contentBlocks.length > 0) {
+  if (!hasTextBlock && activeBlocks.length > 0) {
     currentGridBlocks.push({
       _type: 'metadataBlock',
       _key: 'auto-project-metadata',
@@ -634,7 +634,7 @@ export default async function ProjectDetailPage({
                     <ProjectMediaCarousel 
                       slides={blockSlides} 
                       title={block.title || project.title} 
-                      isDrawings={Boolean(block.isDrawings)} 
+                      singleSlide={Boolean(block.singleSlide || block.isDrawings)} 
                       isInline
                     />
                   </section>
@@ -654,10 +654,21 @@ export default async function ProjectDetailPage({
           /* Fallback Layout if contentBlocks array is empty */
           <div id="project-details" className="px-side-padding mb-[4.75rem] md:mb-[6rem]">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
-              {project.body && (
+              {project.body ? (
                 <div className="md:col-start-3 md:col-span-8 text-[1rem] text-black">
-                  <div className="news-content !m-0 !max-w-none">
-                    <PortableText value={project.body} />
+                  <div className="text-measure">
+                    <div className="news-content !m-0 !max-w-none text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                      <PortableText value={project.body} />
+                    </div>
+                    <div className="mt-[1.5em]">
+                      {renderMetadataBlock('fallback-metadata')}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="md:col-start-3 md:col-span-8 text-[1rem] text-black">
+                  <div className="text-measure">
+                    {renderMetadataBlock('fallback-metadata')}
                   </div>
                 </div>
               )}
@@ -693,9 +704,6 @@ export default async function ProjectDetailPage({
                   ))}
                 </div>
               )}
-
-              {/* Data Table Metadata Block at the bottom */}
-              {renderMetadataBlock('fallback-metadata', { marginTop: project.body ? 'calc(2.5 * var(--fm))' : '0' })}
             </div>
           </div>
         )}
@@ -703,7 +711,7 @@ export default async function ProjectDetailPage({
         {/* 3. DRAWINGS & PLANS CAROUSEL (Dersom definert fra legacy galleri) */}
         {drawingSlides.length > 0 && (
           <section className="w-full flex flex-col mb-[4.75rem] md:mb-[6rem]">
-            <ProjectMediaCarousel slides={drawingSlides} title={project.title} isDrawings={true} />
+            <ProjectMediaCarousel slides={drawingSlides} title={project.title} singleSlide={true} />
           </section>
         )}
 

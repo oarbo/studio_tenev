@@ -111,7 +111,7 @@ export default async function ProjectsPage() {
     image: p.coverImage
       ? {
           url: p.coverImage,
-          aspectRatio: p.coverImageAspectRatio || 1,
+          aspectRatio: p.coverImageAspectRatio || 1.4,
           lqip: p.coverImageLqip,
           hotspot: p.coverImageHotspot,
         }

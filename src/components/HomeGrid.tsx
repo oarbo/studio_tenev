@@ -4,6 +4,7 @@ import type { TypedObject } from '@portabletext/types';
 import SanityImage, { SanityHotspot } from './SanityImage';
 import Link from 'next/link';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { formatTypography } from '@/utils/typography';
 
 export interface GridItemRef {
   _id: string;
@@ -128,7 +129,7 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                 {/* Text Layer (Below Image) */}
                 <div className="mt-4 flex flex-col items-start justify-start">
                   {/* Meta info ABOVE title */}
-                  <div className="text-[0.875rem] leading-[1.3] text-black mb-2 flex flex-row flex-wrap gap-x-4">
+                  <div className="text-[0.875rem] leading-[1.3] text-black mb-[calc(0.5rem-5px)] flex flex-row flex-wrap gap-x-4">
                     <span>
                       {item._type === 'news'
                         ? (item.tag ? translateTag(item.tag) : (locale === 'en' ? 'News' : 'Nyhet'))
@@ -146,8 +147,8 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                   </div>
                   
                   {/* Title */}
-                  <h2 className="m-0 text-[1.33rem] leading-[1.3] text-black font-normal">
-                    {(locale === 'en' && item.titleEn) ? item.titleEn : item.title}
+                  <h2 className="m-0 text-[1.33rem] leading-[calc(1.33rem*1.3-4px)] text-black font-normal">
+                    {formatTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title)}
                   </h2>
                 </div>
               </Link>

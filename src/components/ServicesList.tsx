@@ -170,7 +170,7 @@ export default function ServicesList() {
                 aria-expanded={isActive}
                 className="w-full text-left pt-1.5 pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none group"
               >
-                <div className="text-black text-[1rem] group-hover:opacity-70 transition-opacity">
+                <div className="text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) group-hover:opacity-70 transition-opacity">
                   {title}
                 </div>
               </button>
@@ -184,7 +184,7 @@ export default function ServicesList() {
                 }`}
               >
                 <div className="overflow-hidden min-h-0">
-                  <div className="w-full pb-6 md:pb-8 pt-1 flex flex-col gap-4 text-black text-[1rem]">
+                  <div className="w-full pb-6 md:pb-8 pt-1 flex flex-col gap-4 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                     {description.split('\n\n').map((para, i) => (
                       <p key={i} className="leading-(--line-height)">
                         {para}
@@ -199,7 +199,7 @@ export default function ServicesList() {
       })}
 
       {/* Avsluttende CTA */}
-      <div className="mt-[calc(2*var(--fm))]">
+      <div className="mt-[calc(2*var(--fm))] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
         <Link
           href="/kontakt"
           className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block"

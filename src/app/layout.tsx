@@ -132,7 +132,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="font-sans text-base antialiased bg-white text-black min-h-full flex flex-col">
-        <LanguageProvider>
+        <LanguageProvider customTagTranslations={settings?.tagTranslations}>
           <WorkCategoryProvider>
             {children}
             {showGridOverlay && <GridOverlay />}

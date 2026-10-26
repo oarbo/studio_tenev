@@ -62,7 +62,7 @@ function renderTextWithEmail(text: string) {
         <a
           key={i}
           href={`mailto:${part}`}
-          className="underline underline-offset-4 hover:opacity-70 transition-opacity"
+          className="underline underline-offset-4 hover:opacity-70 transition-opacity whitespace-nowrap"
         >
           {part}
         </a>
@@ -97,15 +97,15 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
                     <div className="text-measure" lang={locale === 'en' ? 'en-GB' : 'nb'}>
                       {displayTitle && (
-                        <h2 className="font-normal mb-4">{displayTitle}</h2>
+                        <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       )}
                       {displayText && (
-                        <div className="news-content !m-0 !max-w-none" lang={locale === 'en' ? 'en-GB' : 'nb'}>
+                        <div className="news-content !m-0 !max-w-none text-[1.125rem] md:text-[1.2rem] leading-(--line-height)" lang={locale === 'en' ? 'en-GB' : 'nb'}>
                           <PortableText value={formatPortableText(displayText) || displayText} />
                         </div>
                       )}
                       {isIntroBlock && (
-                        <div className="mt-[calc(2*var(--fm))] flex flex-col gap-[calc(0.5*var(--fm))] !indent-0 [text-indent:0]">
+                        <div className="mt-[calc(2*var(--fm))] flex flex-col gap-[calc(0.5*var(--fm))] !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                           <div>
                             <Link
                               href="/tjenester"
@@ -129,68 +129,68 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 );
               }
 
-              /* Bildeblokk */
+              /* Bildeblokk (låst til samme bredde som teksten) */
               if (block._type === 'imageBlock' && block.image) {
-                const { gridClass, sizes } = studioImageGridClass(block.size);
                 const displayCaption = (locale === 'en' && block.captionEn) ? block.captionEn : block.caption;
 
                 return (
-                  <div key={block._key} className={`${gridClass} group`}>
-                    <div
-                      className="relative w-full bg-gray-100"
-                      style={{ aspectRatio: block.imageAspectRatio || 1.33 }}
-                    >
-                      <SanityImage
-                        src={block.image}
-                        alt={displayCaption || 'Studio bilde'}
-                        fill
-                        lqip={block.imageLqip}
-                        hotspot={block.imageHotspot}
-                        className="object-cover"
-                        sizes={sizes}
-                      />
-                    </div>
-                    {displayCaption && (
+                  <div key={block._key} className="md:col-start-3 md:col-span-8">
+                    <div className="text-measure group">
                       <div
-                        className="mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height)"
-                        style={{ color: 'var(--secondary-color)' }}
+                        className="relative w-full bg-gray-100"
+                        style={{ aspectRatio: block.imageAspectRatio || 1.33 }}
                       >
-                        {displayCaption}
+                        <SanityImage
+                          src={block.image}
+                          alt={displayCaption || 'Studio bilde'}
+                          fill
+                          lqip={block.imageLqip}
+                          hotspot={block.imageHotspot}
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, var(--text-width-desktop)"
+                        />
                       </div>
-                    )}
+                      {displayCaption && (
+                        <div
+                          className="mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height)"
+                          style={{ color: 'var(--secondary-color)' }}
+                        >
+                          {displayCaption}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               }
 
-              /* Videoblokk */
+              /* Videoblokk (låst til samme bredde som teksten) */
               if (block._type === 'videoBlock' && block.videoUrl) {
-                const { gridClass } = studioImageGridClass(block.size);
                 const displayCaption = (locale === 'en' && block.captionEn) ? block.captionEn : block.caption;
 
                 return (
-                  <div key={block._key} className={`${gridClass} group`}>
-                    <div className="relative w-full bg-gray-100 aspect-video">
-                      <video
-                        src={block.videoUrl}
-                        width={1280}
-                        height={720}
-                        loading="lazy"
-                        preload="metadata"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    {displayCaption && (
-                      <div
-                        className="mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height)"
-                        style={{ color: 'var(--secondary-color)' }}
-                      >
-                        {displayCaption}
+                  <div key={block._key} className="md:col-start-3 md:col-span-8">
+                    <div className="text-measure group">
+                      <div className="relative w-full bg-gray-100 aspect-video">
+                        <video
+                          src={block.videoUrl}
+                          width={1280}
+                          height={720}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="w-full h-full object-cover overflow-hidden"
+                        />
                       </div>
-                    )}
+                      {displayCaption && (
+                        <div
+                          className="mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height)"
+                          style={{ color: 'var(--secondary-color)' }}
+                        >
+                          {displayCaption}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               }
@@ -217,8 +217,8 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
-                    <div className="text-measure">
-                      <h2 className="font-normal mb-4">{displayTitle}</h2>
+                    <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <ul className="flex flex-col">
                         {names.map((name, i) => (
                           <li key={i}>{name}</li>
@@ -235,8 +235,8 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
-                    <div className="text-measure">
-                      <h2 className="font-normal mb-4">{displayTitle}</h2>
+                    <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <ul className="flex flex-col">
                         {block.items.map((item, i) => (
                           <li key={i}>{item}</li>
@@ -254,9 +254,9 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
-                    <div className="text-measure">
-                      <h2 className="font-normal mb-4">{displayTitle}</h2>
-                      <p className="whitespace-pre-wrap leading-(--line-height)">
+                    <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                      <p className="whitespace-pre-wrap">
                         {renderTextWithEmail(displayText || '')}
                       </p>
                     </div>
@@ -275,15 +275,15 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
-                    <div className="text-measure">
-                      <h2 className="font-normal mb-8">{displayTitle}</h2>
+                    <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                      <h2 className="font-normal mb-8 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <div className="mb-8">
                         <div>{sName}</div>
                         {addr && <div className="whitespace-pre-wrap">{addr}</div>}
                       </div>
                       <div className="mb-8">
-                        {mail && <div><a href={`mailto:${mail}`} className="hover:opacity-70 transition-opacity">{mail}</a></div>}
-                        {ph   && <div><a href={`tel:${ph}`}       className="hover:opacity-70 transition-opacity">{ph}</a></div>}
+                        {mail && <div><a href={`mailto:${mail}`} className="hover:opacity-70 transition-opacity whitespace-nowrap">{mail}</a></div>}
+                        {ph   && <div><a href={`tel:${ph}`}       className="hover:opacity-70 transition-opacity whitespace-nowrap">{ph}</a></div>}
                       </div>
                       {insta && (
                         <div>
@@ -306,8 +306,8 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
         <div className="px-side-padding pt-content-top">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
             <div className="md:col-start-3 md:col-span-8">
-              <div className="text-measure">
-                <h1 className="font-normal mb-4">
+              <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                <h1 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                   {locale === 'en' ? 'Studio Tenev — Architects Bergen' : 'Studio Tenev — Arkitekt Bergen'}
                 </h1>
                 <p>
@@ -315,7 +315,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                     ? 'Studio Tenev is an architecture practice established in 2024 by Daniel Tenev, based in the heart of Bergen, Norway. We work on a wide range of projects, from interior architecture and renovation to new construction, private houses, cabins, office buildings, and public and cultural spaces.'
                     : 'Studio Tenev er et arkitektkontor etablert i 2024 av Daniel Tenev, med base i hjertet av Bergen sentrum. Vi arbeider med et bredt spekter av prosjekter, fra interiørarkitektur og rehabilitering til nybygg, eneboliger, hytter, kontorbygg og offentlige og kulturelle bygg.'}
                 </p>
-                <div className="mt-[calc(2*var(--fm))] flex flex-col gap-[calc(0.5*var(--fm))] !indent-0 [text-indent:0]">
+                <div className="mt-[calc(2*var(--fm))] flex flex-col gap-[calc(0.5*var(--fm))] !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                   <div>
                     <Link
                       href="/tjenester"

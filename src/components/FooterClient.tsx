@@ -98,8 +98,8 @@ export default function FooterClient({
       <div className="md:col-start-8 md:col-span-2">
         <h3 className="mb-[0.7em]">{t('contact')}</h3>
         <ul className="flex flex-col gap-0">
-          <li>{contactEmail}</li>
-          <li>{phone}</li>
+          <li className="whitespace-nowrap">{contactEmail}</li>
+          <li className="whitespace-nowrap">{phone}</li>
           <li className="mt-[1.4em]">
             &copy; {studioName} {currentYear}
           </li>

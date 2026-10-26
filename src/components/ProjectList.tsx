@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import SanityImage, { SanityHotspot } from './SanityImage';
 import { formatTypography, formatYearRange } from '@/utils/typography';
@@ -94,18 +94,20 @@ function ClampedText({
     }
 
     const compute = () => {
-      // Temporarily render full text to check if it overflows
-      el.textContent = text;
-      const computed = window.getComputedStyle(el);
-      const lineHeight = parseFloat(computed.lineHeight) || 24;
-      const maxHeight = lineHeight * maxLines + 1.5;
+      // 1. Measure true single line height
+      el.textContent = '\u00A0';
+      const singleLineHeight = el.scrollHeight || 24;
+      // Allow up to maxLines (e.g. 6 lines), but strictly not an extra 7th line
+      const maxAllowedHeight = Math.floor(singleLineHeight * maxLines) + 2;
 
-      if (el.scrollHeight <= maxHeight) {
+      // 2. Temporarily render full text to check if it fits within maxLines
+      el.textContent = text;
+      if (el.scrollHeight <= maxAllowedHeight) {
         setDisplayText(text);
         return;
       }
 
-      // Overflows maxLines: binary search for max whole words that fit with trailing " …"
+      // 3. Overflows maxLines: binary search for max words that fit with non-breaking ellipsis "\u00A0…"
       const words = text.split(/\s+/).filter(Boolean);
       let low = 0;
       let high = words.length;
@@ -113,8 +115,8 @@ function ClampedText({
 
       while (low <= high) {
         const mid = Math.floor((low + high) / 2);
-        el.textContent = words.slice(0, mid).join(' ') + ' …';
-        if (el.scrollHeight <= maxHeight) {
+        el.textContent = words.slice(0, mid).join(' ') + '\u00A0…';
+        if (el.scrollHeight <= maxAllowedHeight) {
           best = mid;
           low = mid + 1;
         } else {
@@ -123,11 +125,20 @@ function ClampedText({
       }
 
       if (best > 0 && best < words.length) {
-        const candidateWords = words.slice(0, best);
-        const lastIdx = candidateWords.length - 1;
-        // Strip trailing punctuation before ellipsis so we never get "ord, …"
-        candidateWords[lastIdx] = candidateWords[lastIdx].replace(/[,.;:–—\s]+$/, '');
-        setDisplayText(candidateWords.join(' ') + ' …');
+        let candidateWords = words.slice(0, best);
+        candidateWords[candidateWords.length - 1] = candidateWords[candidateWords.length - 1].replace(/[,.;:–—\s]+$/, '');
+        let candidateText = candidateWords.join(' ') + '\u00A0…';
+        el.textContent = candidateText;
+
+        // Verify and pull back word if ellipsis causes it to spill onto line 7
+        while (candidateWords.length > 1 && el.scrollHeight > maxAllowedHeight) {
+          candidateWords.pop();
+          candidateWords[candidateWords.length - 1] = candidateWords[candidateWords.length - 1].replace(/[,.;:–—\s]+$/, '');
+          candidateText = candidateWords.join(' ') + '\u00A0…';
+          el.textContent = candidateText;
+        }
+
+        setDisplayText(candidateText);
       } else {
         setDisplayText(text);
       }
@@ -144,7 +155,16 @@ function ClampedText({
   }, [text, maxLines]);
 
   return (
-    <p ref={containerRef} className={className}>
+    <p
+      ref={containerRef}
+      className={`line-clamp-6 ${className || ''}`}
+      style={{
+        display: '-webkit-box',
+        WebkitLineClamp: maxLines,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+      }}
+    >
       {displayText}
     </p>
   );
@@ -346,7 +366,7 @@ export default function ProjectList({
                     </div>
 
                     {/* Size (hidden on mobile) */}
-                    <div className="hidden md:block md:col-span-1 whitespace-nowrap group-hover:opacity-70 transition-opacity">
+                    <div className="hidden md:block md:col-span-1 tabular-nums whitespace-nowrap group-hover:opacity-70 transition-opacity">
                       {item.size?.value ? `${item.size.value}\u00A0${(item.size.unit || 'm²').trim()}` : ''}
                     </div>
 
@@ -375,7 +395,7 @@ export default function ProjectList({
                     </div>
 
                     {/* Size (hidden on mobile) */}
-                    <div className="hidden md:block md:col-span-1 whitespace-nowrap">
+                    <div className="hidden md:block md:col-span-1 tabular-nums whitespace-nowrap">
                       {item.size?.value ? `${item.size.value}\u00A0${(item.size.unit || 'm²').trim()}` : ''}
                     </div>
 
@@ -391,66 +411,60 @@ export default function ProjectList({
                   </div>
                 )}
 
-                {/* Expanded Content with smooth CSS Grid slide animation (only for expandable projects) */}
-                {isExpandable && (
-                  <div
-                    className={`col-span-2 md:col-start-3 md:col-span-8 grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                      isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'
-                    }`}
-                  >
-                    <div className="overflow-hidden min-h-0">
-                      <div className="grid grid-cols-1 md:grid-cols-8 gap-x-fm-1 pb-8 md:pb-10">
-                        {/* Left Column (Col 3–4): Thumbnail Image if available */}
-                        <div className="md:col-span-2 mb-6 md:mb-0 md:pr-4 md:pt-[0.28em]">
-                          {item.coverImage ? (
-                            <div
-                              className="relative w-full overflow-hidden bg-gray-50"
-                              style={{ aspectRatio: item.coverImageAspectRatio || 1.33 }}
+                {/* Expanded Content (snappy & instantaneous) */}
+                {isExpandable && isExpanded && (
+                  <div className="col-span-2 md:col-start-3 md:col-span-8">
+                    <div className="grid grid-cols-1 md:grid-cols-8 gap-x-fm-1 pb-8 md:pb-10">
+                      {/* Left Column (Col 3–4): Thumbnail Image if available */}
+                      <div className="md:col-span-2 mb-6 md:mb-0 md:pr-4 md:pt-[0.28em]">
+                        {item.coverImage ? (
+                          <div
+                            className="relative w-full overflow-hidden bg-gray-50"
+                            style={{ aspectRatio: item.coverImageAspectRatio || 1.33 }}
+                          >
+                            <SanityImage
+                              src={item.coverImage}
+                              alt={item.coverImageAlt || displayTitle}
+                              fill
+                              lqip={item.coverImageLqip}
+                              hotspot={item.coverImageHotspot}
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, 25vw"
+                            />
+                          </div>
+                        ) : null}
+                      </div>
+
+                      {/* Right Column (Col 5–10): Description & Link */}
+                      <div
+                        className="md:col-span-6 flex flex-col items-start"
+                        style={{ gap: 'var(--fm-half)' }}
+                      >
+                        {(displaySummary || item.body) && (
+                          displaySummary ? (
+                            <ClampedText
+                              text={formatTypography(displaySummary)}
+                              maxLines={6}
+                              className="text-measure-left"
+                            />
+                          ) : (
+                            <div className="text-measure-left line-clamp-6">
+                              {item.body}
+                            </div>
+                          )
+                        )}
+
+                        {canVisitProjectPage && projectHref && (
+                          <div>
+                            <Link
+                              href={projectHref}
+                              prefetch={true}
+                              className="inline-block border-b border-black hover:opacity-60 transition-opacity"
                             >
-                              <SanityImage
-                                src={item.coverImage}
-                                alt={item.coverImageAlt || displayTitle}
-                                fill
-                                lqip={item.coverImageLqip}
-                                hotspot={item.coverImageHotspot}
-                                className="object-cover"
-                                sizes="(max-width: 768px) 100vw, 25vw"
-                              />
-                            </div>
-                          ) : null}
-                        </div>
-
-                        {/* Right Column (Col 5–10): Description & Link */}
-                        <div
-                          className="md:col-span-6 flex flex-col items-start"
-                          style={{ gap: 'var(--fm-half)' }}
-                        >
-                          {(displaySummary || item.body) && (
-                            displaySummary ? (
-                              <ClampedText
-                                text={formatTypography(displaySummary)}
-                                maxLines={6}
-                                className="text-measure-left"
-                              />
-                            ) : (
-                              <div className="text-measure-left line-clamp-6">
-                                {item.body}
-                              </div>
-                            )
-                          )}
-
-                          {canVisitProjectPage && projectHref && (
-                            <div>
-                              <Link
-                                href={projectHref}
-                                prefetch={true}
-                                className="inline-block border-b border-black hover:opacity-60 transition-opacity"
-                              >
-                                {t('goToProject')}
-                              </Link>
-                            </div>
-                          )}
-                        </div>
+                              {t('goToProject')}
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

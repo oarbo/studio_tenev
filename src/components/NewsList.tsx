@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import SanityImage, { SanityHotspot } from './SanityImage';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { formatTypography } from '@/utils/typography';
 
 export interface ExpandingListItem {
   _id: string;
@@ -87,7 +88,7 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
 
                 {/* Title (Original plassering: Kolonne 3-8 på desktop) */}
                 <div className="md:col-span-6 text-black text-[1rem] group-hover:opacity-70 transition-opacity">
-                  {(locale === 'en' && item.titleEn) ? item.titleEn : item.title}
+                  {formatTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title)}
                 </div>
               </button>
 

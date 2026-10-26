@@ -75,5 +75,44 @@ export default defineType({
       type: 'boolean',
       initialValue: false,
     }),
+    defineField({
+      name: 'tagTranslations',
+      title: 'Tag-oversettelser (Underkategorier)',
+      description: 'Legg til eller overstyr oversettelser fra norsk til engelsk for tags og underkategorier. Gjelder automatisk for alle prosjekter på siden.',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          name: 'tagPair',
+          title: 'Oversettelse',
+          fields: [
+            defineField({
+              name: 'no',
+              title: 'Norsk tag (f.eks. Tilbygg)',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'en',
+              title: 'Engelsk oversettelse (f.eks. Extension)',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: {
+              title: 'no',
+              subtitle: 'en',
+            },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || 'Uten navn',
+                subtitle: subtitle ? `→ ${subtitle}` : 'Mangler engelsk',
+              };
+            },
+          },
+        },
+      ],
+    }),
   ],
 })

@@ -2,17 +2,17 @@
 
 @theme {
   --font-sans: "neue-haas-unica", sans-serif;
-  /* Spacing tokens basert på rem (proporsjonalt med 1.45 linjehøyde) */
-  --spacing-fm: 1.45rem;    /* Standard horisontal/vertikal grunnenhet */
-  --spacing-fm-1: 1.45rem;  /* 1 linjehøyde */
-  --spacing-fm-2: 2.9rem;   /* 2 linjehøyder */
-  --spacing-fm-3: 4.35rem;
-  --spacing-fm-4: 5.8rem;
-  --spacing-fm-5: 7.25rem;  /* ~5 blanke linjer */
-  --spacing-fm-6: 8.7rem;
-  --spacing-fm-7: 10.15rem;
-  --spacing-fm-8: 11.6rem;
-  --spacing-fm-9: 13.05rem;
+  /* Spacing tokens basert på rem (proporsjonalt med 1.35 linjehøyde) */
+  --spacing-fm: 1.35rem;    /* Standard horisontal/vertikal grunnenhet */
+  --spacing-fm-1: 1.35rem;  /* 1 linjehøyde */
+  --spacing-fm-2: 2.7rem;   /* 2 linjehøyder */
+  --spacing-fm-3: 4.05rem;
+  --spacing-fm-4: 5.4rem;
+  --spacing-fm-5: 6.75rem;  /* ~5 blanke linjer */
+  --spacing-fm-6: 8.1rem;
+  --spacing-fm-7: 9.45rem;
+  --spacing-fm-8: 10.8rem;
+  --spacing-fm-9: 12.15rem;
   --spacing-side-padding: 2rem;
 }
 
@@ -69,7 +69,7 @@ html {
    ------------------------------------------------------- */
 
 :root {
-  --line-height: 1.45;
+  --line-height: 1.35;
   --fm: calc(1em * var(--line-height));  /* 1 linjehøyde */
   --fm-half: calc(0.5 * var(--fm));
   --fm-1: calc(1 * var(--fm));
@@ -79,8 +79,10 @@ html {
   --fm-5: calc(5 * var(--fm));           /* Blokkavstand: ~5 linjehøyder */
   --fm-6: calc(6 * var(--fm));
   --fm-8: calc(8 * var(--fm));
-  /* Tekstmål: proporsjonalt skalert med skriftstørrelsen (39rem ~ 819px ved 21px skrift, ~75–82 tegn per linje) */
-  --text-width-desktop: 39rem;
+  /* Tekstmål: proporsjonalt skalert med skriftstørrelsen (42rem ~ 882px ved 21px skrift, ~80–87 tegn per linje) */
+  --text-width-desktop: 42rem;
+  /* Tekstmål for forkortet tekst i lister (~15 tegn kortere linjelengde for behagelig lesing) */
+  --text-width-list: 34rem;
   --container-wide: 57rem;
   --secondary-color: rgba(0, 0, 0, 0.62);
   --color: #000;
@@ -96,7 +98,6 @@ body {
   line-height: var(--line-height);
   text-transform: none;
   letter-spacing: -0.005em;
-  font-feature-settings: "pnum";
   -webkit-font-smoothing: antialiased;
 }
 
@@ -117,13 +118,17 @@ p {
   margin-bottom: 0;
   text-indent: 0;
   text-wrap: pretty;
+  hanging-punctuation: first last;
+  -webkit-hanging-punctuation: first last;
 }
 
 li, blockquote {
   text-wrap: pretty;
+  hanging-punctuation: first last;
+  -webkit-hanging-punctuation: first last;
 }
 
-/* Automatisk orddeling (hyphenation) for brødtekst */
+/* Balansert form på avsnitt: konservativ automatisk orddeling */
 p,
 li,
 blockquote,
@@ -134,7 +139,11 @@ blockquote,
   -webkit-hyphens: auto;
   -ms-hyphens: auto;
   hyphens: auto;
-  hyphenate-limit-chars: 6 3 3;
+  /* Minst 10 tegn i ordet, minst 4 før og 4 etter bindestrek */
+  hyphenate-limit-chars: 10 4 4;
+  -webkit-hyphenate-limit-lines: 1;
+  hyphenate-limit-lines: 1;
+  hyphenate-limit-last: always;
 }
 
 /* Unngå orddeling på overskrifter, navigasjon, knapper og koder */
@@ -149,6 +158,30 @@ pre {
   hyphens: manual;
 }
 
+/* Eposter, telefonnumre og kontaktinfo skal ALDRI orddeles eller brytes over linjer */
+a[href^="mailto:"],
+a[href^="tel:"],
+.nowrap,
+.whitespace-nowrap {
+  white-space: nowrap !important;
+  -webkit-hyphens: none !important;
+  -ms-hyphens: none !important;
+  hyphens: none !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+}
+
+/* Faste 16px avstandsklasser */
+.mt-16px {
+  margin-top: 16px !important;
+}
+.mb-16px {
+  margin-bottom: 16px !important;
+}
+.gap-y-16px {
+  row-gap: 16px !important;
+}
+
 /* -------------------------------------------------------
    TEKSTMÅL: Midtstilt kolonne med begrenset linjelengde
    ------------------------------------------------------- */
@@ -159,14 +192,16 @@ pre {
   margin-left: auto;
   margin-right: auto;
   align-self: center;
+  line-height: var(--line-height);
 }
 
 .text-measure-left {
-  max-width: var(--text-width-desktop);
+  max-width: var(--text-width-list);
   width: 100%;
   margin-left: 0;
   margin-right: auto;
   align-self: flex-start;
+  line-height: var(--line-height);
 }
 
 /* Prosa og nyhetsinnhold */
@@ -174,6 +209,7 @@ pre {
 .news-content {
   max-width: var(--text-width-desktop);
   width: 100%;
+  line-height: var(--line-height);
 }
 
 /* Frittstående avsnitt utenfor grid-kontekst */
@@ -276,16 +312,68 @@ article p {
 
 /* -------------------------------------------------------
    KARUSELL-PEKERE (<, +, >) SOM PÅ PSL
-   Minimalistiske arkitektoniske cursors for bildekaruseller
+   Minimalistiske arkitektoniske cursors for bildekaruseller (rene sorte linjer uten hvit kant)
    ------------------------------------------------------- */
 .cursor-carousel-prev {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpolyline points='30 12 18 24 30 36'/%3E%3C/g%3E%3Cg stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpolyline points='30 12 18 24 30 36'/%3E%3C/g%3E%3C/svg%3E") 24 24, pointer;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpolyline points='30 12 18 24 30 36' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") 24 24, pointer;
 }
 
 .cursor-carousel-center {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cline x1='24' y1='12' x2='24' y2='36'/%3E%3Cline x1='12' y1='24' x2='36' y2='24'/%3E%3C/g%3E%3Cg stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cline x1='24' y1='12' x2='24' y2='36'/%3E%3Cline x1='12' y1='24' x2='36' y2='24'/%3E%3C/g%3E%3C/svg%3E") 24 24, pointer;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cline x1='24' y1='14' x2='24' y2='34' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cline x1='14' y1='24' x2='34' y2='24' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") 24 24, pointer;
 }
 
 .cursor-carousel-next {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg stroke='%23ffffff' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpolyline points='18 12 30 24 18 36'/%3E%3C/g%3E%3Cg stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpolyline points='18 12 30 24 18 36'/%3E%3C/g%3E%3C/svg%3E") 24 24, pointer;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpolyline points='18 12 30 24 18 36' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") 24 24, pointer;
 }
+
+/* -------------------------------------------------------
+   RESPONSIV KARUSELL-HØYDE & BALANSERT LUFT (OVER/UNDER)
+   Holder avstanden over og under bildet relativt lik uansett vindushøyde på desktop,
+   slik at neste seksjon (listen / teksten) alltid titter frem 'above the fold'.
+   Definert globalt på :root slik at alle karuseller på tvers av hele nettsiden
+   har nøyaktig samme konsistente høyde.
+   ------------------------------------------------------- */
+:root {
+  --carousel-space: clamp(4.5rem, 12vh, 8rem);
+  --carousel-h: 54vh;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --carousel-h: 64vh;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --carousel-space: clamp(4.5rem, 12vh, 8rem);
+    --carousel-space: clamp(4.5rem, 12dvh, 8rem);
+    --carousel-h: max(220px, calc(100vh - (2 * var(--carousel-space)) - 3.5rem));
+    --carousel-h: max(220px, calc(100dvh - (2 * var(--carousel-space)) - 3.5rem));
+  }
+}
+
+.carousel-hero-container {
+  --carousel-space: clamp(4.5rem, 12vh, 8rem);
+  --carousel-h: 54vh;
+}
+
+@media (min-width: 640px) {
+  .carousel-hero-container {
+    --carousel-h: 64vh;
+  }
+}
+
+@media (min-width: 768px) {
+  .carousel-hero-container {
+    --carousel-space: clamp(4.5rem, 12vh, 8rem);
+    --carousel-space: clamp(4.5rem, 12dvh, 8rem);
+    --carousel-h: max(220px, calc(100vh - (2 * var(--carousel-space)) - 3.5rem));
+    --carousel-h: max(220px, calc(100dvh - (2 * var(--carousel-space)) - 3.5rem));
+    padding-top: var(--carousel-space) !important;
+    padding-bottom: var(--carousel-space) !important;
+  }
+}
+
+
+

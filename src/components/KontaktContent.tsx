@@ -13,13 +13,13 @@ export default function KontaktContent() {
     <div className="w-full px-side-padding pt-content-top mb-42">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
         <div className="md:col-start-3 md:col-span-8">
-          <div className="text-measure flex flex-col">
+          <div className="text-measure flex flex-col text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
             {isSubmitted ? (
               <div className="flex flex-col">
-                <h1 className="font-normal mb-4">
+                <h1 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                   {isEn ? 'Thank you for reaching out' : 'Takk for din henvendelse'}
                 </h1>
-                <p className="mb-6 leading-(--line-height)">
+                <p className="mb-6">
                   {isEn
                     ? 'We have received your message and will get back to you as soon as possible to discuss your project.'
                     : 'Vi har mottatt meldingen din og vil ta kontakt så snart som mulig for å diskutere prosjektet.'}
@@ -28,7 +28,7 @@ export default function KontaktContent() {
                   <button
                     type="button"
                     onClick={() => setIsSubmitted(false)}
-                    className="text-black underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer text-[1rem]"
+                    className="text-black underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer text-[1.125rem] md:text-[1.2rem]"
                   >
                     {isEn ? 'Send another inquiry →' : 'Send en ny henvendelse →'}
                   </button>
@@ -36,7 +36,7 @@ export default function KontaktContent() {
               </div>
             ) : (
               <>
-                <h1 className="font-normal mb-4">
+                <h1 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                   {isEn ? 'Contact' : 'Kontakt'}
                 </h1>
 

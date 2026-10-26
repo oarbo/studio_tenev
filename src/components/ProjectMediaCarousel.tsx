@@ -23,6 +23,7 @@ interface ProjectMediaCarouselProps {
   slides: ProjectMediaSlide[];
   title?: string;
   isDrawings?: boolean;
+  singleSlide?: boolean;
   isInline?: boolean;
 }
 
@@ -33,12 +34,13 @@ interface ProjectMediaCarouselProps {
 function ProjectMediaStaticView({
   slide,
   title,
-  isDrawings = false,
+  singleSlide = false,
   isInline = false,
 }: {
   slide: ProjectMediaSlide;
   title?: string;
   isDrawings?: boolean;
+  singleSlide?: boolean;
   isInline?: boolean;
 }) {
   const aspectRatio = slide.aspectRatio || 1.4;
@@ -48,27 +50,25 @@ function ProjectMediaStaticView({
       className={`w-full bg-white ${
         isInline
           ? 'py-4 md:py-6'
-          : isDrawings
-          ? 'pt-12 md:pt-16 pb-16 md:pb-24'
-          : 'pt-20 md:pt-32 pb-16 md:pb-24'
-      } overflow-hidden relative select-none cursor-default [--carousel-h:50vh] sm:[--carousel-h:58vh] md:[--carousel-h:70vh]`}
+          : 'carousel-hero-container pt-20 pb-16'
+      } overflow-hidden relative select-none cursor-default`}
     >
       <div
         className="w-full flex justify-center items-center h-[var(--carousel-h)]"
         style={{ height: 'var(--carousel-h)' }}
       >
         <div
-          className="relative select-none h-[var(--carousel-h)]"
-          style={{
-            width: `calc(var(--carousel-h) * ${aspectRatio})`,
-            maxWidth: '86vw',
-            height: 'var(--carousel-h)',
-          }}
+          className="relative select-none h-[var(--carousel-h)] max-w-[86vw]"
+          style={
+            {
+              '--aspect': aspectRatio,
+              width: `calc(var(--carousel-h) * ${aspectRatio})`,
+              height: 'var(--carousel-h)',
+            } as React.CSSProperties
+          }
         >
           <div
-            className={`relative w-full h-full overflow-hidden ${
-              isDrawings ? 'bg-white' : 'bg-gray-50'
-            }`}
+            className="relative w-full h-full overflow-hidden bg-white"
             style={{ height: 'var(--carousel-h)' }}
           >
             {slide.videoUrl ? (
@@ -79,7 +79,13 @@ function ProjectMediaStaticView({
                 muted
                 loop
                 playsInline
-                className="w-full h-full object-cover select-none pointer-events-none"
+                preload="auto"
+                ref={(el) => {
+                  if (el && el.paused) {
+                    el.play().catch(() => {});
+                  }
+                }}
+                className={`w-full h-full ${singleSlide ? 'object-contain' : 'object-cover'} select-none pointer-events-none`}
               />
             ) : slide.url ? (
               <SanityImage
@@ -90,7 +96,7 @@ function ProjectMediaStaticView({
                 hotspot={slide.hotspot}
                 loading="eager"
                 fetchPriority="high"
-                className={`${isDrawings ? 'object-contain' : 'object-cover'} select-none pointer-events-none`}
+                className={`${singleSlide ? 'object-contain' : 'object-cover'} select-none pointer-events-none`}
                 sizes="(max-width: 768px) 85vw, 55vw"
                 draggable={false}
               />
@@ -110,11 +116,13 @@ function ProjectMediaCarouselInner({
   displaySlides,
   title,
   isDrawings = false,
+  singleSlide = false,
   isInline = false,
 }: {
   displaySlides: ProjectMediaSlide[];
   title?: string;
   isDrawings?: boolean;
+  singleSlide?: boolean;
   isInline?: boolean;
 }) {
   const isTwoSlides = displaySlides.length === 2;
@@ -164,13 +172,6 @@ function ProjectMediaCarouselInner({
   }, []);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (bandRef.current) {
-      const rect = bandRef.current.getBoundingClientRect();
-      if (e.clientY < rect.top || e.clientY > rect.bottom) {
-        setIsHoveringBand(false);
-        return;
-      }
-    }
     setIsHoveringBand(true);
     updateCursorSide(e.clientX);
     if (!pointerStartRef.current) return;
@@ -266,30 +267,35 @@ function ProjectMediaCarouselInner({
       const engine = emblaApi.internalEngine();
       if (!engine) return;
 
-      const isDiscreteNotch = isShiftScroll || e.deltaMode !== 0 || Math.abs(horizontalDelta) >= 60;
+      // Tradisjonelt rullehjul med fysiske klikk / Shift+rullehjul
+      const isDiscreteWheel = isShiftScroll || e.deltaMode !== 0;
 
-      if (isDiscreteNotch) {
+      if (isDiscreteWheel) {
         const now = Date.now();
-        if (now - lastWheelTime > 80) {
+        if (now - lastWheelTime > 120) {
           lastWheelTime = now;
-          engine.scrollBody.useDuration(25).useFriction(0.68);
+          engine.scrollBody.useDuration(22).useFriction(0.72);
           if (horizontalDelta > 0) {
             emblaApi.scrollNext();
           } else {
             emblaApi.scrollPrev();
           }
         }
-      } else {
-        engine.scrollBody.useFriction(0.35).useDuration(0.75);
-        engine.animation.start();
-        engine.target.add(-horizontalDelta);
-
-        if (scrollTimeout) clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-          const selected = emblaApi.selectedScrollSnap();
-          emblaApi.scrollTo(selected);
-        }, 80);
+        return;
       }
+
+      // Kontinuerlig rulling (Magic Mouse og Trackpad):
+      // Følg bevegelsen og momentum 1:1 uten forsinkelse eller motstand,
+      // og la brukeren rulle fritt helt til de stopper.
+      engine.scrollBody.useDuration(0).useFriction(0);
+      engine.animation.start();
+      engine.target.add(-horizontalDelta);
+
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        engine.scrollBody.useDuration(22).useFriction(0.72);
+        engine.scrollTo.distance(0, true);
+      }, 140);
     };
 
     targetNode.addEventListener('wheel', handleWheel, { passive: false });
@@ -308,21 +314,22 @@ function ProjectMediaCarouselInner({
   return (
     <div
       ref={containerRef}
-      onPointerMove={(e) => {
-        if (bandRef.current) {
-          const rect = bandRef.current.getBoundingClientRect();
-          if (e.clientY < rect.top || e.clientY > rect.bottom) {
-            setIsHoveringBand(false);
-          }
-        }
+      onPointerEnter={(e) => {
+        setIsHoveringBand(true);
+        updateCursorSide(e.clientX);
       }}
+      onPointerLeave={() => {
+        setIsHoveringBand(false);
+      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onClick={handleSlideClick}
       className={`w-full bg-white ${
         isInline
           ? 'py-4 md:py-6'
-          : isDrawings
-          ? 'pt-12 md:pt-16 pb-16 md:pb-24'
-          : 'pt-20 md:pt-32 pb-16 md:pb-24'
-      } overflow-hidden relative select-none cursor-default [--carousel-h:50vh] sm:[--carousel-h:58vh] md:[--carousel-h:70vh]`}
+          : 'carousel-hero-container pt-20 pb-16'
+      } overflow-hidden relative select-none ${cursorClass}`}
     >
       <div
         className={`embla overflow-hidden h-[var(--carousel-h)] ${cursorClass}`}
@@ -331,16 +338,6 @@ function ProjectMediaCarouselInner({
           emblaRef(node);
           (bandRef as any).current = node;
         }}
-        onPointerEnter={(e) => {
-          setIsHoveringBand(true);
-          updateCursorSide(e.clientX);
-        }}
-        onPointerLeave={() => {
-          setIsHoveringBand(false);
-        }}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
       >
         <div className="embla__container flex touch-pan-y items-start h-[var(--carousel-h)]" style={{ height: 'var(--carousel-h)' }}>
           {infiniteSlides.map((slide, index) => {
@@ -351,19 +348,38 @@ function ProjectMediaCarouselInner({
             return (
               <div
                 key={`${slide.videoUrl || slide.url || index}-${index}`}
-                className="embla__slide flex-none relative min-w-0 select-none mr-[calc(1rem*4/3)] md:mr-[calc(2rem*4/3)] h-[var(--carousel-h)]"
-                style={{
-                  width: `calc(var(--carousel-h) * ${aspectRatio})`,
-                  maxWidth: '86vw',
-                  height: 'var(--carousel-h)',
-                }}
+                className={`embla__slide flex-none relative min-w-0 select-none h-[var(--carousel-h)] ${
+                  singleSlide
+                    ? 'w-full min-w-full max-w-full mr-0 px-4 md:px-12 flex justify-center items-center'
+                    : 'w-[calc(var(--carousel-h)*var(--aspect))] mr-8 md:mr-[calc(7vw+3.5rem)]'
+                }`}
+                style={
+                  singleSlide
+                    ? { height: 'var(--carousel-h)' }
+                    : ({
+                        '--aspect': aspectRatio,
+                        width: `calc(var(--carousel-h) * ${aspectRatio})`,
+                        height: 'var(--carousel-h)',
+                      } as React.CSSProperties)
+                }
               >
                 <div
-                  onClick={handleSlideClick}
-                  className={`block w-full h-full group ${cursorClass}`}
+                  className={`block h-full ${
+                    singleSlide
+                      ? 'w-[calc(var(--carousel-h)*var(--aspect))] max-w-[86vw] mx-auto flex items-center justify-center'
+                      : 'w-full'
+                  }`}
+                  style={
+                    singleSlide
+                      ? ({
+                          '--aspect': aspectRatio,
+                          height: 'var(--carousel-h)',
+                        } as React.CSSProperties)
+                      : { height: 'var(--carousel-h)' }
+                  }
                 >
                   <div
-                    className={`relative w-full h-full overflow-hidden ${isDrawings ? 'bg-white' : 'bg-gray-50'} ${cursorClass}`}
+                    className="relative w-full h-full overflow-hidden bg-white"
                     style={{ height: 'var(--carousel-h)' }}
                   >
                     {slide.videoUrl ? (
@@ -374,7 +390,13 @@ function ProjectMediaCarouselInner({
                         muted
                         loop
                         playsInline
-                        className="w-full h-full object-cover select-none pointer-events-none"
+                        preload="auto"
+                        ref={(el) => {
+                          if (el && el.paused) {
+                            el.play().catch(() => {});
+                          }
+                        }}
+                        className={`w-full h-full ${singleSlide ? 'object-contain' : 'object-cover'} select-none pointer-events-none`}
                       />
                     ) : slide.url ? (
                       <SanityImage
@@ -385,7 +407,7 @@ function ProjectMediaCarouselInner({
                         hotspot={slide.hotspot}
                         loading={isInitialSlide || isSecondaryVisible ? 'eager' : 'lazy'}
                         fetchPriority={isInitialSlide ? 'high' : isSecondaryVisible ? undefined : 'low'}
-                        className={`${isDrawings ? 'object-contain' : 'object-cover'} select-none pointer-events-none`}
+                        className={`${singleSlide ? 'object-contain' : 'object-cover'} select-none pointer-events-none`}
                         sizes="(max-width: 768px) 85vw, 55vw"
                         draggable={false}
                       />
@@ -405,6 +427,7 @@ export default function ProjectMediaCarousel({
   slides,
   title,
   isDrawings = false,
+  singleSlide = false,
   isInline = false,
 }: ProjectMediaCarouselProps) {
   // Dedupliserer medier strengt på ren url eller videoUrl
@@ -431,6 +454,7 @@ export default function ProjectMediaCarousel({
         slide={displaySlides[0]}
         title={title}
         isDrawings={isDrawings}
+        singleSlide={singleSlide}
         isInline={isInline}
       />
     );
@@ -442,6 +466,7 @@ export default function ProjectMediaCarousel({
       displaySlides={displaySlides}
       title={title}
       isDrawings={isDrawings}
+      singleSlide={singleSlide}
       isInline={isInline}
     />
   );

@@ -28,13 +28,38 @@ export const getHtmlLang = (loc: Locale): string => (loc === 'en' ? 'en-GB' : 'n
 export function LanguageProvider({
   children,
   initialLocale = 'no',
+  customTagTranslations,
 }: {
   children: ReactNode;
   initialLocale?: Locale;
+  customTagTranslations?: { no?: string; en?: string }[];
 }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
   const router = useRouter();
   const [, startTransition] = useTransition();
+
+  const mergedTagMap = React.useMemo(() => {
+    const map = new Map<string, { no: string; en: string }>();
+
+    // 1. Innebygde standardoversettelser
+    Object.entries(tagTranslations).forEach(([k, v]) => {
+      map.set(k.toLowerCase(), v);
+    });
+
+    // 2. Egendefinerte oversettelser fra Sanity Site Settings
+    if (Array.isArray(customTagTranslations)) {
+      customTagTranslations.forEach((item) => {
+        if (item?.no && item?.en) {
+          map.set(item.no.trim().toLowerCase(), {
+            no: item.no.trim(),
+            en: item.en.trim(),
+          });
+        }
+      });
+    }
+
+    return map;
+  }, [customTagTranslations]);
 
   useEffect(() => {
     // 1. Sjekk om språket er eksplisitt overstyrt i URL med ?lang=
@@ -96,26 +121,19 @@ export function LanguageProvider({
   const translateTag = (tag: string): string => {
     if (!tag) return '';
     const cleanTag = tag.trim();
+    const lower = cleanTag.toLowerCase();
 
-    // 1. Direkte oppslag
-    if (tagTranslations[cleanTag]) {
-      return locale === 'en' ? tagTranslations[cleanTag].en : tagTranslations[cleanTag].no;
+    // 1. Direkte / case-insensitivt oppslag på norsk nøkkel
+    const match = mergedTagMap.get(lower);
+    if (match) {
+      return locale === 'en' ? match.en : match.no;
     }
 
-    // 2. Case-insensitivt oppslag på norsk nøkkel
-    const matchKey = Object.keys(tagTranslations).find(
-      (k) => k.toLowerCase() === cleanTag.toLowerCase()
-    );
-    if (matchKey) {
-      return locale === 'en' ? tagTranslations[matchKey].en : tagTranslations[matchKey].no;
-    }
-
-    // 3. Oppslag hvis taggen er skrevet på engelsk i kilden
-    const matchByEn = Object.keys(tagTranslations).find(
-      (k) => tagTranslations[k].en.toLowerCase() === cleanTag.toLowerCase()
-    );
-    if (matchByEn) {
-      return locale === 'en' ? tagTranslations[matchByEn].en : tagTranslations[matchByEn].no;
+    // 2. Oppslag hvis taggen er skrevet på engelsk i kilden
+    for (const val of mergedTagMap.values()) {
+      if (val.en.toLowerCase() === lower) {
+        return locale === 'en' ? val.en : val.no;
+      }
     }
 
     return cleanTag;

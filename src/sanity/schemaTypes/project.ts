@@ -336,6 +336,13 @@ export const projectType = defineType({
       components: { input: AutocompleteStringInput }
     }),
     defineField({
+      name: 'country',
+      title: 'Land',
+      type: 'string',
+      initialValue: 'Norge',
+      components: { input: AutocompleteStringInput }
+    }),
+    defineField({
       name: 'client',
       title: 'Oppdragsgiver',
       type: 'string',
@@ -348,8 +355,29 @@ export const projectType = defineType({
       components: { input: AutocompleteStringInput }
     }),
     defineField({
+      name: 'imageCreditType',
+      title: 'Bildekreditering (Type)',
+      description: 'Velg om krediteringen skal vises som Fotograf eller Bilder (f.eks. for 3D-visualisering / rendringer).',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Fotograf (Photographer)', value: 'photographer' },
+          { title: 'Bilder / Rendring (Images)', value: 'images' },
+        ],
+        layout: 'radio',
+        direction: 'horizontal',
+      },
+      initialValue: 'photographer',
+    }),
+    defineField({
       name: 'photographer',
-      title: 'Fotograf / Rendring',
+      title: 'Fotograf / Rendringsfirma',
+      type: 'string',
+      components: { input: AutocompleteStringInput }
+    }),
+    defineField({
+      name: 'renderingFirm',
+      title: 'Rendring / Illustrasjoner (valgfri separat)',
       type: 'string',
       components: { input: AutocompleteStringInput }
     }),
@@ -377,7 +405,7 @@ export const projectType = defineType({
     defineField({
       name: 'contentBlocks',
       title: 'Sidebygger',
-      description: 'Bygg prosjektsiden ved å legge til tekst, bilder (med størrelse), autoplay-videoer (med caption), slideshows (planløsninger) og metadata. Blokker kan flyttes opp og ned.',
+      description: 'Bygg prosjektsiden ved å legge til tekst, bilder (med størrelse), autoplay-videoer (med caption) og slideshows (planløsninger). Blokker kan flyttes opp og ned.',
       type: 'array',
       of: [
         {
@@ -602,9 +630,9 @@ export const projectType = defineType({
               type: 'string',
             }),
             defineField({
-              name: 'isDrawings',
-              title: 'Er dette arkitektoniske tegninger / planer?',
-              description: 'Hvis denne er huket av, styles karusellen som tekniske linjetegninger og plasseres under prosjektteksten.',
+              name: 'singleSlide',
+              title: 'Vis kun ett bilde om gangen',
+              description: 'Når denne er på, vises kun det aktive bildet/tegningen sentrert uten at forrige og neste bilde titter inn på sidene. Default er av (viser bilde før og etter).',
               type: 'boolean',
               initialValue: false,
             }),
@@ -715,15 +743,15 @@ export const projectType = defineType({
             select: {
               title: 'title',
               items: 'items',
-              isDrawings: 'isDrawings',
+              singleSlide: 'singleSlide',
               disabled: 'disabled',
             },
             prepare(selection) {
               const count = Array.isArray(selection.items) ? selection.items.length : 0;
-              const typeLabel = selection.isDrawings ? 'Tegninger/Planer' : 'Bilder/Video';
+              const modeLabel = selection.singleSlide ? ' (1 om gangen)' : '';
               const prefix = selection.disabled ? '🚫 [Deaktivert] ' : '';
               return {
-                title: `${prefix}${selection.title ? `Karusell: ${selection.title}` : `Karusell (${typeLabel})`}`,
+                title: `${prefix}${selection.title ? `Karusell: ${selection.title}` : `Karusell${modeLabel}`}`,
                 subtitle: `${count} medier lagt til`,
               };
             },
@@ -1062,33 +1090,6 @@ export const projectType = defineType({
             },
           },
         },
-        {
-          type: 'object',
-          name: 'metadataBlock',
-          title: 'Prosjekt-metadata (Tabell over sted, type, status etc.)',
-          fields: [
-            defineField({
-              name: 'disabled',
-              title: 'Deaktiver denne blokken',
-              description: 'Huk av for å skjule denne blokken fra prosjektsiden uten å slette den.',
-              type: 'boolean',
-              initialValue: false,
-            }),
-            defineField({
-              name: 'title',
-              title: 'Overoverskrift (Valgfri)',
-              type: 'string',
-              initialValue: 'Prosjektdetaljer'
-            })
-          ],
-          preview: {
-            select: { title: 'title', disabled: 'disabled' },
-            prepare(selection) {
-              const prefix = selection.disabled ? '🚫 [Deaktivert] ' : '';
-              return { title: `${prefix}${selection.title || 'Prosjekt-metadata (Tabell)'}` }
-            }
-          }
-        }
       ]
     }),
   ],

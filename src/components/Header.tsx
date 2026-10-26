@@ -321,63 +321,24 @@ export default function Header({
   const isWhiteText = isDarkHero && !isPastHero;
   const textColorClass = isWhiteText ? 'text-white' : 'text-black';
 
-  const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Avgjør om vi er i en undermeny av hovedmenyen
-  let subnav: { label: string; href: string } | null = null;
-  if (pathname.startsWith('/work/') || pathname.startsWith('/projects/')) {
-    subnav = { label: 'Work', href: '/work' };
-  } else if (
-    pathname === '/tjenester' ||
-    pathname.startsWith('/tjenester/') ||
-    pathname === '/kontakt' ||
-    pathname.startsWith('/kontakt/') ||
-    pathname === '/imprint' ||
-    pathname === '/applications'
-  ) {
-    subnav = { label: 'Studio', href: '/studio' };
-  }
-
-  const handleBack = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (
-      typeof window !== 'undefined' &&
-      window.history.length > 1 &&
-      document.referrer &&
-      document.referrer.includes(window.location.host)
-    ) {
-      e.preventDefault();
-      router.back();
-    }
-  };
-
+  // Lukk mobilmeny ved ruteendring
   useEffect(() => {
-    if (!subnav) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (
-        target &&
-        (target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.isContentEditable)
-      ) {
-        return;
-      }
-      if (e.key === 'Escape') {
-        if (
-          typeof window !== 'undefined' &&
-          window.history.length > 1 &&
-          document.referrer &&
-          document.referrer.includes(window.location.host)
-        ) {
-          router.back();
-        } else {
-          router.push(subnav.href);
-        }
-      }
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Lås scrolling i bakgrunnen når mobilmenyen er åpen
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [subnav, router]);
+  }, [isMobileMenuOpen]);
 
   const navLinks = [
     { name: t('work'), href: '/work', key: 'work' },
@@ -386,101 +347,145 @@ export default function Header({
   ];
 
   return (
-    <header 
-      className="fixed top-0 left-0 w-full z-[9999] bg-transparent pointer-events-none flex justify-center"
-      style={{ paddingTop: '1.3em' }}
-    >
-      {/* TOP RIGHT: Navigation */}
-      <div 
-        ref={rightRef}
-        className="absolute right-0 px-side-padding pointer-events-auto"
+    <>
+      <header 
+        className="fixed top-0 left-0 w-full z-[9999] bg-transparent pointer-events-none flex justify-center"
+        style={{ paddingTop: '1.3em' }}
       >
-        <nav className={`flex justify-end text-[1.33rem] font-normal ${textColorClass}`}>
-          <ul className="flex gap-[1em] leading-tight whitespace-nowrap">
-            {navLinks.map((link) => {
-              const isActive = 
-                pathname === link.href || 
-                pathname.startsWith(link.href + '/') ||
-                (link.key === 'work' && pathname.startsWith('/projects/'));
-                
-              return (
-                <li key={link.key}>
-                  <Link
-                    href={link.href}
-                    prefetch={true}
-                    className={`hover:underline hover:underline-offset-4 hover:decoration-1 ${isActive ? 'underline underline-offset-4 decoration-1' : ''}`}
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      </div>
-
-      {/* TOP LEFT: Site Title + Undermeny Tilbake */}
-      <div
-        ref={leftRef}
-        className="absolute left-0 px-side-padding pointer-events-auto flex flex-col items-start"
-      >
-        <Link
-          href="/"
-          prefetch={true}
-          className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal ${textColorClass}`}
+        {/* TOP RIGHT: Desktop Navigation & Mobile Menu Button */}
+        <div 
+          ref={rightRef}
+          className="absolute right-0 px-side-padding pointer-events-auto"
         >
-          Studio Tenev
-        </Link>
-        {subnav && (
-          <div className="mt-[calc(0.5*var(--fm))]">
-            <Link
-              href={subnav.href}
-              prefetch={true}
-              onClick={handleBack}
-              className={`whitespace-nowrap text-[1rem] leading-tight font-normal hover:underline hover:underline-offset-4 hover:decoration-1 cursor-pointer ${textColorClass}`}
-            >
-              {subnav.label}
-            </Link>
-          </div>
-        )}
-      </div>
-
-      {/* TOP CENTER: Categories on /work OR Project Title on detail page */}
-      {displayProjectTitle ? (
-        <div ref={titleRef} className="absolute left-1/2 -translate-x-1/2 pointer-events-auto flex items-center h-[2.13rem] -mt-[0.4rem] max-w-[calc(100%-18rem)] overflow-hidden">
-          <span className={`whitespace-nowrap truncate py-[0.2em] leading-tight text-[1.33rem] font-normal ${textColorClass}`}>
-            {displayProjectTitle}
-          </span>
-        </div>
-      ) : pathname === '/work' ? (
-        <div ref={titleRef} className="absolute left-1/2 -translate-x-1/2 pointer-events-auto hidden md:block pt-[0.29rem]">
-          <nav className={`text-[1rem] font-normal ${textColorClass}`}>
+          {/* Desktop Nav */}
+          <nav className={`hidden md:flex justify-end text-[1.33rem] font-normal ${textColorClass}`}>
             <ul className="flex gap-[1em] leading-tight whitespace-nowrap">
-              {[
-                { key: 'all' as WorkCategory, label: t('viewAll') },
-                { key: 'bolig' as WorkCategory, label: t('categoryResidential') },
-                { key: 'naering' as WorkCategory, label: t('categoryCommercial') },
-                { key: 'destinasjonsutvikling' as WorkCategory, label: t('categoryDestination') },
-              ].map((cat) => {
-                const isActive = activeCategory === cat.key;
+              {navLinks.map((link) => {
+                const isActive = 
+                  pathname === link.href || 
+                  pathname.startsWith(link.href + '/') ||
+                  (link.key === 'work' && pathname.startsWith('/projects/'));
+                  
                 return (
-                  <li key={cat.key}>
-                    <button
-                      type="button"
-                      onClick={() => setCategory(cat.key)}
-                      className={`cursor-pointer p-0 m-0 leading-tight bg-transparent border-0 font-normal hover:underline hover:underline-offset-4 hover:decoration-1 ${
-                        isActive ? 'underline underline-offset-4 decoration-1 font-normal' : ''
-                      }`}
+                  <li key={link.key}>
+                    <Link
+                      href={link.href}
+                      prefetch={true}
+                      className={`hover:underline hover:underline-offset-4 hover:decoration-1 ${isActive ? 'underline underline-offset-4 decoration-1' : ''}`}
                     >
-                      {cat.label}
-                    </button>
+                      {link.name}
+                    </Link>
                   </li>
                 );
               })}
             </ul>
           </nav>
+
+          {/* Mobile Menu Trigger */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-label={isMobileMenuOpen ? (locale === 'en' ? 'Close menu' : 'Lukk meny') : (locale === 'en' ? 'Open menu' : 'Åpne meny')}
+            className={`flex md:hidden items-center justify-end text-[1.33rem] font-normal leading-tight cursor-pointer hover:underline underline-offset-4 decoration-1 bg-transparent border-0 p-0 ${textColorClass}`}
+          >
+            {isMobileMenuOpen ? (locale === 'en' ? 'Close' : 'Lukk') : (locale === 'en' ? 'Menu' : 'Meny')}
+          </button>
         </div>
-      ) : null}
-    </header>
+
+        {/* TOP LEFT: Site Title (Logo) */}
+        <div
+          ref={leftRef}
+          className="absolute left-0 px-side-padding pointer-events-auto flex flex-col items-start"
+        >
+          <Link
+            href="/"
+            prefetch={true}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal ${textColorClass}`}
+          >
+            Studio Tenev
+          </Link>
+        </div>
+
+        {/* TOP CENTER: Categories on /work OR Project Title on detail page */}
+        {displayProjectTitle ? (
+          <div ref={titleRef} className="absolute left-1/2 -translate-x-1/2 pointer-events-auto flex items-center h-[2.13rem] -mt-[0.4rem] max-w-[calc(100%-14rem)] md:max-w-[calc(100%-18rem)] overflow-hidden">
+            <span className={`whitespace-nowrap truncate py-[0.2em] leading-tight text-[1.15rem] md:text-[1.33rem] font-normal ${textColorClass}`}>
+              {displayProjectTitle}
+            </span>
+          </div>
+        ) : pathname === '/work' ? (
+          <div ref={titleRef} className="absolute left-1/2 -translate-x-1/2 pointer-events-auto hidden md:block pt-[0.29rem]">
+            <nav className={`text-[1rem] font-normal ${textColorClass}`}>
+              <ul className="flex gap-[1em] leading-tight whitespace-nowrap">
+                {[
+                  { key: 'all' as WorkCategory, label: t('viewAll') },
+                  { key: 'bolig' as WorkCategory, label: t('categoryResidential') },
+                  { key: 'naering' as WorkCategory, label: t('categoryCommercial') },
+                  { key: 'destinasjonsutvikling' as WorkCategory, label: t('categoryDestination') },
+                ].map((cat) => {
+                  const isActive = activeCategory === cat.key;
+                  return (
+                    <li key={cat.key}>
+                      <button
+                        type="button"
+                        onClick={() => setCategory(cat.key)}
+                        className={`cursor-pointer p-0 m-0 leading-tight bg-transparent border-0 font-normal hover:underline hover:underline-offset-4 hover:decoration-1 ${
+                          isActive ? 'underline underline-offset-4 decoration-1 font-normal' : ''
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </div>
+        ) : null}
+      </header>
+
+      {/* Fullskjerm minimalistisk mobilmeny */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[9998] bg-white text-black flex flex-col justify-between px-side-padding pt-[5.5rem] pb-10 md:hidden animate-in fade-in duration-200">
+          <nav className="flex flex-col gap-6 text-[2rem] font-normal">
+            {navLinks.map((link) => {
+              const isActive =
+                pathname === link.href ||
+                pathname.startsWith(link.href + '/') ||
+                (link.key === 'work' && pathname.startsWith('/projects/'));
+
+              return (
+                <Link
+                  key={link.key}
+                  href={link.href}
+                  prefetch={true}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`hover:underline underline-offset-8 decoration-1 ${
+                    isActive ? 'underline underline-offset-8 decoration-1' : ''
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="flex flex-col gap-4 text-[1rem] text-black/70 border-t border-black/15 pt-6">
+            <Link
+              href="/kontakt"
+              prefetch={true}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="hover:underline underline-offset-4 decoration-1 text-black"
+            >
+              {locale === 'en' ? 'Contact' : 'Kontakt'}
+            </Link>
+            <div className="text-[0.95rem]">
+              Strandgaten 86, 5004 Bergen
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -26,6 +26,8 @@ const builder = createImageUrlBuilder({ projectId, dataset });
 
 interface SanityAssetItem {
   _id: string;
+  _type?: string;
+  mimeType?: string;
   url: string;
   originalFilename?: string;
   metadata?: {
@@ -62,8 +64,10 @@ export default function BulkMediaSelectInput(props: ArrayOfObjectsInputProps) {
     setSearchQuery('');
 
     try {
-      const query = `*[_type == "sanity.imageAsset"] | order(_createdAt desc)[0...300] {
+      const query = `*[_type in ["sanity.imageAsset", "sanity.fileAsset"] && (!defined(mimeType) || mimeType match "image/*" || mimeType match "video/*")] | order(_createdAt desc)[0...300] {
         _id,
+        _type,
+        mimeType,
         url,
         originalFilename,
         metadata {
@@ -77,7 +81,7 @@ export default function BulkMediaSelectInput(props: ArrayOfObjectsInputProps) {
       const assets = await client.fetch<SanityAssetItem[]>(query);
       setLibraryAssets(assets || []);
     } catch (err) {
-      console.error('Kunne ikke hente bilder fra arkivet:', err);
+      console.error('Kunne ikke hente medier fra arkivet:', err);
     } finally {
       setIsLoadingLibrary(false);
     }
@@ -102,15 +106,37 @@ export default function BulkMediaSelectInput(props: ArrayOfObjectsInputProps) {
     }
 
     const selectedItems = libraryAssets.filter((a) => selectedAssetIds.has(a._id));
-    const newItems = selectedItems.map((asset) => ({
-      _type: 'image',
-      _key: Math.random().toString(36).substring(2, 12),
-      asset: {
-        _type: 'reference',
-        _ref: asset._id,
-      },
-      alt: asset.originalFilename ? asset.originalFilename.replace(/\.[^/.]+$/, '') : '',
-    }));
+    const newItems = selectedItems.map((asset) => {
+      const isVideo =
+        asset._type === 'sanity.fileAsset' ||
+        (typeof asset.mimeType === 'string' && asset.mimeType.startsWith('video/')) ||
+        Boolean(asset.originalFilename?.match(/\.(mp4|webm|mov)$/i));
+
+      if (isVideo) {
+        return {
+          _type: 'carouselVideo',
+          _key: Math.random().toString(36).substring(2, 12),
+          video: {
+            _type: 'file',
+            asset: {
+              _type: 'reference',
+              _ref: asset._id,
+            },
+          },
+          alt: asset.originalFilename ? asset.originalFilename.replace(/\.[^/.]+$/, '') : '',
+        };
+      }
+
+      return {
+        _type: 'image',
+        _key: Math.random().toString(36).substring(2, 12),
+        asset: {
+          _type: 'reference',
+          _ref: asset._id,
+        },
+        alt: asset.originalFilename ? asset.originalFilename.replace(/\.[^/.]+$/, '') : '',
+      };
+    });
 
     const next = [...(value || []), ...newItems];
     onChange(set(next));
@@ -222,10 +248,22 @@ export default function BulkMediaSelectInput(props: ArrayOfObjectsInputProps) {
                 >
                   {filteredLibraryAssets.map((asset) => {
                     const isSelected = selectedAssetIds.has(asset._id);
-                    // Henter bildet i full bredde uten beskjæring (crop)
-                    const thumb = builder.image(asset._id).width(500).auto('format').url();
+                    const isVideo =
+                      asset._type === 'sanity.fileAsset' ||
+                      (typeof asset.mimeType === 'string' && asset.mimeType.startsWith('video/')) ||
+                      Boolean(asset.originalFilename?.match(/\.(mp4|webm|mov)$/i));
+
+                    let thumb: string | null = null;
+                    if (!isVideo) {
+                      try {
+                        thumb = builder.image(asset._id).width(500).auto('format').url();
+                      } catch {
+                        thumb = null;
+                      }
+                    }
+
                     const dims = asset.metadata?.dimensions;
-                    const dimLabel = dims ? `${dims.width} × ${dims.height}` : null;
+                    const dimLabel = dims ? `${dims.width} × ${dims.height}` : isVideo ? 'Video (MP4)' : null;
 
                     return (
                       <div
@@ -246,7 +284,7 @@ export default function BulkMediaSelectInput(props: ArrayOfObjectsInputProps) {
                           boxSizing: 'border-box',
                         }}
                       >
-                        {/* Bildet vises i sin HELHET med objectFit: 'contain' */}
+                        {/* Bildet eller videoen vises med objectFit: 'contain' */}
                         <div
                           style={{
                             height: '165px',
@@ -263,16 +301,30 @@ export default function BulkMediaSelectInput(props: ArrayOfObjectsInputProps) {
                             flexShrink: 0,
                           }}
                         >
-                          <img
-                            src={thumb}
-                            alt={asset.originalFilename || ''}
-                            style={{
-                              maxWidth: '100%',
-                              maxHeight: '100%',
-                              objectFit: 'contain',
-                              display: 'block',
-                            }}
-                          />
+                          {isVideo ? (
+                            <video
+                              src={asset.url}
+                              muted
+                              playsInline
+                              style={{
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                objectFit: 'contain',
+                                display: 'block',
+                              }}
+                            />
+                          ) : (
+                            <img
+                              src={thumb || asset.url}
+                              alt={asset.originalFilename || ''}
+                              style={{
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                objectFit: 'contain',
+                                display: 'block',
+                              }}
+                            />
+                          )}
 
                           {/* Avkryssings-sirkel */}
                           <div

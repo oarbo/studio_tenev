@@ -41,6 +41,11 @@ export function formatTypography(text: string): string {
 
   return (
     formatted
+      // 0. Eksplisitt hardt mellomrom (non-breaking space) satt av redaktør
+      // Støtter tilde (~) mellom ord (typografisk standard, f.eks. "Studio~Tenev" -> "Studio\u00A0Tenev")
+      // og "&nbsp;"
+      .replace(/(?<=[^\s~])(?:~|\s+~\s+)(?=[^\s~])/g, '\u00A0')
+      .replace(/&nbsp;/gi, '\u00A0')
       // 1. Tusenskillere i tall (f.eks. "1 650" -> "1\u00A0650")
       .replace(/(\b\d{1,3}) +(?=\d{3}\b)/g, '$1\u00A0')
       // 2. Tall etterfulgt av måleenhet, prosent eller valuta (f.eks. "1650 m²", "100 kvm", "50 %")
