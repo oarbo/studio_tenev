@@ -464,11 +464,45 @@ export default async function ProjectDetailPage({
       );
     }
 
-    /* Slideshow (f.eks. for plantegninger) */
-    if (block._type === 'slideshowBlock' && block.images && block.images.length > 0) {
+    /* Karusell / Slideshow i kolonnevisning (f.eks. 8 kolonner, 6 kolonner etc.) */
+    if (block._type === 'carouselBlock' && block.items && block.items.length > 0) {
+      const { gridClass } = getGridClassAndSizes(block.size);
+      const slides: ProjectMediaSlide[] = block.items.map((item) => ({
+        _key: item._key || item.url || item.videoUrl,
+        url: item.url,
+        videoUrl: item.videoUrl,
+        posterUrl: item.posterUrl,
+        type: item.type,
+        alt: item.alt || block.title || project.title,
+        caption: item.caption,
+        captionEn: item.captionEn,
+        aspectRatio: item.aspectRatio || 1.4,
+        lqip: item.lqip,
+        hotspot: item.hotspot,
+      }));
+
       return (
-        <div key={block._key} className="md:col-start-3 md:col-span-8">
-          <ProjectSlideshow images={block.images} title={block.title} size={block.size} />
+        <div key={block._key} className={gridClass}>
+          <ProjectSlideshow slides={slides} title={block.title} size={block.size} />
+        </div>
+      );
+    }
+
+    /* Slideshow (Legacy / bakoverkompatibilitet) */
+    if (block._type === 'slideshowBlock' && block.images && block.images.length > 0) {
+      const { gridClass } = getGridClassAndSizes(block.size);
+      const slides: ProjectMediaSlide[] = block.images.map((img) => ({
+        url: img.url,
+        alt: img.alt || block.title || project.title,
+        caption: img.caption,
+        aspectRatio: img.aspectRatio || 1.4,
+        lqip: img.lqip,
+        hotspot: img.hotspot,
+      }));
+
+      return (
+        <div key={block._key} className={gridClass}>
+          <ProjectSlideshow slides={slides} title={block.title} size={block.size} />
         </div>
       );
     }
@@ -566,11 +600,35 @@ export default async function ProjectDetailPage({
 
   for (const b of activeBlocks) {
     if (b._type === 'carouselBlock' && b.items && b.items.length > 0) {
+      if (b.size && b.size !== 'full') {
+        // Kolonnebasert karusell / slideshow (f.eks. 8 kolonner eller 6 kolonner)
+        currentGridBlocks.push(b);
+      } else {
+        // Fullskjerm / full-bredde karusell / slideshow
+        if (currentGridBlocks.length > 0) {
+          contentSections.push({ type: 'grid', id: currentGridBlocks[0]._key, blocks: currentGridBlocks });
+          currentGridBlocks = [];
+        }
+        contentSections.push({ type: 'carousel', id: b._key, block: b });
+      }
+    } else if (b._type === 'slideshowBlock' && b.size === 'full' && b.images && b.images.length > 0) {
+      // Legacy slideshow med fullskjerm
       if (currentGridBlocks.length > 0) {
         contentSections.push({ type: 'grid', id: currentGridBlocks[0]._key, blocks: currentGridBlocks });
         currentGridBlocks = [];
       }
-      contentSections.push({ type: 'carousel', id: b._key, block: b });
+      contentSections.push({
+        type: 'carousel',
+        id: b._key,
+        block: {
+          ...b,
+          singleSlide: true,
+          items: b.images.map((img: any) => ({
+            _type: 'image',
+            ...img,
+          })),
+        },
+      });
     } else {
       currentGridBlocks.push(b);
     }

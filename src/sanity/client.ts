@@ -201,6 +201,7 @@ export const getProjectBySlugQuery = `
         "videoUrl": select(asset->_type == "sanity.fileAsset" || asset->mimeType match "video/*" => asset->url),
         alt,
         caption,
+        captionEn,
         "aspectRatio": coalesce(asset->metadata.dimensions.aspectRatio, 1.777),
         "lqip": asset->metadata.lqip,
         hotspot,

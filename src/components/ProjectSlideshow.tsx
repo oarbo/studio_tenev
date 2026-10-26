@@ -3,23 +3,33 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import SanityImage, { SanityHotspot } from './SanityImage';
+import type { ProjectMediaSlide } from './ProjectMediaCarousel';
+import { ProjectLocalizedCaption } from './ProjectLocalizedText';
 
 export interface SlideshowImage {
-  url: string;
+  _key?: string;
+  url?: string;
+  videoUrl?: string;
+  posterUrl?: string;
+  type?: 'image' | 'video';
   alt?: string;
   caption?: string;
+  captionEn?: string;
   aspectRatio?: number;
   lqip?: string;
   hotspot?: SanityHotspot;
 }
 
 interface ProjectSlideshowProps {
-  images: SlideshowImage[];
+  images?: SlideshowImage[];
+  slides?: ProjectMediaSlide[];
   title?: string;
   size?: string;
 }
 
-export default function ProjectSlideshow({ images, title, size }: ProjectSlideshowProps) {
+export default function ProjectSlideshow({ images, slides, title, size }: ProjectSlideshowProps) {
+  const items = slides || images || [];
+
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: true, 
     align: 'start', 
@@ -120,7 +130,7 @@ export default function ProjectSlideshow({ images, title, size }: ProjectSlidesh
     };
   }, [emblaApi]);
 
-  if (!images || images.length === 0) return null;
+  if (!items || items.length === 0) return null;
 
   return (
     <div 
@@ -138,14 +148,14 @@ export default function ProjectSlideshow({ images, title, size }: ProjectSlidesh
         {/* Carousel Viewport */}
         <div className="w-full overflow-hidden" ref={emblaRef}>
           <div className="flex">
-            {images.map((img, idx) => (
+            {items.map((item, idx) => (
               <div 
-                key={idx} 
+                key={item._key || idx} 
                 className="flex-[0_0_100%] min-w-0 relative group/slide flex flex-col"
               >
                 <div 
                   className={`relative w-full bg-gray-50 select-none ${
-                    images.length > 1
+                    items.length > 1
                       ? slideHoverRole === 'prev'
                         ? 'cursor-carousel-prev'
                         : slideHoverRole === 'next'
@@ -153,7 +163,7 @@ export default function ProjectSlideshow({ images, title, size }: ProjectSlidesh
                         : 'cursor-carousel-center'
                       : 'cursor-default'
                   }`}
-                  style={{ aspectRatio: img.aspectRatio || 1.5 }}
+                  style={{ aspectRatio: item.aspectRatio || 1.5 }}
                   onPointerMove={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     const ratio = (e.clientX - rect.left) / rect.width;
@@ -166,7 +176,7 @@ export default function ProjectSlideshow({ images, title, size }: ProjectSlidesh
                     }
                   }}
                   onClick={(e) => {
-                    if (images.length <= 1) return;
+                    if (items.length <= 1) return;
                     const rect = e.currentTarget.getBoundingClientRect();
                     const clickX = e.clientX - rect.left;
                     if (clickX < rect.width / 2) {
@@ -176,24 +186,40 @@ export default function ProjectSlideshow({ images, title, size }: ProjectSlidesh
                     }
                   }}
                 >
-                  <SanityImage 
-                    src={img.url} 
-                    alt={img.caption || img.alt || title || `Slide ${idx + 1}`} 
-                    fill 
-                    lqip={img.lqip}
-                    hotspot={img.hotspot}
-                    loading="lazy"
-                    fetchPriority={idx === 0 ? undefined : 'low'}
-                    className="object-contain"
-                    sizes="(max-width: 768px) 100vw, 75vw"
-                  />
+                  {item.videoUrl ? (
+                    <video
+                      src={item.videoUrl}
+                      poster={item.posterUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="auto"
+                      className="w-full h-full object-cover select-none pointer-events-none"
+                    />
+                  ) : item.url ? (
+                    <SanityImage 
+                      src={item.url} 
+                      alt={item.caption || item.alt || title || `Slide ${idx + 1}`} 
+                      fill 
+                      lqip={item.lqip}
+                      hotspot={item.hotspot}
+                      loading="lazy"
+                      fetchPriority={idx === 0 ? undefined : 'low'}
+                      className="object-contain"
+                      sizes="(max-width: 768px) 100vw, 75vw"
+                    />
+                  ) : null}
                 </div>
-                {(img.caption || img.alt) && (
+                {(item.caption || item.captionEn || item.alt) && (
                   <div
                     className={`mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height) ${size === 'full' ? 'px-side-padding' : 'px-0'}`}
                     style={{ color: 'var(--secondary-color)' }}
                   >
-                    {img.caption || img.alt}
+                    <ProjectLocalizedCaption
+                      caption={item.caption || item.alt}
+                      captionEn={item.captionEn}
+                    />
                   </div>
                 )}
               </div>
@@ -202,7 +228,7 @@ export default function ProjectSlideshow({ images, title, size }: ProjectSlidesh
         </div>
 
         {/* Carousel Navigation Controls */}
-        {images.length > 1 && (
+        {items.length > 1 && (
           <>
             <button 
               onClick={scrollPrev}

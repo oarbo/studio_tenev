@@ -405,7 +405,7 @@ export const projectType = defineType({
     defineField({
       name: 'contentBlocks',
       title: 'Sidebygger',
-      description: 'Bygg prosjektsiden ved å legge til tekst, bilder (med størrelse), autoplay-videoer (med caption) og slideshows (planløsninger). Blokker kan flyttes opp og ned.',
+      description: 'Bygg prosjektsiden ved å legge til tekst, bilder (med størrelse), autoplay-videoer og karuseller/slideshows. Blokker kan flyttes opp og ned.',
       type: 'array',
       of: [
         {
@@ -621,8 +621,8 @@ export const projectType = defineType({
         {
           type: 'object',
           name: 'carouselBlock',
-          title: 'Karusell (Bilder og Video)',
-          description: 'Horisontal karusell med bilder og/eller autoplay-videoer (MP4).',
+          title: 'Karusell / Slideshow (Bilder og Video)',
+          description: 'Horisontal karusell eller slideshow med bilder og/eller autoplay-videoer (MP4). Kan settes til fullskjerm eller kolonnebredde, og kan vise ett bilde om gangen (slideshow) eller rullende bånd (karusell).',
           fields: [
             defineField({
               name: 'title',
@@ -630,9 +630,26 @@ export const projectType = defineType({
               type: 'string',
             }),
             defineField({
+              name: 'size',
+              title: 'Størrelse / Bredde',
+              description: 'Velg om blokken skal fylle hele skjermbredden (fullskjerm) eller tilpasses kolonnene i rutenettet.',
+              type: 'string',
+              initialValue: 'full',
+              options: {
+                list: [
+                  { title: 'Fullskjerm / Full bredde (12 kolonner)', value: 'full' },
+                  { title: 'Stor (8 kolonner)', value: 'large' },
+                  { title: 'Medium (6 kolonner)', value: 'medium' },
+                  { title: 'Liten (4 kolonner)', value: 'small' },
+                  { title: 'Ekstra liten (2 kolonner)', value: 'xsmall' },
+                ],
+                layout: 'radio',
+              },
+            }),
+            defineField({
               name: 'singleSlide',
-              title: 'Vis kun ett bilde om gangen',
-              description: 'Når denne er på, vises kun det aktive bildet/tegningen sentrert uten at forrige og neste bilde titter inn på sidene. Default er av (viser bilde før og etter).',
+              title: 'Vis kun ett bilde om gangen (Slideshow-modus)',
+              description: 'Når denne er på, vises kun det aktive bildet/videoen sentrert (slideshow) uten at forrige og neste bilde titter inn på sidene. Kombiner med "Fullskjerm" for et rent fullskjerms-slideshow. Når denne er av, vises et rullende bånd hvor neste/forrige bilde titter inn på sidene (karusell).',
               type: 'boolean',
               initialValue: false,
             }),
@@ -645,7 +662,7 @@ export const projectType = defineType({
             }),
             defineField({
               name: 'items',
-              title: 'Medier i karusellen (Bilder og video)',
+              title: 'Medier i karusellen / slideshowet (Bilder og video)',
               type: 'array',
               components: { input: BulkMediaSelectInput },
               options: {
@@ -665,7 +682,12 @@ export const projectType = defineType({
                     defineField({
                       name: 'caption',
                       type: 'string',
-                      title: 'Bildetekst',
+                      title: 'Bildetekst (Norsk)',
+                    }),
+                    defineField({
+                      name: 'captionEn',
+                      type: 'string',
+                      title: 'Bildetekst (Engelsk)',
                     }),
                   ],
                   preview: {
@@ -744,14 +766,16 @@ export const projectType = defineType({
               title: 'title',
               items: 'items',
               singleSlide: 'singleSlide',
+              size: 'size',
               disabled: 'disabled',
             },
             prepare(selection) {
               const count = Array.isArray(selection.items) ? selection.items.length : 0;
-              const modeLabel = selection.singleSlide ? ' (1 om gangen)' : '';
+              const modeLabel = selection.singleSlide ? ' (1 om gangen)' : ' (Karusell)';
+              const sizeLabel = selection.size && selection.size !== 'full' ? ` [${selection.size}]` : ' [Fullskjerm]';
               const prefix = selection.disabled ? '🚫 [Deaktivert] ' : '';
               return {
-                title: `${prefix}${selection.title ? `Karusell: ${selection.title}` : `Karusell${modeLabel}`}`,
+                title: `${prefix}${selection.title ? `${selection.title}` : `Karusell / Slideshow`}${modeLabel}${sizeLabel}`,
                 subtitle: `${count} medier lagt til`,
               };
             },
@@ -760,7 +784,11 @@ export const projectType = defineType({
         {
           type: 'object',
           name: 'slideshowBlock',
-          title: 'Slideshow / Karusell (f.eks. Planløsning)',
+          title: '⚠️ Slideshow (Utgått – bruk Karusell / Slideshow)',
+          description: 'Denne blokken er slått sammen med Karusell. Bruk "Karusell / Slideshow" ovenfor for å legge til nye slideshows eller karuseller.',
+          deprecated: {
+            reason: 'Slått sammen med Karusell / Slideshow.',
+          },
           fields: [
             defineField({
               name: 'title',

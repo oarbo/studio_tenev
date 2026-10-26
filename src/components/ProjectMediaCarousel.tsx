@@ -4,6 +4,7 @@ import React, { useEffect, useCallback, useState, useRef } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import SanityImage, { SanityHotspot } from './SanityImage';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { ProjectLocalizedCaption } from './ProjectLocalizedText';
 
 export interface ProjectMediaSlide {
   _key?: string;
@@ -104,6 +105,14 @@ function ProjectMediaStaticView({
           </div>
         </div>
       </div>
+      {(slide.caption || slide.captionEn) && (
+        <div className="w-full px-side-padding mt-4 text-center cursor-default select-text">
+          <ProjectLocalizedCaption
+            caption={slide.caption}
+            captionEn={slide.captionEn}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -151,6 +160,27 @@ function ProjectMediaCarouselInner({
     skipSnaps: false,
     dragFree: false, // Snapper alltid til sentrert bilde, aldri halvveis scrollet
   });
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => {
+      const snap = emblaApi.selectedScrollSnap();
+      if (isTwoSlides) {
+        setActiveIndex(snap % 2 === 1 ? 0 : 1);
+      } else {
+        setActiveIndex(snap % displaySlides.length);
+      }
+    };
+    onSelect();
+    emblaApi.on('select', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
+  }, [emblaApi, isTwoSlides, displaySlides.length]);
+
+  const activeSlide = displaySlides[activeIndex];
 
   const containerRef = useRef<HTMLDivElement>(null);
   const bandRef = useRef<HTMLDivElement>(null);
@@ -419,6 +449,22 @@ function ProjectMediaCarouselInner({
           })}
         </div>
       </div>
+      {(activeSlide?.caption || activeSlide?.captionEn) && (
+        <div
+          className="w-full px-side-padding mt-4 text-center cursor-default select-text relative z-10"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          onPointerMove={(e) => {
+            e.stopPropagation();
+            setIsHoveringBand(false);
+          }}
+        >
+          <ProjectLocalizedCaption
+            caption={activeSlide.caption}
+            captionEn={activeSlide.captionEn}
+          />
+        </div>
+      )}
     </div>
   );
 }
