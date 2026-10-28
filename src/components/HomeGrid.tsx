@@ -98,17 +98,32 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
               >
                 {/* Media Layer (Video or Image) */}
                 {item.videoUrl ? (
-                  <div className="relative w-full overflow-hidden bg-gray-50" style={{ aspectRatio }}>
-                    <video
-                      src={item.videoUrl}
-                      preload="metadata"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
+                  <>
+                    {/* Mobil: Bevares uendret */}
+                    <div className="md:hidden relative w-full overflow-hidden bg-gray-50" style={{ aspectRatio }}>
+                      <video
+                        src={item.videoUrl}
+                        preload="metadata"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
+                    {/* Desktop: Vises i sin opprinnelige oppløsning uten forstørring eller cropping, nøyaktig som tidligere */}
+                    <div className="hidden md:inline-block relative max-w-full overflow-hidden">
+                      <video
+                        src={item.videoUrl}
+                        preload="metadata"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="block max-w-full h-auto max-h-[70vh] object-contain"
+                      />
+                    </div>
+                  </>
                 ) : item.image?.url ? (
                   <div className="relative w-full overflow-hidden bg-gray-50" style={{ aspectRatio }}>
                     <SanityImage 
