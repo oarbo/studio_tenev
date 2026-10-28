@@ -227,7 +227,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
                   setFieldErrors((prev) => ({ ...prev, firstName: undefined }));
                 }
               }}
-              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none ${
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none ${
                 fieldErrors.firstName ? 'text-red-600' : 'text-black'
               }`}
             />
@@ -269,7 +269,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
                   setFieldErrors((prev) => ({ ...prev, lastName: undefined }));
                 }
               }}
-              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none ${
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none ${
                 fieldErrors.lastName ? 'text-red-600' : 'text-black'
               }`}
             />
@@ -316,7 +316,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
                   setFieldErrors((prev) => ({ ...prev, email: undefined }));
                 }
               }}
-              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none ${
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none ${
                 fieldErrors.email ? 'text-red-600' : 'text-black'
               }`}
             />
@@ -356,7 +356,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
                   setFieldErrors((prev) => ({ ...prev, phone: undefined }));
                 }
               }}
-              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none ${
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none ${
                 fieldErrors.phone ? 'text-red-600' : 'text-black'
               }`}
             />
@@ -400,7 +400,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
                 setFieldErrors((prev) => ({ ...prev, message: undefined }));
               }
             }}
-            className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none resize-none overflow-hidden leading-(--line-height) ${
+            className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none resize-none overflow-hidden leading-(--line-height) ${
               fieldErrors.message ? 'text-red-600' : 'text-black'
             }`}
           />
@@ -419,19 +419,9 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
         </p>
       )}
 
-      {/* Send-knapp (sentrert) & Personvernerklæring under */}
-      <div className="flex flex-col items-center text-center gap-3 pt-6">
-        <button
-          type="submit"
-          disabled={status === 'submitting'}
-          className="border border-black px-6 pt-[calc(0.625rem-3px)] pb-[calc(0.625rem+3px)] text-[1rem] text-black bg-transparent hover:bg-black hover:text-white transition-colors cursor-pointer rounded-none disabled:opacity-50 whitespace-nowrap"
-        >
-          {status === 'submitting'
-            ? (isEn ? 'Sending...' : 'Sender...')
-            : (isEn ? 'Send inquiry' : 'Send henvendelse')}
-        </button>
-
-        <p className="text-[0.875rem] text-black leading-tight max-w-[28rem]">
+      {/* Send-knapp & Personvernerklæring: Mobil er midtstilt stakket, Desktop er på samme linje med matchende baseline */}
+      <div className="flex flex-col items-center text-center gap-3 pt-6 md:flex-row md:items-baseline md:justify-between md:text-left md:pt-4">
+        <p className="order-2 md:order-1 text-[0.875rem] text-black leading-tight max-w-[28rem]">
           {isEn ? (
             <>
               By submitting, you agree to our{' '}
@@ -450,6 +440,16 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
             </>
           )}
         </p>
+
+        <button
+          type="submit"
+          disabled={status === 'submitting'}
+          className="order-1 md:order-2 border border-black px-6 pt-[calc(0.625rem-3px)] pb-[calc(0.625rem+3px)] text-[1rem] text-black bg-transparent hover:bg-black hover:text-white transition-colors cursor-pointer rounded-none disabled:opacity-50 whitespace-nowrap self-center md:self-auto"
+        >
+          {status === 'submitting'
+            ? (isEn ? 'Sending...' : 'Sender...')
+            : (isEn ? 'Send inquiry' : 'Send henvendelse')}
+        </button>
       </div>
     </form>
   );
