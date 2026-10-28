@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SanityHotspot } from './SanityImage';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useWorkCategory, WorkCategory } from '@/context/WorkCategoryContext';
 import { renderTypography } from '@/utils/typography';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -155,6 +156,7 @@ export default function Header({
   heroTextColor = 'auto' 
 }: HeaderProps) {
   const { locale, t } = useLanguage();
+  const { activeCategory, setCategory } = useWorkCategory();
   const displayProjectTitle = (locale === 'en' && projectTitleEn) ? projectTitleEn : projectTitle;
   const pathname = usePathname();
   const [isDarkHero, setIsDarkHero] = useState(heroTextColor === 'white');
@@ -436,7 +438,7 @@ export default function Header({
           </Link>
         </div>
 
-        {/* TOP CENTER: Project Title on detail page */}
+        {/* TOP CENTER: Project Title on detail page OR Categories on /work (Desktop only) */}
         {displayProjectTitle ? (
           <div
             ref={titleRef}
@@ -451,6 +453,37 @@ export default function Header({
                 ? renderTypography(displayProjectTitle, locale === 'en' ? 'en-GB' : 'nb')
                 : displayProjectTitle}
             </span>
+          </div>
+        ) : pathname === '/work' ? (
+          <div
+            ref={titleRef}
+            className="absolute left-1/2 -translate-x-1/2 pointer-events-auto hidden md:block pt-[0.29rem]"
+          >
+            <nav className={`text-[1rem] font-normal ${textColorClass}`}>
+              <ul className="flex gap-[1em] leading-tight whitespace-nowrap">
+                {[
+                  { key: 'all' as WorkCategory, label: t('viewAll') },
+                  { key: 'bolig' as WorkCategory, label: t('categoryResidential') },
+                  { key: 'naering' as WorkCategory, label: t('categoryCommercial') },
+                  { key: 'destinasjonsutvikling' as WorkCategory, label: t('categoryDestination') },
+                ].map((cat) => {
+                  const isActive = activeCategory === cat.key;
+                  return (
+                    <li key={cat.key}>
+                      <button
+                        type="button"
+                        onClick={() => setCategory(cat.key)}
+                        className={`cursor-pointer p-0 m-0 leading-tight bg-transparent border-0 font-normal hover:underline hover:underline-offset-4 hover:decoration-1 ${
+                          isActive ? 'underline underline-offset-4 decoration-1 font-normal' : ''
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
           </div>
         ) : null}
       </header>

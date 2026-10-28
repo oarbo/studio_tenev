@@ -133,10 +133,10 @@ export default function WorkFilter({ items, initialTag }: WorkFilterProps) {
 
   return (
     <div className="w-full flex flex-col pt-0">
-      {/* Category filter menu (centered, can wrap over multiple lines) */}
+      {/* Category filter menu - Mobile only */}
       <nav
         aria-label="Kategorier"
-        className="w-full flex flex-wrap items-center justify-center gap-x-[1.25em] gap-y-2 pt-content-top pb-8 md:pb-12 text-[1rem] leading-tight text-center px-side-padding"
+        className="w-full flex flex-wrap items-center justify-center gap-x-[1.25em] gap-y-2 pt-content-top pb-8 md:hidden text-[1rem] leading-tight text-center px-side-padding"
       >
         {categories.map((cat) => {
           const isActive = activeCategory === cat.key;
