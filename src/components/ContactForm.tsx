@@ -36,12 +36,21 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
   const isPhoneFloating = Boolean(phone);
   const isMessageFloating = Boolean(message);
 
-  const handlePhoneFocus = () => {
+  const handlePhoneFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     if (fieldErrors.phone) {
       setFieldErrors((prev) => ({ ...prev, phone: undefined }));
     }
+    const input = e.currentTarget;
     if (!phone.trim()) {
       setPhone('+47 ');
+      requestAnimationFrame(() => {
+        input.setSelectionRange(4, 4);
+      });
+    } else {
+      requestAnimationFrame(() => {
+        const len = input.value.length;
+        input.setSelectionRange(len, len);
+      });
     }
   };
 
