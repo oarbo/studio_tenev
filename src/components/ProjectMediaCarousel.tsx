@@ -51,8 +51,18 @@ function getSlideItemDimensions(
   if (size === 'full') {
     return {
       slideWidth: '100vw',
-      slideMarginClass: singleSlide ? '' : 'mr-4 md:mr-16',
+      slideMarginClass: singleSlide ? '' : 'mr-4 md:mr-[calc(7vw+3.5rem)]',
       sizes: '100vw',
+    };
+  }
+
+  // På desktop i karusellvisning (!singleSlide) skal bildene følge karusellhøyden og ha naturlig proporsjonal bredde,
+  // med romslig margin slik at nabobildene flyter utenfor margen og blør (bleed) ut på begge sider.
+  if (!singleSlide) {
+    return {
+      slideWidth: `calc(var(--carousel-h) * ${ar})`,
+      slideMarginClass: 'mr-4 md:mr-[calc(7vw+3.5rem)]',
+      sizes: '(max-width: 768px) 85vw, 55vw',
     };
   }
 
@@ -557,7 +567,7 @@ function ProjectMediaCarouselInner({
       } overflow-hidden relative select-none ${cursorClass}`}
     >
       <div
-        className={`embla overflow-hidden ${cursorClass}`}
+        className={`embla overflow-hidden md:overflow-visible ${cursorClass}`}
         style={{ height: containerHeightCss }}
         ref={(node) => {
           emblaRef(node);
@@ -589,7 +599,7 @@ function ProjectMediaCarouselInner({
                 } as React.CSSProperties}
               >
                 <div
-                  className="relative flex items-center justify-center overflow-hidden w-full max-w-full md:max-w-[100vw]"
+                  className="relative flex items-center justify-center overflow-hidden w-full h-full"
                   style={{
                     width: singleSlide ? 'var(--slide-w)' : '100%',
                     height: '100%',
@@ -614,7 +624,7 @@ function ProjectMediaCarouselInner({
                           }
                         }
                       }}
-                      className="w-full h-full object-contain select-none pointer-events-none"
+                      className={`w-full h-full ${singleSlide ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
                     />
                   ) : slide.url ? (
                     <SanityImage
@@ -625,7 +635,7 @@ function ProjectMediaCarouselInner({
                       hotspot={slide.hotspot}
                       loading="eager"
                       fetchPriority={isInitialSlide ? 'high' : undefined}
-                      className="object-contain select-none pointer-events-none"
+                      className={`${singleSlide ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
                       sizes={dims.sizes}
                       draggable={false}
                     />

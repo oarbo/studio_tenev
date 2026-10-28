@@ -300,7 +300,7 @@ export default async function ProjectDetailPage({
   // Helper for image and video sizing in Sidebygger (Page Builder)
   const getGridClassAndSizes = (size?: string) => {
     if (size === 'full') {
-      return { gridClass: 'col-span-full', sizes: '100vw' };
+      return { gridClass: 'col-span-full md:full-bleed-block', sizes: '100vw' };
     }
     if (size === 'large' || size === '8' || size === 'cols8') {
       return { gridClass: 'md:col-start-3 md:col-span-8', sizes: '(max-width: 768px) 100vw, 85vw' };

@@ -329,6 +329,17 @@ article p,
   margin-right: -50vw;
 }
 
+@media (min-width: 768px) {
+  .md\:full-bleed-block {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+}
+
 /* Global toppmarg for sidetitler og innhold som starter fra toppen av siden */
 .pt-content-top {
   padding-top: 8.75rem;
