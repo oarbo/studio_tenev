@@ -24,7 +24,7 @@
 
 html {
   box-sizing: border-box;
-  font-size: 18px;
+  font-size: 17px;
   /* Forhindrer layout-hopp når vertikal scrollbar aktiveres/deaktiveres (Win, Mac, alle nettlesere) */
   overflow-y: scroll;
 }

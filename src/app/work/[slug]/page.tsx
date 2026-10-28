@@ -15,7 +15,7 @@ import { PortableText } from '@portabletext/react';
 import type { PortableTextBlock } from '@portabletext/types';
 import { formatTypography, formatPortableText, formatYearRange, portableTextComponents, renderTypography } from '@/utils/typography';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   const projects = await client.fetch(getAllProjectSlugsQuery).catch(() => []);

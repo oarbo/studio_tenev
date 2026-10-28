@@ -222,7 +222,18 @@ export default function ProjectList({
   const toggleItem = (id: string) => {
     const targetItem = items.find((it) => it._id === id);
     if (!targetItem || !isProjectExpandable(targetItem)) return;
-    setActiveId((prev) => (prev === id ? null : id));
+    setActiveId((prev) => {
+      const nextId = prev === id ? null : id;
+      if (nextId && typeof window !== 'undefined' && window.innerWidth < 768) {
+        setTimeout(() => {
+          const el = document.getElementById(`project-${id}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 120);
+      }
+      return nextId;
+    });
   };
 
   const formatDateRange = (item: ProjectListItem) => {
@@ -243,12 +254,14 @@ export default function ProjectList({
         type="button"
         onClick={() => onSort && onSort(sortKey)}
         className={`${colSpan} ${mobileHidden ? 'hidden md:flex' : 'flex'} items-center ${
-          isDate ? 'justify-end md:justify-between text-right md:text-left' : 'justify-between text-left'
+          isDate 
+            ? 'justify-end md:justify-between text-right md:text-left' 
+            : 'justify-start md:justify-between text-left'
         } hover:opacity-70 transition-opacity cursor-pointer font-normal`}
       >
-        {/* Mobilvisning for Year: pil foran teksten som på mobil */}
+        {/* Mobilvisning for Year: pil foran teksten */}
         {isActive && isDate && (
-          <span className="md:hidden flex-shrink-0 opacity-50 relative top-[1px] mr-1.5">
+          <span className="md:hidden flex-shrink-0 opacity-50 relative top-[1px] mr-1.5 leading-none">
             {sortDir === 'asc' ? (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
             ) : (
@@ -259,9 +272,20 @@ export default function ProjectList({
 
         <span>{label}</span>
 
+        {/* Mobilvisning for Name: pil 1em etter teksten */}
+        {isActive && !isDate && (
+          <span className="md:hidden flex-shrink-0 opacity-50 relative top-[1px] ml-[1em] leading-none">
+            {sortDir === 'asc' ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            )}
+          </span>
+        )}
+
         {/* Desktopvisning: opprinnelig pil (20x20, top-[2px]) plassert på høyre ytterkant av kolonnen */}
         {isActive && (
-          <span className={`flex-shrink-0 opacity-50 relative top-[2px] ${isDate ? 'hidden md:inline-flex' : ''}`}>
+          <span className="hidden md:inline-flex flex-shrink-0 opacity-50 relative top-[2px]">
             {sortDir === 'asc' ? (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
             ) : (

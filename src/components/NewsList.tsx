@@ -53,7 +53,18 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
   }, []);
 
   const toggleItem = (id: string) => {
-    setActiveId(activeId === id ? null : id);
+    setActiveId((prev) => {
+      const nextId = prev === id ? null : id;
+      if (nextId && typeof window !== 'undefined' && window.innerWidth < 768) {
+        setTimeout(() => {
+          const el = document.getElementById(`news-${id}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 120);
+      }
+      return nextId;
+    });
   };
 
   return (
