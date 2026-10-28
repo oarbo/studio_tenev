@@ -206,9 +206,9 @@ export default function FooterClient({
               src="/nal_liggende_rgb_pos.png"
               alt="NAL Logo"
               width={160}
-              height={33}
+              height={43}
               loading="lazy"
-              className="w-[154px] max-w-none h-auto object-contain block"
+              className="w-[154px] max-w-none h-auto grayscale contrast-[500%] object-contain block"
             />
           </div>
         </div>
