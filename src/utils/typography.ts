@@ -1,4 +1,16 @@
+import React from 'react';
 import type { PortableTextBlock } from '@portabletext/types';
+import { toBritishEnglish } from './britishEnglish';
+
+/**
+ * Standardkomponenter for PortableText for å støtte typografisk formatering,
+ * inkludert 20 unit tracking (0.02em) på 2+ CAPS (f.eks. PLATÅ, GDPR, MNAL).
+ */
+export const portableTextComponents = {
+  marks: {
+    caps: ({ children }: any) => React.createElement('span', { className: 'tracking-[0.02em]' }, children),
+  },
+};
 
 /**
  * Konverterer rette anførselstegn («dumb quotes») og rette apostrofer til
@@ -33,11 +45,17 @@ export function applySmartQuotes(text: string): string {
 /**
  * Setter inn harde mellomrom (\u00A0) og typografiske anførselstegn/apostrofer
  * der god typografi krever det.
+ * Hvis lang er 'en' eller 'en-GB', sikres britisk-engelsk staving automatisk.
  */
-export function formatTypography(text: string): string {
+export function formatTypography(text: string, lang?: string): string {
   if (!text || typeof text !== 'string') return text;
 
-  const formatted = applySmartQuotes(text);
+  let source = text;
+  if (lang && (lang === 'en' || lang.startsWith('en-') || lang.startsWith('en_'))) {
+    source = toBritishEnglish(source);
+  }
+
+  const formatted = applySmartQuotes(source);
 
   return (
     formatted
@@ -66,13 +84,37 @@ export function formatTypography(text: string): string {
       .replace(/(\b[A-ZÆØÅ][a-zæøå]{2,}) +(\d{1,3}[A-Za-z]?\b)/g, '$1\u00A0$2')
       // 6. Tankestrek (–) skal aldri brytes til starten av ny linje; lås mellomrommet foran tankestreken
       .replace(/ +([–—]) +/g, '\u00A0$1 ')
+      // 7. Korte ord (1–2 bokstaver, f.eks. "og", "i", "på", "av", "til", "om", "en", "et") bindes til neste ord
+      // med hardt mellomrom (\u00A0) slik at de aldri blir stående alene på slutten av en linje,
+      // men trekkes ned til neste linje dersom det brytes
+      .replace(/(?<=(?:^|[\s\u00A0(\[{]))([a-zæøåA-ZÆØÅ]{1,2})\s+(?=\S)/g, '$1\u00A0')
   );
 }
 
 /**
- * Formaterer alle tekst-spans inne i Sanity PortableText-blokker med harde mellomrom.
+ * Rendrer formatert typografi som React-noder med 20 unit tracking (0.02em)
+ * på alle sekvenser av 2 eller flere store bokstaver (CAPS/akronymer som PLATÅ, GDPR, MNAL).
  */
-export function formatPortableText<T extends PortableTextBlock>(blocks?: T[]): T[] | undefined {
+export function renderTypography(text?: string | null, lang?: string): React.ReactNode {
+  if (!text || typeof text !== 'string') return null;
+
+  const formatted = formatTypography(text, lang);
+  const parts = formatted.split(/([A-ZÆØÅ]{2,})/g);
+  if (parts.length <= 1) return formatted;
+
+  return parts.map((part, i) => {
+    if (/^[A-ZÆØÅ]{2,}$/.test(part)) {
+      return React.createElement('span', { key: i, className: 'tracking-[0.02em]' }, part);
+    }
+    return part;
+  });
+}
+
+/**
+ * Formaterer alle tekst-spans inne i Sanity PortableText-blokker med harde mellomrom
+ * og 20 unit tracking (0.02em) på alle sekvenser av 2+ CAPS (f.eks. PLATÅ, GDPR, MNAL).
+ */
+export function formatPortableText<T extends PortableTextBlock>(blocks?: T[], lang?: string): T[] | undefined {
   if (!Array.isArray(blocks)) return blocks;
 
   return blocks.map((block) => {
@@ -80,17 +122,43 @@ export function formatPortableText<T extends PortableTextBlock>(blocks?: T[]): T
       return block;
     }
 
+    const newChildren: any[] = [];
+
+    block.children.forEach((child, childIdx) => {
+      if (typeof child?.text === 'string') {
+        const formatted = formatTypography(child.text, lang);
+        const parts = formatted.split(/([A-ZÆØÅ]{2,})/g);
+
+        if (parts.length > 1) {
+          parts.forEach((part, partIdx) => {
+            if (!part) return;
+            const isCaps = /^[A-ZÆØÅ]{2,}$/.test(part);
+            const marks = isCaps
+              ? [...(child.marks || []), 'caps']
+              : (child.marks || []);
+            newChildren.push({
+              ...child,
+              _key: `${child._key || childIdx}-${partIdx}`,
+              text: part,
+              marks,
+            });
+          });
+          return;
+        }
+
+        newChildren.push({
+          ...child,
+          text: formatted,
+        });
+        return;
+      }
+
+      newChildren.push(child);
+    });
+
     return {
       ...block,
-      children: block.children.map((child) => {
-        if (typeof child?.text === 'string') {
-          return {
-            ...child,
-            text: formatTypography(child.text),
-          };
-        }
-        return child;
-      }),
+      children: newChildren,
     };
   });
 }

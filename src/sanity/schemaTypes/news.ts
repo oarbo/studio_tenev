@@ -84,9 +84,16 @@ export const newsType = defineType({
     }),
     defineField({
       name: 'project',
-      title: 'Navn / Prosjekt',
+      title: 'Navn / Prosjekt (Tekst)',
       type: 'string',
       description: 'F.eks. Torgallmenningen 10, Laserlab, Studio, Geilo hytte...',
+    }),
+    defineField({
+      name: 'relatedProjects',
+      title: 'Tilknyttet prosjekt',
+      description: 'Koble denne nyhetssaken til prosjekt(er). Nyheten vil da automatisk vises som et lukket listeelement nederst på prosjektsiden. (Du kan koble herfra eller fra prosjektsiden, aldri duplikater).',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'project' }] }],
     }),
     defineField({
       name: 'summary',

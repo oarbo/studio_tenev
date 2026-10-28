@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { formatTypography } from '@/utils/typography';
+import { formatTypography, renderTypography } from '@/utils/typography';
 
 interface ProjectMetadataBlockProps {
   id?: string;
@@ -20,8 +20,30 @@ interface ProjectMetadataBlockProps {
   size?: { value: number; unit: string };
   contractor?: string;
   photographer?: string;
-  imageCreditType?: string;
   renderingFirm?: string;
+  team?: string[] | string;
+}
+
+function formatTeamList(team?: string[] | string): string {
+  if (!team) return '';
+
+  const rawList = Array.isArray(team) ? team : [team];
+  const names: string[] = [];
+
+  for (const item of rawList) {
+    if (typeof item === 'string') {
+      const parts = item.split(',').map((p) => p.trim()).filter(Boolean);
+      names.push(...parts);
+    }
+  }
+
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} & ${names[1]}`;
+
+  const allExceptLast = names.slice(0, -1).join(', ');
+  const last = names[names.length - 1];
+  return `${allExceptLast} & ${last}`;
 }
 
 export default function ProjectMetadataBlock({
@@ -40,8 +62,8 @@ export default function ProjectMetadataBlock({
   size,
   contractor,
   photographer,
-  imageCreditType,
   renderingFirm,
+  team,
 }: ProjectMetadataBlockProps) {
   const { locale, t, translateStatus, translateTag } = useLanguage();
 
@@ -116,21 +138,20 @@ export default function ProjectMetadataBlock({
     });
   }
 
-  // 7. <Photographer> (or) <Images>: <PhotographerName> (or) <RenderingFirmName>
-  if (photographer && renderingFirm && photographer !== renderingFirm) {
+  // 7. Fotograf
+  if (photographer) {
     metadataFields.push({ label: t('photographer'), value: photographer });
-    metadataFields.push({ label: t('images'), value: renderingFirm });
-  } else {
-    const creditValue = renderingFirm || photographer;
-    if (creditValue) {
-      const isImages =
-        imageCreditType === 'images' ||
-        Boolean(renderingFirm) ||
-        /^(mir|nrml|nrml studio|kvantit|render|rendering|visual|3d)/i.test(creditValue.trim());
+  }
 
-      const creditLabel = isImages ? t('images') : t('photographer');
-      metadataFields.push({ label: creditLabel, value: creditValue });
-    }
+  // 8. Rendring
+  if (renderingFirm) {
+    metadataFields.push({ label: t('rendering'), value: renderingFirm });
+  }
+
+  // 9. Team (nederst i listen)
+  const teamFormatted = formatTeamList(team);
+  if (teamFormatted) {
+    metadataFields.push({ label: t('team'), value: teamFormatted });
   }
 
   if (metadataFields.length === 0) return null;
@@ -143,7 +164,7 @@ export default function ProjectMetadataBlock({
       {metadataFields.map((field) => (
         <div key={field.label} className="leading-(--line-height) text-black">
           <span>{field.label}:</span>{' '}
-          <span>{formatTypography(field.value)}</span>
+          <span>{renderTypography(field.value, locale === 'en' ? 'en-GB' : 'nb')}</span>
         </div>
       ))}
     </div>

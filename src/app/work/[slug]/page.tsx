@@ -6,13 +6,14 @@ import Layout from '@/components/Layout';
 import SanityImage, { SanityHotspot } from '@/components/SanityImage';
 import ProjectSlideshow, { SlideshowImage } from '@/components/ProjectSlideshow';
 import ProjectMediaCarousel, { ProjectMediaSlide } from '@/components/ProjectMediaCarousel';
+import NewsList, { ExpandingListItem } from '@/components/NewsList';
 import ProjectMetadataBlock from '@/components/ProjectMetadataBlock';
 import MoreProjectsSection from '@/components/MoreProjectsSection';
 import { ProjectLocalizedTextBlock, ProjectLocalizedCaption } from '@/components/ProjectLocalizedText';
 import { client, getProjectBySlugQuery, getAllProjectsSummaryQuery, getAllProjectSlugsQuery } from '@/sanity/client';
 import { PortableText } from '@portabletext/react';
 import type { PortableTextBlock } from '@portabletext/types';
-import { formatTypography, formatPortableText, formatYearRange } from '@/utils/typography';
+import { formatTypography, formatPortableText, formatYearRange, portableTextComponents, renderTypography } from '@/utils/typography';
 
 export const revalidate = 0;
 
@@ -30,6 +31,7 @@ interface GalleryItem {
   lqip?: string;
   hotspot?: SanityHotspot;
   filename?: string;
+  size?: string;
 }
 
 interface RelatedProjectSummary {
@@ -77,6 +79,7 @@ export interface CarouselMediaItem {
   lqip?: string;
   hotspot?: SanityHotspot;
   filename?: string;
+  size?: string;
 }
 
 interface ContentBlock {
@@ -122,8 +125,8 @@ interface ProjectData {
   client?: string;
   contractor?: string;
   photographer?: string;
-  imageCreditType?: string;
   renderingFirm?: string;
+  team?: string[];
   size?: { value: number; unit: string };
   coverImage?: string;
   coverImageFilename?: string;
@@ -136,6 +139,22 @@ interface ProjectData {
   gallery?: GalleryItem[];
   body?: PortableTextBlock[];
   contentBlocks?: ContentBlock[];
+  relatedNews?: RelatedNewsItem[];
+}
+
+interface RelatedNewsItem {
+  _id: string;
+  title: string;
+  titleEn?: string;
+  tag?: string;
+  date: string;
+  link?: string;
+  summary?: string;
+  summaryEn?: string;
+  image?: string;
+  imageLqip?: string;
+  imageAspectRatio?: number;
+  imageHotspot?: SanityHotspot;
 }
 
 export async function generateMetadata({
@@ -273,8 +292,8 @@ export default async function ProjectDetailPage({
       size={project.size}
       contractor={project.contractor}
       photographer={project.photographer}
-      imageCreditType={project.imageCreditType}
       renderingFirm={project.renderingFirm}
+      team={project.team}
     />
   );
 
@@ -320,7 +339,7 @@ export default async function ProjectDetailPage({
           posterUrl: item.posterUrl,
           type: 'video',
           alt: item.alt || project.title,
-          aspectRatio: item.aspectRatio || 1.777,
+          aspectRatio: item.aspectRatio,
           lqip: item.lqip,
         });
       } else if (item.url) {
@@ -381,6 +400,50 @@ export default async function ProjectDetailPage({
       }
     }
   }
+
+  // Formaterer tilknyttede nyhetssaker som listeelementer (samme design som på /news)
+  // Streng deduplisering sikrer at en nyhetssak aldri vises to ganger uansett om den er lenket fra prosjektet, nyheten eller begge
+  const seenNewsIds = new Set<string>();
+  const uniqueRelatedNews = (project.relatedNews || []).filter((n) => {
+    const cleanId = (n._id || '').replace(/^drafts\./, '');
+    if (!cleanId || seenNewsIds.has(cleanId)) return false;
+    seenNewsIds.add(cleanId);
+    return true;
+  });
+
+  const relatedNewsItems: ExpandingListItem[] = uniqueRelatedNews.map((n) => {
+    const dateObj = new Date(n.date);
+    const formattedDate = !isNaN(dateObj.getTime())
+      ? dateObj.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      : n.date;
+
+    return {
+      _id: n._id,
+      tag: n.tag,
+      date: formattedDate,
+      title: formatTypography(n.title),
+      titleEn: n.titleEn ? formatTypography(n.titleEn) : undefined,
+      image: n.image,
+      imageLqip: n.imageLqip,
+      imageAspectRatio: n.imageAspectRatio,
+      imageHotspot: n.imageHotspot,
+      content: n.summary ? (
+        <div className="flex flex-col gap-y-[var(--fm)]">
+          {n.summary.split(/\n\s*\n/).map((para, i) => (
+            <p key={i}>{renderTypography(para.trim(), 'nb')}</p>
+          ))}
+        </div>
+      ) : null,
+      contentEn: n.summaryEn ? (
+        <div className="flex flex-col gap-y-[var(--fm)]">
+          {n.summaryEn.split(/\n\s*\n/).map((para, i) => (
+            <p key={i}>{renderTypography(para.trim(), 'en')}</p>
+          ))}
+        </div>
+      ) : undefined,
+      link: n.link,
+    };
+  });
 
   // Filter out disabled blocks and any legacy metadataBlock from sidebygger
   const activeBlocks = (project.contentBlocks || []).filter(
@@ -466,7 +529,8 @@ export default async function ProjectDetailPage({
 
     /* Karusell / Slideshow i kolonnevisning (f.eks. 8 kolonner, 6 kolonner etc.) */
     if (block._type === 'carouselBlock' && block.items && block.items.length > 0) {
-      const { gridClass } = getGridClassAndSizes(block.size);
+      const blockSize = block.size || 'large';
+      const { gridClass } = getGridClassAndSizes(blockSize);
       const slides: ProjectMediaSlide[] = block.items.map((item) => ({
         _key: item._key || item.url || item.videoUrl,
         url: item.url,
@@ -483,7 +547,7 @@ export default async function ProjectDetailPage({
 
       return (
         <div key={block._key} className={gridClass}>
-          <ProjectSlideshow slides={slides} title={block.title} size={block.size} />
+          <ProjectSlideshow slides={slides} title={block.title} size={blockSize} />
         </div>
       );
     }
@@ -600,35 +664,13 @@ export default async function ProjectDetailPage({
 
   for (const b of activeBlocks) {
     if (b._type === 'carouselBlock' && b.items && b.items.length > 0) {
-      if (b.size && b.size !== 'full') {
-        // Kolonnebasert karusell / slideshow (f.eks. 8 kolonner eller 6 kolonner)
-        currentGridBlocks.push(b);
-      } else {
-        // Fullskjerm / full-bredde karusell / slideshow
-        if (currentGridBlocks.length > 0) {
-          contentSections.push({ type: 'grid', id: currentGridBlocks[0]._key, blocks: currentGridBlocks });
-          currentGridBlocks = [];
-        }
-        contentSections.push({ type: 'carousel', id: b._key, block: b });
-      }
-    } else if (b._type === 'slideshowBlock' && b.size === 'full' && b.images && b.images.length > 0) {
-      // Legacy slideshow med fullskjerm
       if (currentGridBlocks.length > 0) {
         contentSections.push({ type: 'grid', id: currentGridBlocks[0]._key, blocks: currentGridBlocks });
         currentGridBlocks = [];
       }
-      contentSections.push({
-        type: 'carousel',
-        id: b._key,
-        block: {
-          ...b,
-          singleSlide: true,
-          items: b.images.map((img: any) => ({
-            _type: 'image',
-            ...img,
-          })),
-        },
-      });
+      contentSections.push({ type: 'carousel', id: b._key, block: b });
+    } else if (b._type === 'slideshowBlock' && b.images && b.images.length > 0) {
+      currentGridBlocks.push(b);
     } else {
       currentGridBlocks.push(b);
     }
@@ -678,6 +720,7 @@ export default async function ProjectDetailPage({
                   aspectRatio: item.aspectRatio || 1.4,
                   lqip: item.lqip,
                   hotspot: item.hotspot,
+                  size: item.size,
                 }));
 
                 return (
@@ -716,7 +759,7 @@ export default async function ProjectDetailPage({
                 <div className="md:col-start-3 md:col-span-8 text-[1rem] text-black">
                   <div className="text-measure">
                     <div className="news-content !m-0 !max-w-none text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                      <PortableText value={project.body} />
+                      <PortableText value={formatPortableText(project.body) || project.body} components={portableTextComponents} />
                     </div>
                     <div className="mt-[1.5em]">
                       {renderMetadataBlock('fallback-metadata')}
@@ -773,7 +816,14 @@ export default async function ProjectDetailPage({
           </section>
         )}
 
-        {/* 4. MORE PROJECTS SECTION */}
+        {/* 4. RELATERTE NYHETER (Lukkede listeelementer fra nyhetssiden) */}
+        {relatedNewsItems.length > 0 && (
+          <section className="w-full px-side-padding mb-[4.75rem] md:mb-[6rem]">
+            <NewsList items={relatedNewsItems} initialActiveId={null} />
+          </section>
+        )}
+
+        {/* 5. MORE PROJECTS SECTION */}
         {selectedProjects.length > 0 && (
           <MoreProjectsSection projects={selectedProjects} categoryTitle={categoryTitle} />
         )}

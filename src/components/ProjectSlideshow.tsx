@@ -38,8 +38,19 @@ export default function ProjectSlideshow({ images, slides, title, size }: Projec
     skipSnaps: false
   });
 
-  const [slideHoverRole, setSlideHoverRole] = useState<'prev' | 'center' | 'next'>('center');
+  const [slideHoverRole, setSlideHoverRole] = useState<'prev' | 'next'>('next');
   const isHoveredRef = useRef(false);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const didDragRef = useRef(false);
+
+  const updateCursorSide = useCallback((clientX: number) => {
+    if (!viewportRef.current) return;
+    const rect = viewportRef.current.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    const ratio = (clientX - rect.left) / rect.width;
+    setSlideHoverRole(ratio < 0.5 ? 'prev' : 'next');
+  }, []);
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -48,6 +59,57 @@ export default function ProjectSlideshow({ images, slides, title, size }: Projec
   const scrollNext = useCallback(() => {
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    pointerStartRef.current = { x: e.clientX, y: e.clientY };
+    didDragRef.current = false;
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    updateCursorSide(e.clientX);
+    if (!pointerStartRef.current) return;
+    const dx = Math.abs(e.clientX - pointerStartRef.current.x);
+    const dy = Math.abs(e.clientY - pointerStartRef.current.y);
+    if (dx > 6 || dy > 6) {
+      didDragRef.current = true;
+    }
+  }, [updateCursorSide]);
+
+  const handlePointerUp = useCallback(() => {
+    pointerStartRef.current = null;
+  }, []);
+
+  const centerInViewport = useCallback(() => {
+    if (!viewportRef.current) return;
+    const rect = viewportRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const elementCenter = rect.top + rect.height / 2;
+    const viewportCenter = viewportHeight / 2;
+
+    if (Math.abs(elementCenter - viewportCenter) > 40) {
+      const targetScrollY = window.scrollY + (elementCenter - viewportCenter);
+      window.scrollTo({
+        top: Math.max(0, targetScrollY),
+        behavior: 'smooth',
+      });
+    }
+  }, []);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    if (didDragRef.current) {
+      didDragRef.current = false;
+      return;
+    }
+    if (items.length <= 1 || !viewportRef.current) return;
+    centerInViewport();
+    const rect = viewportRef.current.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    if (ratio < 0.5) {
+      scrollPrev();
+    } else {
+      scrollNext();
+    }
+  }, [items.length, scrollPrev, scrollNext, centerInViewport]);
 
   // Tastaturnavigasjon gjelder kun det slideshowet brukeren holder musepekeren over eller har fokusert
   useEffect(() => {
@@ -144,7 +206,20 @@ export default function ProjectSlideshow({ images, slides, title, size }: Projec
         </div>
       )}
 
-      <div className="relative w-full group">
+      <div 
+        ref={viewportRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onClick={handleClick}
+        className={`relative w-full group select-none ${
+          items.length > 1
+            ? slideHoverRole === 'prev'
+              ? 'cursor-carousel-prev'
+              : 'cursor-carousel-next'
+            : 'cursor-default'
+        }`}
+      >
         {/* Carousel Viewport */}
         <div className="w-full overflow-hidden" ref={emblaRef}>
           <div className="flex">
@@ -154,37 +229,8 @@ export default function ProjectSlideshow({ images, slides, title, size }: Projec
                 className="flex-[0_0_100%] min-w-0 relative group/slide flex flex-col"
               >
                 <div 
-                  className={`relative w-full bg-gray-50 select-none ${
-                    items.length > 1
-                      ? slideHoverRole === 'prev'
-                        ? 'cursor-carousel-prev'
-                        : slideHoverRole === 'next'
-                        ? 'cursor-carousel-next'
-                        : 'cursor-carousel-center'
-                      : 'cursor-default'
-                  }`}
+                  className="relative w-full bg-white select-none pointer-events-none"
                   style={{ aspectRatio: item.aspectRatio || 1.5 }}
-                  onPointerMove={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const ratio = (e.clientX - rect.left) / rect.width;
-                    if (ratio < 0.35) {
-                      setSlideHoverRole('prev');
-                    } else if (ratio > 0.65) {
-                      setSlideHoverRole('next');
-                    } else {
-                      setSlideHoverRole('center');
-                    }
-                  }}
-                  onClick={(e) => {
-                    if (items.length <= 1) return;
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const clickX = e.clientX - rect.left;
-                    if (clickX < rect.width / 2) {
-                      scrollPrev();
-                    } else {
-                      scrollNext();
-                    }
-                  }}
                 >
                   {item.videoUrl ? (
                     <video
@@ -207,17 +253,20 @@ export default function ProjectSlideshow({ images, slides, title, size }: Projec
                       loading="lazy"
                       fetchPriority={idx === 0 ? undefined : 'low'}
                       className="object-contain"
-                      sizes="(max-width: 768px) 100vw, 75vw"
+                      sizes={size === 'full' ? '100vw' : '(max-width: 768px) 100vw, 75vw'}
                     />
                   ) : null}
                 </div>
-                {(item.caption || item.captionEn || item.alt) && (
+                {(item.caption || item.captionEn) && (
                   <div
-                    className={`mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height) ${size === 'full' ? 'px-side-padding' : 'px-0'}`}
+                    className={`mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height) pointer-events-auto cursor-default select-text ${size === 'full' ? 'px-side-padding' : 'px-0'}`}
                     style={{ color: 'var(--secondary-color)' }}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onPointerMove={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <ProjectLocalizedCaption
-                      caption={item.caption || item.alt}
+                      caption={item.caption}
                       captionEn={item.captionEn}
                     />
                   </div>
@@ -226,46 +275,6 @@ export default function ProjectSlideshow({ images, slides, title, size }: Projec
             ))}
           </div>
         </div>
-
-        {/* Carousel Navigation Controls */}
-        {items.length > 1 && (
-          <>
-            <button 
-              onClick={scrollPrev}
-              className="absolute top-1/2 -translate-y-1/2 left-2 md:-left-12 p-2 text-black hover:opacity-60 transition-opacity focus:outline-none cursor-pointer select-none z-20"
-              aria-label="Forrige bilde"
-            >
-              <svg 
-                width="32" 
-                height="32" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="1" 
-                strokeLinecap="square"
-              >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
-            <button 
-              onClick={scrollNext}
-              className="absolute top-1/2 -translate-y-1/2 right-2 md:-right-12 p-2 text-black hover:opacity-60 transition-opacity focus:outline-none cursor-pointer select-none z-20"
-              aria-label="Neste bilde"
-            >
-              <svg 
-                width="32" 
-                height="32" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="1" 
-                strokeLinecap="square"
-              >
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-          </>
-        )}
       </div>
     </div>
   );

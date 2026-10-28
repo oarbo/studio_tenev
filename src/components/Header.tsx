@@ -2,10 +2,11 @@
 
 import React, { ReactNode, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { SanityHotspot } from './SanityImage';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { useWorkCategory, WorkCategory } from '@/context/WorkCategoryContext';
+import { renderTypography } from '@/utils/typography';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface HeaderProps {
   sticky?: boolean;
@@ -154,7 +155,6 @@ export default function Header({
   heroTextColor = 'auto' 
 }: HeaderProps) {
   const { locale, t } = useLanguage();
-  const { activeCategory, setCategory } = useWorkCategory();
   const displayProjectTitle = (locale === 'en' && projectTitleEn) ? projectTitleEn : projectTitle;
   const pathname = usePathname();
   const [isDarkHero, setIsDarkHero] = useState(heroTextColor === 'white');
@@ -264,15 +264,25 @@ export default function Header({
       }
 
       if (el && projectTitle) {
-        const first = document.querySelector('#project-details > div > *');
+        const first = document.querySelector('#project-details > div > *') || document.querySelector('#project-details');
         if (!first) {
           el.style.transform = '';
+          el.style.opacity = '';
         } else {
           const gap = 1.33 * rootPx;
           const restBottom = el.offsetTop + el.offsetHeight;
           const textTop = first.getBoundingClientRect().top;
           const dy = Math.min(0, textTop - gap - restBottom);
-          el.style.transform = `translateY(${dy}px)`;
+          el.style.transform = dy === 0 ? '' : `translateY(${dy}px)`;
+          if (dy < 0) {
+            const fadeDist = window.innerWidth < 768 ? 35 : 50;
+            const op = Math.max(0, 1 + dy / fadeDist);
+            el.style.opacity = op.toFixed(2);
+            el.style.pointerEvents = op <= 0.05 ? 'none' : 'auto';
+          } else {
+            el.style.opacity = '';
+            el.style.pointerEvents = 'auto';
+          }
         }
       }
     };
@@ -328,16 +338,33 @@ export default function Header({
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  // Lås scrolling i bakgrunnen når mobilmenyen er åpen
+  // Lås scrolling i bakgrunnen når mobilmenyen er åpen (iOS, Android og desktop)
   useEffect(() => {
     if (isMobileMenuOpen) {
+      const scrollY = window.scrollY;
+      document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setIsMobileMenuOpen(false);
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isMobileMenuOpen]);
 
   const navLinks = [
@@ -385,8 +412,10 @@ export default function Header({
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
             aria-label={isMobileMenuOpen ? (locale === 'en' ? 'Close menu' : 'Lukk meny') : (locale === 'en' ? 'Open menu' : 'Åpne meny')}
-            className={`flex md:hidden items-center justify-end text-[1.33rem] font-normal leading-tight cursor-pointer hover:underline underline-offset-4 decoration-1 bg-transparent border-0 p-0 ${textColorClass}`}
+            className={`flex md:hidden items-center justify-end text-[1.33rem] font-normal leading-tight cursor-pointer hover:underline underline-offset-4 decoration-1 bg-transparent border-0 p-0 ${isMobileMenuOpen ? '!text-black' : textColorClass}`}
           >
             {isMobileMenuOpen ? (locale === 'en' ? 'Close' : 'Lukk') : (locale === 'en' ? 'Menu' : 'Meny')}
           </button>
@@ -401,88 +430,59 @@ export default function Header({
             href="/"
             prefetch={true}
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal ${textColorClass}`}
+            className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal ${isMobileMenuOpen ? '!text-black' : textColorClass}`}
           >
             Studio Tenev
           </Link>
         </div>
 
-        {/* TOP CENTER: Categories on /work OR Project Title on detail page */}
+        {/* TOP CENTER: Project Title on detail page */}
         {displayProjectTitle ? (
-          <div ref={titleRef} className="absolute left-1/2 -translate-x-1/2 pointer-events-auto flex items-center h-[2.13rem] -mt-[0.4rem] max-w-[calc(100%-14rem)] md:max-w-[calc(100%-18rem)] overflow-hidden">
-            <span className={`whitespace-nowrap truncate py-[0.2em] leading-tight text-[1.15rem] md:text-[1.33rem] font-normal ${textColorClass}`}>
-              {displayProjectTitle}
+          <div
+            ref={titleRef}
+            className={`absolute left-0 translate-x-0 w-full px-side-padding top-[3.75rem] pointer-events-auto items-center justify-center text-center md:left-1/2 md:-translate-x-1/2 md:top-auto md:-mt-[0.4rem] md:h-[2.13rem] md:w-auto md:max-w-[calc(100%-18rem)] md:overflow-hidden md:px-0 ${
+              isMobileMenuOpen ? 'hidden md:flex' : 'flex'
+            }`}
+          >
+            <span
+              className={`leading-tight text-[1.15rem] md:text-[1.33rem] font-normal [text-wrap:balance] text-center whitespace-normal md:whitespace-nowrap md:truncate ${textColorClass}`}
+            >
+              {typeof displayProjectTitle === 'string'
+                ? renderTypography(displayProjectTitle, locale === 'en' ? 'en-GB' : 'nb')
+                : displayProjectTitle}
             </span>
-          </div>
-        ) : pathname === '/work' ? (
-          <div ref={titleRef} className="absolute left-1/2 -translate-x-1/2 pointer-events-auto hidden md:block pt-[0.29rem]">
-            <nav className={`text-[1rem] font-normal ${textColorClass}`}>
-              <ul className="flex gap-[1em] leading-tight whitespace-nowrap">
-                {[
-                  { key: 'all' as WorkCategory, label: t('viewAll') },
-                  { key: 'bolig' as WorkCategory, label: t('categoryResidential') },
-                  { key: 'naering' as WorkCategory, label: t('categoryCommercial') },
-                  { key: 'destinasjonsutvikling' as WorkCategory, label: t('categoryDestination') },
-                ].map((cat) => {
-                  const isActive = activeCategory === cat.key;
-                  return (
-                    <li key={cat.key}>
-                      <button
-                        type="button"
-                        onClick={() => setCategory(cat.key)}
-                        className={`cursor-pointer p-0 m-0 leading-tight bg-transparent border-0 font-normal hover:underline hover:underline-offset-4 hover:decoration-1 ${
-                          isActive ? 'underline underline-offset-4 decoration-1 font-normal' : ''
-                        }`}
-                      >
-                        {cat.label}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
           </div>
         ) : null}
       </header>
 
       {/* Fullskjerm minimalistisk mobilmeny */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[9998] bg-white text-black flex flex-col justify-between px-side-padding pt-[5.5rem] pb-10 md:hidden animate-in fade-in duration-200">
-          <nav className="flex flex-col gap-6 text-[2rem] font-normal">
-            {navLinks.map((link) => {
-              const isActive =
-                pathname === link.href ||
-                pathname.startsWith(link.href + '/') ||
-                (link.key === 'work' && pathname.startsWith('/projects/'));
-
-              return (
+        <div
+          id="mobile-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label={locale === 'en' ? 'Mobile navigation' : 'Mobilnavigasjon'}
+          className="fixed inset-0 z-[9998] bg-white text-black flex flex-col justify-between px-side-padding pt-[4.75rem] pb-8 md:hidden overscroll-contain animate-in fade-in duration-200"
+          onTouchMove={(e) => e.stopPropagation()}
+        >
+          <nav className="w-full flex flex-col text-[1.33rem] leading-tight font-normal text-center border-t border-black">
+            {navLinks.map((link) => (
+              <div key={link.key} className="w-full border-b border-black py-2">
                 <Link
-                  key={link.key}
                   href={link.href}
                   prefetch={true}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`hover:underline underline-offset-8 decoration-1 ${
-                    isActive ? 'underline underline-offset-8 decoration-1' : ''
-                  }`}
+                  className="block w-full hover:underline underline-offset-4 decoration-1"
                 >
                   {link.name}
                 </Link>
-              );
-            })}
+              </div>
+            ))}
           </nav>
 
-          <div className="flex flex-col gap-4 text-[1rem] text-black/70 border-t border-black/15 pt-6">
-            <Link
-              href="/kontakt"
-              prefetch={true}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="hover:underline underline-offset-4 decoration-1 text-black"
-            >
-              {locale === 'en' ? 'Contact' : 'Kontakt'}
-            </Link>
-            <div className="text-[0.95rem]">
-              Strandgaten 86, 5004 Bergen
-            </div>
+          {/* Språkvelger nederst på mobilmenyen */}
+          <div className="w-full flex justify-center py-2">
+            <LanguageSwitcher />
           </div>
         </div>
       )}

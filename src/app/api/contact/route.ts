@@ -13,6 +13,25 @@ export async function POST(request: Request) {
       );
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(email.trim())) {
+      return NextResponse.json(
+        { error: 'Enter a valid email address' },
+        { status: 400 }
+      );
+    }
+
+    const cleanPhone = phone ? phone.trim() : null;
+    if (cleanPhone && cleanPhone !== '+47' && cleanPhone !== '+') {
+      const digits = cleanPhone.replace(/\D/g, '');
+      if (digits.length < 8 || digits.length > 15) {
+        return NextResponse.json(
+          { error: 'Enter a valid mobile phone number' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Format the inquiry for logging
     const inquiry = {
       receivedAt: new Date().toISOString(),

@@ -4,7 +4,7 @@ import Layout from '@/components/Layout';
 import { client, getNewsQuery } from '@/sanity/client';
 import NewsList, { ExpandingListItem } from '@/components/NewsList';
 import { SanityHotspot } from '@/components/SanityImage';
-import { formatTypography } from '@/utils/typography';
+import { formatTypography, renderTypography } from '@/utils/typography';
 
 export const revalidate = 60;
 
@@ -52,13 +52,17 @@ export default async function NewsPage() {
       imageAspectRatio: n.imageAspectRatio,
       imageHotspot: n.imageHotspot,
       content: n.summary ? (
-        <div>
-          <p>{formatTypography(n.summary)}</p>
+        <div className="flex flex-col gap-y-[var(--fm)]">
+          {n.summary.split(/\n\s*\n/).map((para, i) => (
+            <p key={i}>{renderTypography(para.trim(), 'nb')}</p>
+          ))}
         </div>
       ) : null,
       contentEn: n.summaryEn ? (
-        <div>
-          <p>{formatTypography(n.summaryEn)}</p>
+        <div className="flex flex-col gap-y-[var(--fm)]">
+          {n.summaryEn.split(/\n\s*\n/).map((para, i) => (
+            <p key={i}>{renderTypography(para.trim(), 'en')}</p>
+          ))}
         </div>
       ) : undefined,
       link: n.link,

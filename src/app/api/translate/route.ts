@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { applySmartQuotes } from '@/utils/typography';
+import { toBritishEnglish } from '@/utils/britishEnglish';
 
 async function translateWithGooglePost(text: string, from: string, to: string): Promise<string> {
   const params = new URLSearchParams({
@@ -120,7 +121,7 @@ async function translateSingleChunk(chunk: string, from: string, to: string): Pr
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { text, from = 'no', to = 'en' } = body;
+    const { text, from = 'no', to = 'en-GB' } = body;
 
     if (!text || typeof text !== 'string' || text.trim() === '') {
       return NextResponse.json({ translatedText: '' });
@@ -139,7 +140,14 @@ export async function POST(request: Request) {
       }
     }
 
-    const result = applySmartQuotes(translatedParagraphs.join('\n\n'));
+    let result = translatedParagraphs.join('\n\n');
+
+    // Sikre konsekvent britisk engelsk (British English) ved oversettelse til engelsk
+    if (to.toLowerCase().startsWith('en')) {
+      result = toBritishEnglish(result);
+    }
+
+    result = applySmartQuotes(result);
     return NextResponse.json({ translatedText: result || applySmartQuotes(text) });
   } catch (error: any) {
     console.error('Translation error:', error);

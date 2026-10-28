@@ -218,14 +218,16 @@ export const projectType = defineType({
             defineField({
               name: 'aspectRatio',
               title: 'Bredde/høyde-forhold (Format)',
+              description: 'La stå tom for automatisk tilpasning til videoens faktiske format.',
               type: 'number',
-              initialValue: 1.777,
               options: {
                 list: [
+                  { title: 'Automatisk (anbefalt)', value: 0 },
                   { title: '16:9 (Landskap / standard)', value: 1.777 },
                   { title: '4:3', value: 1.333 },
                   { title: '1:1 (Kvadratisk)', value: 1.0 },
                   { title: '3:2', value: 1.5 },
+                  { title: '4:5 (Stående / Instagram)', value: 0.8 },
                   { title: '9:16 (Vertikal / stående)', value: 0.5625 },
                 ],
               },
@@ -355,31 +357,28 @@ export const projectType = defineType({
       components: { input: AutocompleteStringInput }
     }),
     defineField({
-      name: 'imageCreditType',
-      title: 'Bildekreditering (Type)',
-      description: 'Velg om krediteringen skal vises som Fotograf eller Bilder (f.eks. for 3D-visualisering / rendringer).',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Fotograf (Photographer)', value: 'photographer' },
-          { title: 'Bilder / Rendring (Images)', value: 'images' },
-        ],
-        layout: 'radio',
-        direction: 'horizontal',
-      },
-      initialValue: 'photographer',
-    }),
-    defineField({
       name: 'photographer',
-      title: 'Fotograf / Rendringsfirma',
+      title: 'Fotograf',
+      description: 'Navn på fotograf for prosjektet (vises som «Fotograf: ...» i metalisten).',
       type: 'string',
       components: { input: AutocompleteStringInput }
     }),
     defineField({
       name: 'renderingFirm',
-      title: 'Rendring / Illustrasjoner (valgfri separat)',
+      title: 'Rendring',
+      description: 'Navn på rendringsfirma eller illustratør (vises som «Rendring: ...» i metalisten).',
       type: 'string',
       components: { input: AutocompleteStringInput }
+    }),
+    defineField({
+      name: 'team',
+      title: 'Team',
+      description: 'Teammedlemmer på prosjektet. Vises som «Team: Navn 1, Navn 2 & Navn 3» nederst i metalisten.',
+      type: 'array',
+      of: [{ type: 'string' }],
+      options: {
+        layout: 'tags'
+      }
     }),
     defineField({
       name: 'size',
@@ -622,7 +621,7 @@ export const projectType = defineType({
           type: 'object',
           name: 'carouselBlock',
           title: 'Karusell / Slideshow (Bilder og Video)',
-          description: 'Horisontal karusell eller slideshow med bilder og/eller autoplay-videoer (MP4). Kan settes til fullskjerm eller kolonnebredde, og kan vise ett bilde om gangen (slideshow) eller rullende bånd (karusell).',
+          description: 'Horisontal karusell eller slideshow med bilder og/eller autoplay-videoer (MP4). Kan vise ett bilde om gangen (slideshow) eller rullende bånd (karusell). Størrelse kan styres individuelt per bilde.',
           fields: [
             defineField({
               name: 'title',
@@ -630,26 +629,9 @@ export const projectType = defineType({
               type: 'string',
             }),
             defineField({
-              name: 'size',
-              title: 'Størrelse / Bredde',
-              description: 'Velg om blokken skal fylle hele skjermbredden (fullskjerm) eller tilpasses kolonnene i rutenettet.',
-              type: 'string',
-              initialValue: 'full',
-              options: {
-                list: [
-                  { title: 'Fullskjerm / Full bredde (12 kolonner)', value: 'full' },
-                  { title: 'Stor (8 kolonner)', value: 'large' },
-                  { title: 'Medium (6 kolonner)', value: 'medium' },
-                  { title: 'Liten (4 kolonner)', value: 'small' },
-                  { title: 'Ekstra liten (2 kolonner)', value: 'xsmall' },
-                ],
-                layout: 'radio',
-              },
-            }),
-            defineField({
               name: 'singleSlide',
               title: 'Vis kun ett bilde om gangen (Slideshow-modus)',
-              description: 'Når denne er på, vises kun det aktive bildet/videoen sentrert (slideshow) uten at forrige og neste bilde titter inn på sidene. Kombiner med "Fullskjerm" for et rent fullskjerms-slideshow. Når denne er av, vises et rullende bånd hvor neste/forrige bilde titter inn på sidene (karusell).',
+              description: 'Når denne er på, vises kun det aktive bildet/videoen sentrert (slideshow) uten at forrige og neste bilde titter inn på sidene. Når denne er av, vises et rullende bånd hvor neste/forrige bilde titter inn på sidene (karusell).',
               type: 'boolean',
               initialValue: false,
             }),
@@ -675,6 +657,24 @@ export const projectType = defineType({
                   options: { hotspot: true },
                   fields: [
                     defineField({
+                      name: 'size',
+                      title: 'Bildestørrelse',
+                      description: 'Standard bruker karusellens faste høyde. Du kan også sette bildet til fullskjerm eller kolonnebredde.',
+                      type: 'string',
+                      initialValue: 'default',
+                      options: {
+                        list: [
+                          { title: 'Standard (Karusellhøyde, proporsjonal bredde)', value: 'default' },
+                          { title: '8 kolonner (Stor)', value: 'large' },
+                          { title: '6 kolonner (Medium)', value: 'medium' },
+                          { title: '4 kolonner (Liten)', value: 'small' },
+                          { title: '2 kolonner (Ekstra liten)', value: 'xsmall' },
+                          { title: 'Fullskjerm (Full bredde helt ut til kantene)', value: 'full' },
+                        ],
+                        layout: 'radio',
+                      },
+                    }),
+                    defineField({
                       name: 'alt',
                       type: 'string',
                       title: 'Alternativ tekst / Tittel',
@@ -695,11 +695,21 @@ export const projectType = defineType({
                       media: 'asset',
                       alt: 'alt',
                       caption: 'caption',
+                      size: 'size',
                     },
                     prepare(selection) {
+                      const sizeMap: Record<string, string> = {
+                        full: 'Fullskjerm',
+                        large: '8 kol',
+                        medium: '6 kol',
+                        small: '4 kol',
+                        xsmall: '2 kol',
+                        default: 'Standard',
+                      };
+                      const sizeName = sizeMap[selection.size] || 'Standard';
                       return {
                         title: selection.alt || selection.caption || 'Bilde',
-                        subtitle: 'Bilde',
+                        subtitle: `Bilde [${sizeName}]`,
                         media: selection.media,
                       };
                     },
@@ -710,6 +720,24 @@ export const projectType = defineType({
                   name: 'carouselVideo',
                   title: 'Video (MP4)',
                   fields: [
+                    defineField({
+                      name: 'size',
+                      title: 'Videostørrelse',
+                      description: 'Standard bruker karusellens faste høyde. Du kan også sette videoen til fullskjerm eller kolonnebredde.',
+                      type: 'string',
+                      initialValue: 'default',
+                      options: {
+                        list: [
+                          { title: 'Standard (Karusellhøyde, proporsjonal bredde)', value: 'default' },
+                          { title: '8 kolonner (Stor)', value: 'large' },
+                          { title: '6 kolonner (Medium)', value: 'medium' },
+                          { title: '4 kolonner (Liten)', value: 'small' },
+                          { title: '2 kolonner (Ekstra liten)', value: 'xsmall' },
+                          { title: 'Fullskjerm (Full bredde helt ut til kantene)', value: 'full' },
+                        ],
+                        layout: 'radio',
+                      },
+                    }),
                     defineField({
                       name: 'video',
                       title: 'Videofil (MP4)',
@@ -731,14 +759,16 @@ export const projectType = defineType({
                     defineField({
                       name: 'aspectRatio',
                       title: 'Bredde/høyde-forhold (Format)',
+                      description: 'La stå tom for automatisk tilpasning til videoens faktiske format.',
                       type: 'number',
-                      initialValue: 1.777,
                       options: {
                         list: [
+                          { title: 'Automatisk (anbefalt)', value: 0 },
                           { title: '16:9 (Landskap / standard)', value: 1.777 },
                           { title: '4:3', value: 1.333 },
                           { title: '1:1 (Kvadratisk)', value: 1.0 },
                           { title: '3:2', value: 1.5 },
+                          { title: '4:5 (Stående / Instagram)', value: 0.8 },
                           { title: '9:16 (Vertikal / stående)', value: 0.5625 },
                         ],
                       },
@@ -748,11 +778,21 @@ export const projectType = defineType({
                     select: {
                       title: 'alt',
                       media: 'poster',
+                      size: 'size',
                     },
                     prepare(selection) {
+                      const sizeMap: Record<string, string> = {
+                        full: 'Fullskjerm',
+                        large: '8 kol',
+                        medium: '6 kol',
+                        small: '4 kol',
+                        xsmall: '2 kol',
+                        default: 'Standard',
+                      };
+                      const sizeName = sizeMap[selection.size] || 'Standard';
                       return {
                         title: selection.title || 'Video (MP4)',
-                        subtitle: 'Autoplay-video',
+                        subtitle: `Autoplay-video [${sizeName}]`,
                         media: selection.media,
                       };
                     },
@@ -766,16 +806,16 @@ export const projectType = defineType({
               title: 'title',
               items: 'items',
               singleSlide: 'singleSlide',
-              size: 'size',
               disabled: 'disabled',
             },
             prepare(selection) {
               const count = Array.isArray(selection.items) ? selection.items.length : 0;
               const modeLabel = selection.singleSlide ? ' (1 om gangen)' : ' (Karusell)';
-              const sizeLabel = selection.size && selection.size !== 'full' ? ` [${selection.size}]` : ' [Fullskjerm]';
+              const hasFull = Array.isArray(selection.items) && selection.items.some((it: any) => it?.size === 'full');
+              const fullLabel = hasFull ? ' [Har fullskjerm]' : '';
               const prefix = selection.disabled ? '🚫 [Deaktivert] ' : '';
               return {
-                title: `${prefix}${selection.title ? `${selection.title}` : `Karusell / Slideshow`}${modeLabel}${sizeLabel}`,
+                title: `${prefix}${selection.title ? `${selection.title}` : `Karusell / Slideshow`}${modeLabel}${fullLabel}`,
                 subtitle: `${count} medier lagt til`,
               };
             },
@@ -1119,6 +1159,13 @@ export const projectType = defineType({
           },
         },
       ]
+    }),
+    defineField({
+      name: 'relatedNews',
+      title: 'Tilknyttede nyhetssaker / Presse',
+      description: 'Valgfritt: Velg nyhetssaker som skal vises nederst på prosjektsiden. (Du kan koble herfra eller fra nyhetsmenyen i Sanity, aldri duplikater).',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'news' }] }],
     }),
   ],
   preview: {

@@ -41,7 +41,7 @@ export function TranslateStringInput(props: StringInputProps) {
     : `${currentFieldName}En`;      // f.eks. title -> titleEn
 
   const fromLang = isEn ? 'no' : 'en';
-  const toLang = isEn ? 'en' : 'no';
+  const toLang = isEn ? 'en-GB' : 'no';
   const buttonLabel = isEn ? 'Oversett fra norsk' : 'Oversett fra engelsk';
   const emptyFeedback = isEn ? 'Fyll ut det norske feltet først' : 'Fyll ut det engelske feltet først';
 
@@ -136,7 +136,7 @@ export function TranslateTextInput(props: TextInputProps) {
     : `${currentFieldName}En`;      // f.eks. summary -> summaryEn
 
   const fromLang = isEn ? 'no' : 'en';
-  const toLang = isEn ? 'en' : 'no';
+  const toLang = isEn ? 'en-GB' : 'no';
   const buttonLabel = isEn ? 'Oversett fra norsk' : 'Oversett fra engelsk';
   const emptyFeedback = isEn ? 'Fyll ut det norske feltet først' : 'Fyll ut det engelske feltet først';
 
@@ -232,7 +232,7 @@ export function TranslateBlockInput(props: ArrayOfObjectsInputProps) {
     : `${currentFieldName}En`;      // f.eks. text -> textEn
 
   const fromLang = isEn ? 'no' : 'en';
-  const toLang = isEn ? 'en' : 'no';
+  const toLang = isEn ? 'en-GB' : 'no';
   const buttonLabel = isEn ? 'Oversett fra norsk' : 'Oversett fra engelsk';
   const emptyFeedback = isEn ? 'Fyll ut det norske feltet først' : 'Fyll ut det engelske feltet først';
 

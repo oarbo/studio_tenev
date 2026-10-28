@@ -436,6 +436,13 @@ export default defineType({
       rows: 3,
     }),
     defineField({
+      name: 'orgNumber',
+      title: 'Organisasjonsnummer',
+      description: 'f.eks. 932 534 134 MVA',
+      type: 'string',
+      initialValue: '932 534 134 MVA',
+    }),
+    defineField({
       name: 'contactEmail',
       title: 'E-post',
       type: 'string',

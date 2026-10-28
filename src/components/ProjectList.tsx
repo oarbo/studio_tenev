@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import SanityImage, { SanityHotspot } from './SanityImage';
-import { formatTypography, formatYearRange } from '@/utils/typography';
+import { formatTypography, renderTypography, formatYearRange } from '@/utils/typography';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 export interface ProjectListItem {
@@ -34,6 +34,7 @@ export interface ProjectListItem {
   client?: string;
   contractor?: string;
   photographer?: string;
+  team?: string[];
   size?: { value: number; unit: string };
 }
 
@@ -85,6 +86,7 @@ function ClampedText({
 }) {
   const containerRef = React.useRef<HTMLParagraphElement>(null);
   const [displayText, setDisplayText] = React.useState(text);
+  const { locale } = useLanguage();
 
   React.useEffect(() => {
     const el = containerRef.current;
@@ -165,7 +167,7 @@ function ClampedText({
         overflow: 'hidden',
       }}
     >
-      {displayText}
+      {renderTypography(displayText, locale === 'en' ? 'en-GB' : 'nb')}
     </p>
   );
 }
@@ -227,25 +229,43 @@ export default function ProjectList({
     return formatYearRange(item.startYear, item.completionYear, item.buildYear);
   };
 
-  const renderSortHeader = (label: string, sortKey: string, colSpan: string, mobileHidden: boolean = false) => {
+  const renderSortHeader = (
+    label: string, 
+    sortKey: string, 
+    colSpan: string, 
+    mobileHidden: boolean = false,
+    alignRight: boolean = false
+  ) => {
     const isActive = sortBy === sortKey;
+    const arrowBefore = sortKey === 'date';
     
     return (
       <button 
         type="button"
         onClick={() => onSort && onSort(sortKey)}
-        className={`${colSpan} ${mobileHidden ? 'hidden md:flex' : 'flex'} items-center justify-between hover:opacity-70 transition-opacity text-left cursor-pointer font-normal`}
+        className={`${colSpan} ${mobileHidden ? 'hidden md:flex' : 'flex'} items-center ${alignRight ? 'justify-end text-right' : 'justify-start text-left'} hover:opacity-70 transition-opacity cursor-pointer font-normal`}
       >
-        <span>{label}</span>
-        {isActive && (
-          <span className="flex-shrink-0 opacity-50 relative top-[2px]">
-            {sortDir === 'asc' ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-            ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            )}
-          </span>
-        )}
+        <span className={`inline-flex items-center gap-[1em] ${alignRight ? 'justify-end' : 'justify-start'}`}>
+          {isActive && arrowBefore && (
+            <span className="flex-shrink-0 opacity-50 relative top-[1px]">
+              {sortDir === 'asc' ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              )}
+            </span>
+          )}
+          <span>{label}</span>
+          {isActive && !arrowBefore && (
+            <span className="flex-shrink-0 opacity-50 relative top-[1px]">
+              {sortDir === 'asc' ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              )}
+            </span>
+          )}
+        </span>
       </button>
     );
   };
@@ -299,7 +319,7 @@ export default function ProjectList({
                   type="button"
                   tabIndex={selectedTags.length > 0 ? 0 : -1}
                   onClick={() => onToggleTag?.(tag)}
-                  className="inline-flex items-center gap-1 cursor-pointer hover:opacity-60 transition-opacity"
+                  className="inline-flex items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity"
                 >
                   <span className="underline underline-offset-4 decoration-1">{translateTag(tag)}</span>
                   <span aria-hidden="true" className="text-[0.9em] leading-none">×</span>
@@ -309,12 +329,12 @@ export default function ProjectList({
           </div>
 
           {/* Table Header Row */}
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-fm-1 text-[1rem] text-black pb-1.5">
-            {renderSortHeader(t('name'), 'name', 'col-span-1 md:col-start-3 md:col-span-2')}
+          <div className="flex justify-between items-baseline md:grid md:grid-cols-12 gap-x-fm-1 text-[1rem] text-black pb-1.5">
+            {renderSortHeader(t('name'), 'name', 'flex-1 md:flex-initial md:col-start-3 md:col-span-2')}
             {renderSortHeader(t('type'), 'type', 'md:col-span-2', true)}
             {renderSortHeader(t('size'), 'size', 'md:col-span-1', true)}
-            {renderSortHeader(t('year'), 'date', 'col-span-1 md:col-span-1 text-right md:text-left')}
             {renderSortHeader(t('status'), 'status', 'md:col-span-2', true)}
+            {renderSortHeader(t('year'), 'date', 'flex-shrink-0 md:col-span-1', false, true)}
           </div>
         </div>
 
@@ -343,22 +363,23 @@ export default function ProjectList({
                 {/* Row Container spanning col 3 to 10 */}
                 {isExpandable ? (
                   <div
-                    role="button"
-                    tabIndex={0}
-                    aria-expanded={isExpanded}
-                    onClick={() => toggleItem(item._id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
+                    onClick={(e) => {
+                      const target = e.target as HTMLElement;
+                      if (!target.closest('button')) {
                         toggleItem(item._id);
                       }
                     }}
-                    className="col-span-2 md:col-start-3 md:col-span-8 grid grid-cols-2 md:grid-cols-8 gap-x-fm-1 pt-1.5 pb-[calc(0.5*var(--fm))] text-left cursor-pointer group focus:outline-none"
+                    className="col-span-2 md:col-start-3 md:col-span-8 flex justify-between items-baseline md:grid md:grid-cols-8 gap-x-fm-1 pt-1.5 pb-[calc(0.5*var(--fm))] text-left cursor-pointer group"
                   >
-                    {/* Name */}
-                    <div className="col-span-1 md:col-span-2 font-normal group-hover:opacity-70 transition-opacity">
-                      {formatTypography(displayTitle)}
-                    </div>
+                    {/* Name: fungerer som tastaturnavigerbar ekspander-knapp */}
+                    <button
+                      type="button"
+                      aria-expanded={isExpanded}
+                      onClick={() => toggleItem(item._id)}
+                      className="flex-1 min-w-0 pr-4 whitespace-nowrap truncate md:whitespace-normal md:overflow-visible md:col-span-2 md:pr-0 font-normal text-left group-hover:opacity-70 transition-opacity bg-transparent border-0 p-0 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-black"
+                    >
+                      {renderTypography(displayTitle, locale === 'en' ? 'en-GB' : 'nb')}
+                    </button>
 
                     {/* Type (hidden on mobile; each tag is individually clickable) */}
                     <div className="hidden md:block md:col-span-2">
@@ -370,23 +391,23 @@ export default function ProjectList({
                       {item.size?.value ? `${item.size.value}\u00A0${(item.size.unit || 'm²').trim()}` : ''}
                     </div>
 
-                    {/* Year */}
-                    <div className="col-span-1 md:col-span-1 tabular-nums whitespace-nowrap text-right md:text-left group-hover:opacity-70 transition-opacity">
-                      {dateStr || ''}
-                    </div>
-
                     {/* Status (hidden on mobile) */}
                     <div className="hidden md:block md:col-span-2 group-hover:opacity-70 transition-opacity">
                       {displayStatus}
                     </div>
+
+                    {/* Year */}
+                    <div className="flex-shrink-0 md:col-span-1 tabular-nums whitespace-nowrap text-right group-hover:opacity-70 transition-opacity">
+                      {dateStr || ''}
+                    </div>
                   </div>
                 ) : (
                   <div
-                    className="col-span-2 md:col-start-3 md:col-span-8 grid grid-cols-2 md:grid-cols-8 gap-x-fm-1 pt-1.5 pb-[calc(0.5*var(--fm))] text-left cursor-default"
+                    className="col-span-2 md:col-start-3 md:col-span-8 flex justify-between items-baseline md:grid md:grid-cols-8 gap-x-fm-1 pt-1.5 pb-[calc(0.5*var(--fm))] text-left cursor-default"
                   >
                     {/* Name */}
-                    <div className="col-span-1 md:col-span-2 font-normal">
-                      {formatTypography(displayTitle)}
+                    <div className="flex-1 min-w-0 pr-4 whitespace-nowrap truncate md:whitespace-normal md:overflow-visible md:col-span-2 md:pr-0 font-normal">
+                      {renderTypography(displayTitle, locale === 'en' ? 'en-GB' : 'nb')}
                     </div>
 
                     {/* Type (hidden on mobile; each tag is individually clickable) */}
@@ -399,14 +420,14 @@ export default function ProjectList({
                       {item.size?.value ? `${item.size.value}\u00A0${(item.size.unit || 'm²').trim()}` : ''}
                     </div>
 
-                    {/* Year */}
-                    <div className="col-span-1 md:col-span-1 tabular-nums whitespace-nowrap text-right md:text-left">
-                      {dateStr || ''}
-                    </div>
-
                     {/* Status (hidden on mobile) */}
                     <div className="hidden md:block md:col-span-2">
                       {displayStatus}
+                    </div>
+
+                    {/* Year */}
+                    <div className="flex-shrink-0 md:col-span-1 tabular-nums whitespace-nowrap text-right">
+                      {dateStr || ''}
                     </div>
                   </div>
                 )}
@@ -459,7 +480,7 @@ export default function ProjectList({
                             <Link
                               href={projectHref}
                               prefetch={true}
-                              className="inline-block border-b border-black hover:opacity-60 transition-opacity"
+                              className="inline-block border-b border-black hover:opacity-70 transition-opacity"
                             >
                               {t('goToProject')}
                             </Link>

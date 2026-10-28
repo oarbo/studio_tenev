@@ -4,7 +4,7 @@ import type { TypedObject } from '@portabletext/types';
 import SanityImage, { SanityHotspot } from './SanityImage';
 import Link from 'next/link';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { formatTypography } from '@/utils/typography';
+import { formatTypography, renderTypography } from '@/utils/typography';
 
 export interface GridItemRef {
   _id: string;
@@ -47,22 +47,22 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
     switch(p) {
       case 0: 
         return isPortrait 
-          ? 'col-span-4 md:col-span-6 md:col-start-4' 
-          : 'col-span-4 md:col-span-8 md:col-start-3'; // Centered large
-      case 1: return 'col-span-4 md:col-span-5 md:col-start-1 md:mt-12'; // Left
-      case 2: return 'col-span-4 md:col-span-5 md:col-start-8 md:mt-[15vw]'; // Right, pushed down
+          ? 'col-span-1 md:col-span-6 md:col-start-4' 
+          : 'col-span-1 md:col-span-8 md:col-start-3'; // Centered large
+      case 1: return 'col-span-1 md:col-span-5 md:col-start-1 md:mt-12'; // Left
+      case 2: return 'col-span-1 md:col-span-5 md:col-start-8 md:mt-[15vw]'; // Right, pushed down
       case 3: 
         return isPortrait 
-          ? 'col-span-4 md:col-span-4 md:col-start-5' 
-          : 'col-span-4 md:col-span-8 md:col-start-3'; // Centered medium
-      case 4: return 'col-span-4 md:col-span-5 md:col-start-2 md:mt-[12vw]'; // Left, pushed down
-      case 5: return 'col-span-4 md:col-span-4 md:col-start-9 md:mt-12'; // Right
-      default: return 'col-span-4 md:col-span-12';
+          ? 'col-span-1 md:col-span-4 md:col-start-5' 
+          : 'col-span-1 md:col-span-8 md:col-start-3'; // Centered medium
+      case 4: return 'col-span-1 md:col-span-5 md:col-start-2 md:mt-[12vw]'; // Left, pushed down
+      case 5: return 'col-span-1 md:col-span-4 md:col-start-9 md:mt-12'; // Right
+      default: return 'col-span-1 md:col-span-12';
     }
   };
 
   return (
-    <ol className="grid grid-cols-4 md:grid-cols-12 gap-x-fm-1 gap-y-16 md:gap-y-32 w-full px-side-padding pb-[15vw] pt-12">
+    <ol className="grid grid-cols-1 md:grid-cols-12 md:gap-x-fm-1 gap-y-16 md:gap-y-32 w-full px-side-padding pb-[15vw] pt-12">
       {items.map((item, index) => {
         if (!item) return null;
 
@@ -92,13 +92,13 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
               <Link 
                 href={href} 
                 prefetch={!isExternal}
-                className="block group/link focus:outline-none cursor-pointer"
+                className="block w-full group/link focus:outline-none cursor-pointer"
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
               >
                 {/* Media Layer (Video or Image) */}
                 {item.videoUrl ? (
-                  <div className="relative inline-block max-w-full overflow-hidden">
+                  <div className="relative w-full overflow-hidden bg-gray-50" style={{ aspectRatio }}>
                     <video
                       src={item.videoUrl}
                       preload="metadata"
@@ -106,7 +106,7 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                       muted
                       loop
                       playsInline
-                      className="block max-w-full h-auto max-h-[70vh] object-contain"
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
                   </div>
                 ) : item.image?.url ? (
@@ -127,7 +127,7 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                 ) : null}
                 
                 {/* Text Layer (Below Image) */}
-                <div className="mt-4 flex flex-col items-start justify-start">
+                <div className="mt-4 flex flex-col items-start justify-start w-full">
                   {/* Meta info ABOVE title */}
                   <div className="text-[0.875rem] leading-[1.3] text-black mb-[calc(0.5rem-5px)] flex flex-row flex-wrap gap-x-4">
                     <span>
@@ -148,7 +148,7 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                   
                   {/* Title */}
                   <h2 className="m-0 text-[1.33rem] leading-[calc(1.33rem*1.3-4px)] text-black font-normal">
-                    {formatTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title)}
+                    {renderTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title, locale === 'en' ? 'en-GB' : 'nb')}
                   </h2>
                 </div>
               </Link>

@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import SanityImage, { SanityHotspot } from '@/components/SanityImage';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { renderTypography } from '@/utils/typography';
 
 export interface RelatedProjectItem {
   _id: string;
@@ -48,7 +49,7 @@ export default function MoreProjectsSection({ projects, categoryTitle }: MorePro
                         fill 
                         lqip={p.coverImageLqip}
                         hotspot={p.coverImageHotspot}
-                        className="object-cover group-hover:opacity-80 transition-opacity duration-150 ease-out"
+                        className="object-cover group-hover:opacity-70 transition-opacity duration-150 ease-out"
                         sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
                       />
                     ) : (
@@ -56,7 +57,7 @@ export default function MoreProjectsSection({ projects, categoryTitle }: MorePro
                     )}
                   </div>
                   <div className="text-[1rem] leading-tight text-black group-hover:opacity-70 transition-opacity duration-150">
-                    {title}
+                    {renderTypography(title, locale === 'en' ? 'en-GB' : 'nb')}
                   </div>
                 </Link>
               );

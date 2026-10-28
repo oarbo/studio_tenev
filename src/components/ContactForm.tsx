@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/i18n/LanguageContext';
 
@@ -10,7 +10,8 @@ interface ContactFormProps {
 
 export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
   const { locale } = useLanguage();
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
@@ -19,8 +20,45 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
 
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<{
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    message?: string;
+  }>({});
 
   const isEn = locale === 'en';
+
+  const isFirstNameFloating = Boolean(firstName);
+  const isLastNameFloating = Boolean(lastName);
+  const isEmailFloating = Boolean(email);
+  const isPhoneFloating = Boolean(phone);
+  const isMessageFloating = Boolean(message);
+
+  const handlePhoneFocus = () => {
+    if (fieldErrors.phone) {
+      setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+    }
+    if (!phone.trim()) {
+      setPhone('+47 ');
+    }
+  };
+
+  const handlePhoneBlur = () => {
+    if (phone.trim() === '+47' || phone.trim() === '+') {
+      setPhone('');
+    }
+  };
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [message]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,29 +70,66 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
       return;
     }
 
-    if (!name.trim() || !email.trim()) {
+    const errors: {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      phone?: string;
+      message?: string;
+    } = {};
+
+    if (!firstName.trim()) {
+      errors.firstName = isEn ? 'Enter your first name' : 'Oppgi fornavn';
+    }
+
+    if (!lastName.trim()) {
+      errors.lastName = isEn ? 'Enter your last name' : 'Oppgi etternavn';
+    }
+
+    const trimmedEmail = email.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!trimmedEmail) {
+      errors.email = isEn ? 'Enter your email address' : 'Oppgi e-postadresse';
+    } else if (!emailRegex.test(trimmedEmail)) {
+      errors.email = isEn ? 'Enter a valid email address' : 'Oppgi en gyldig e-postadresse';
+    }
+
+    const trimmedPhone = phone.trim();
+    const isPhoneEmpty = !trimmedPhone || trimmedPhone === '+47' || trimmedPhone === '+';
+    if (isPhoneEmpty) {
+      errors.phone = isEn ? 'Enter a valid mobile phone number' : 'Oppgi et gyldig mobilnummer';
+    } else {
+      const digits = trimmedPhone.replace(/\D/g, '');
+      if (digits.length < 8 || digits.length > 15) {
+        errors.phone = isEn ? 'Enter a valid mobile phone number' : 'Oppgi et gyldig mobilnummer';
+      }
+    }
+
+    if (!message.trim()) {
+      errors.message = isEn ? 'Please describe your project' : 'Beskriv prosjektet';
+    }
+
+    if (Object.keys(errors).length > 0) {
       setStatus('error');
-      setErrorMessage(
-        isEn
-          ? 'Please fill in your name and email address.'
-          : 'Vennligst fyll ut navn og e-postadresse.'
-      );
+      setFieldErrors(errors);
       return;
     }
 
+    setFieldErrors({});
     setStatus('submitting');
     setErrorMessage('');
 
     try {
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
+          name: fullName,
+          email: trimmedEmail,
+          phone: isPhoneEmpty ? '' : trimmedPhone,
           message: message.trim(),
         }),
       });
@@ -69,8 +144,8 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
       setStatus('error');
       setErrorMessage(
         isEn
-          ? 'Sorry, an error occurred while sending. Please contact us directly at daniel@studiotenev.com.'
-          : 'Beklager, det oppstod en feil under sending. Vennligst send oss en e-post direkte til daniel@studiotenev.com.'
+          ? 'Sorry, an error occurred while sending. Please contact us directly at hello@studiotenev.com.'
+          : 'Beklager, det oppstod en feil under sending. Vennligst send oss en e-post direkte til hello@studiotenev.com.'
       );
     }
   };
@@ -89,10 +164,12 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
         <button
           type="button"
           onClick={() => {
-            setName('');
+            setFirstName('');
+            setLastName('');
             setEmail('');
             setPhone('');
             setMessage('');
+            setFieldErrors({});
             setStatus('idle');
           }}
           className="text-black underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer text-[1rem]"
@@ -104,7 +181,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-8">
+    <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-y-[var(--fm-half)]">
       {/* Honeypot field (hidden from real users) */}
       <div className="hidden" aria-hidden="true">
         <label htmlFor="website">Website</label>
@@ -118,79 +195,247 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
         />
       </div>
 
-      {/* Navn */}
-      <div>
-        <input
-          id="contact-name"
-          aria-label={isEn ? 'Name' : 'Navn'}
-          type="text"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={isEn ? 'Name *' : 'Navn *'}
-          className="w-full bg-transparent border-b border-black pb-2 text-[1rem] text-black placeholder:text-neutral-400 focus:outline-none focus:border-black rounded-none transition-colors"
-        />
+      {/* Fornavn og Etternavn (2 kolonner på desktop) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-[var(--fm-half)]">
+        <div className="relative">
+          <div className={`relative pt-5 pb-1 border-b ${fieldErrors.firstName ? 'border-red-600' : 'border-black'}`}>
+            <label
+              htmlFor="contact-firstname"
+              className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                isFirstNameFloating
+                  ? 'top-[6px] text-[13px] font-normal'
+                  : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
+              } ${fieldErrors.firstName ? 'text-red-600' : 'text-black'}`}
+            >
+              {isEn ? 'First name' : 'Fornavn'}
+            </label>
+            <input
+              id="contact-firstname"
+              type="text"
+              autoComplete="given-name"
+              value={firstName}
+              aria-invalid={Boolean(fieldErrors.firstName)}
+              aria-describedby={fieldErrors.firstName ? 'error-firstname' : undefined}
+              onFocus={() => {
+                if (fieldErrors.firstName) {
+                  setFieldErrors((prev) => ({ ...prev, firstName: undefined }));
+                }
+              }}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+                if (fieldErrors.firstName) {
+                  setFieldErrors((prev) => ({ ...prev, firstName: undefined }));
+                }
+              }}
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none ${
+                fieldErrors.firstName ? 'text-red-600' : 'text-black'
+              }`}
+            />
+          </div>
+          {fieldErrors.firstName && (
+            <p id="error-firstname" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+              {fieldErrors.firstName}
+            </p>
+          )}
+        </div>
+
+        <div className="relative">
+          <div className={`relative pt-5 pb-1 border-b ${fieldErrors.lastName ? 'border-red-600' : 'border-black'}`}>
+            <label
+              htmlFor="contact-lastname"
+              className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                isLastNameFloating
+                  ? 'top-[6px] text-[13px] font-normal'
+                  : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
+              } ${fieldErrors.lastName ? 'text-red-600' : 'text-black'}`}
+            >
+              {isEn ? 'Last name' : 'Etternavn'}
+            </label>
+            <input
+              id="contact-lastname"
+              type="text"
+              autoComplete="family-name"
+              value={lastName}
+              aria-invalid={Boolean(fieldErrors.lastName)}
+              aria-describedby={fieldErrors.lastName ? 'error-lastname' : undefined}
+              onFocus={() => {
+                if (fieldErrors.lastName) {
+                  setFieldErrors((prev) => ({ ...prev, lastName: undefined }));
+                }
+              }}
+              onChange={(e) => {
+                setLastName(e.target.value);
+                if (fieldErrors.lastName) {
+                  setFieldErrors((prev) => ({ ...prev, lastName: undefined }));
+                }
+              }}
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none ${
+                fieldErrors.lastName ? 'text-red-600' : 'text-black'
+              }`}
+            />
+          </div>
+          {fieldErrors.lastName && (
+            <p id="error-lastname" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+              {fieldErrors.lastName}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* E-post og Telefon (2 kolonner på desktop) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <input
-            id="contact-email"
-            aria-label={isEn ? 'Email' : 'E-post'}
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={isEn ? 'Email *' : 'E-post *'}
-            className="w-full bg-transparent border-b border-black pb-2 text-[1rem] text-black placeholder:text-neutral-400 focus:outline-none focus:border-black rounded-none transition-colors"
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-[var(--fm-half)]">
+        <div className="relative">
+          <div className={`relative pt-5 pb-1 border-b ${fieldErrors.email ? 'border-red-600' : 'border-black'}`}>
+            <label
+              htmlFor="contact-email"
+              className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                isEmailFloating
+                  ? 'top-[6px] text-[13px] font-normal'
+                  : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
+              } ${fieldErrors.email ? 'text-red-600' : 'text-black'}`}
+            >
+              {isEn ? 'Email' : 'E-post'}
+            </label>
+            <input
+              id="contact-email"
+              type="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              spellCheck={false}
+              value={email}
+              aria-invalid={Boolean(fieldErrors.email)}
+              aria-describedby={fieldErrors.email ? 'error-email' : undefined}
+              onFocus={() => {
+                if (fieldErrors.email) {
+                  setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                }
+              }}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (fieldErrors.email) {
+                  setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                }
+              }}
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none ${
+                fieldErrors.email ? 'text-red-600' : 'text-black'
+              }`}
+            />
+          </div>
+          {fieldErrors.email && (
+            <p id="error-email" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+              {fieldErrors.email}
+            </p>
+          )}
         </div>
 
-        <div>
-          <input
-            id="contact-phone"
-            aria-label={isEn ? 'Phone' : 'Telefon'}
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder={isEn ? 'Phone (optional)' : 'Telefon (valgfritt)'}
-            className="w-full bg-transparent border-b border-black pb-2 text-[1rem] text-black placeholder:text-neutral-400 focus:outline-none focus:border-black rounded-none transition-colors"
-          />
+        <div className="relative">
+          <div className={`relative pt-5 pb-1 border-b ${fieldErrors.phone ? 'border-red-600' : 'border-black'}`}>
+            <label
+              htmlFor="contact-phone"
+              className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                isPhoneFloating
+                  ? 'top-[6px] text-[13px] font-normal'
+                  : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
+              } ${fieldErrors.phone ? 'text-red-600' : 'text-black'}`}
+            >
+              {isEn ? 'Phone' : 'Telefon'}
+            </label>
+            <input
+              id="contact-phone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              value={phone}
+              aria-invalid={Boolean(fieldErrors.phone)}
+              aria-describedby={fieldErrors.phone ? 'error-phone' : undefined}
+              onFocus={handlePhoneFocus}
+              onBlur={handlePhoneBlur}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                if (fieldErrors.phone) {
+                  setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+                }
+              }}
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none ${
+                fieldErrors.phone ? 'text-red-600' : 'text-black'
+              }`}
+            />
+          </div>
+          {fieldErrors.phone && (
+            <p id="error-phone" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+              {fieldErrors.phone}
+            </p>
+          )}
         </div>
       </div>
 
       {/* Melding */}
-      <div>
-        <textarea
-          id="contact-message"
-          aria-label={isEn ? 'About the project' : 'Om prosjektet'}
-          rows={4}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder={
-            isEn
-              ? 'About the project (description, thoughts or timeframe)'
-              : 'Om prosjektet (beskrivelse, tanker eller tidsramme)'
-          }
-          className="w-full bg-transparent border-b border-black pb-2 text-[1rem] text-black placeholder:text-neutral-400 focus:outline-none focus:border-black rounded-none resize-y transition-colors leading-(--line-height)"
-        />
+      <div className="relative">
+        <div className={`relative pt-5 pb-1 border-b ${fieldErrors.message ? 'border-red-600' : 'border-black'}`}>
+          <label
+            htmlFor="contact-message"
+            className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isMessageFloating
+                ? 'top-[6px] text-[13px] font-normal'
+                : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
+            } ${fieldErrors.message ? 'text-red-600' : 'text-black'}`}
+          >
+            {isEn ? 'About the project' : 'Om prosjektet'}
+          </label>
+          <textarea
+            ref={textareaRef}
+            id="contact-message"
+            rows={3}
+            value={message}
+            aria-invalid={Boolean(fieldErrors.message)}
+            aria-describedby={fieldErrors.message ? 'error-message' : undefined}
+            onFocus={() => {
+              if (fieldErrors.message) {
+                setFieldErrors((prev) => ({ ...prev, message: undefined }));
+              }
+            }}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              if (fieldErrors.message) {
+                setFieldErrors((prev) => ({ ...prev, message: undefined }));
+              }
+            }}
+            className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black rounded-none resize-none overflow-hidden leading-(--line-height) ${
+              fieldErrors.message ? 'text-red-600' : 'text-black'
+            }`}
+          />
+        </div>
+        {fieldErrors.message && (
+          <p id="error-message" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+            {fieldErrors.message}
+          </p>
+        )}
       </div>
 
-      {/* Feilmelding */}
+      {/* Generell feilmelding (kun ved server-/nettverksfeil) */}
       {errorMessage && (
-        <p className="text-black text-[0.95rem] border-l-2 border-black pl-3 py-1">
+        <p className="text-red-600 text-[0.95rem] border-l-2 border-red-600 pl-3 py-1">
           {errorMessage}
         </p>
       )}
 
-      {/* Privacy note & Send-knapp */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
-        <p className="text-[0.875rem] text-black/60 leading-normal">
+      {/* Send-knapp (sentrert) & Personvernerklæring under */}
+      <div className="flex flex-col items-center text-center gap-3 pt-6">
+        <button
+          type="submit"
+          disabled={status === 'submitting'}
+          className="border border-black px-6 pt-[calc(0.625rem-3px)] pb-[calc(0.625rem+3px)] text-[1rem] text-black bg-transparent hover:bg-black hover:text-white transition-colors cursor-pointer rounded-none disabled:opacity-50 whitespace-nowrap"
+        >
+          {status === 'submitting'
+            ? (isEn ? 'Sending...' : 'Sender...')
+            : (isEn ? 'Send inquiry' : 'Send henvendelse')}
+        </button>
+
+        <p className="text-[0.875rem] text-black leading-tight max-w-[28rem]">
           {isEn ? (
             <>
               By submitting, you agree to our{' '}
-              <Link href="/imprint-and-privacy-policy" prefetch={true} className="underline underline-offset-2 text-black hover:opacity-70 transition-opacity">
+              <Link href="/imprint-and-privacy-policy" prefetch={true} className="underline underline-offset-2 decoration-1 text-black hover:opacity-70 transition-opacity">
                 privacy policy
               </Link>
               .
@@ -198,23 +443,13 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
           ) : (
             <>
               Ved å sende inn godtar du vår{' '}
-              <Link href="/imprint-and-privacy-policy" prefetch={true} className="underline underline-offset-2 text-black hover:opacity-70 transition-opacity">
+              <Link href="/imprint-and-privacy-policy" prefetch={true} className="underline underline-offset-2 decoration-1 text-black hover:opacity-70 transition-opacity">
                 personvernerklæring
               </Link>
               .
             </>
           )}
         </p>
-
-        <button
-          type="submit"
-          disabled={status === 'submitting'}
-          className="border border-black px-6 py-2.5 text-[1rem] text-black bg-transparent hover:bg-black hover:text-white transition-colors cursor-pointer rounded-none disabled:opacity-50 whitespace-nowrap self-start sm:self-auto"
-        >
-          {status === 'submitting'
-            ? (isEn ? 'Sending...' : 'Sender...')
-            : (isEn ? 'Send inquiry' : 'Send henvendelse')}
-        </button>
       </div>
     </form>
   );

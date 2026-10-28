@@ -101,8 +101,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6, strong, b {
+h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
+}
+
+b, strong, .font-bold, .font-semibold {
+  font-weight: 600 !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -118,14 +122,14 @@ p {
   margin-bottom: 0;
   text-indent: 0;
   text-wrap: pretty;
-  hanging-punctuation: first last;
-  -webkit-hanging-punctuation: first last;
+  hanging-punctuation: none;
+  -webkit-hanging-punctuation: none;
 }
 
 li, blockquote {
   text-wrap: pretty;
-  hanging-punctuation: first last;
-  -webkit-hanging-punctuation: first last;
+  hanging-punctuation: none;
+  -webkit-hanging-punctuation: none;
 }
 
 /* Balansert form på avsnitt: konservativ automatisk orddeling */
@@ -221,20 +225,40 @@ a[href^="tel:"],
   max-width: 100%;
 }
 
-/* Redaksjonell tekst: 2em innrykk fra og med 2. paragraf */
+/* Body-tekst / redaksjonell tekst: Ingen innrykk, 1 hel linjehøyde blanklinje mellom avsnitt */
 .news-content p + p,
 .prose p + p,
-article p + p {
-  text-indent: 2em !important;
-  margin-top: 0 !important;
+article p + p,
+.text-measure p + p,
+.text-measure-left p + p {
+  text-indent: 0 !important;
+  margin-top: var(--fm) !important;
   margin-bottom: 0 !important;
+}
+
+.text-measure p.mt-half,
+.text-measure-left p.mt-half,
+p.mt-half {
+  margin-top: var(--fm-half) !important;
 }
 
 .news-content p,
 .prose p,
-article p {
-  margin-top: 0 !important;
+article p,
+.text-measure p,
+.text-measure-left p {
+  text-indent: 0 !important;
   margin-bottom: 0 !important;
+}
+
+.news-content h2,
+.news-content h3,
+.news-content h4,
+.prose h2,
+.prose h3,
+.prose h4 {
+  margin-top: var(--fm);
+  margin-bottom: var(--fm-half);
 }
 
 /* Zak Group Content Wrapper modeller */
@@ -374,6 +398,44 @@ article p {
     padding-bottom: var(--carousel-space) !important;
   }
 }
+
+.embla__slide {
+  --slide-w: 100%;
+}
+
+@media (min-width: 768px) {
+  .embla__slide {
+    --slide-w: var(--slide-w-desktop, 100%);
+  }
+}
+
+/* -------------------------------------------------------
+   FJERN NETTLESERENS GULE/BLÅ AUTOFILL-BAKGRUNN (Safari & Chrome)
+   Overskriver nettleserens standard styling slik at autoutfylte felter
+   forblir 100% hvite og beholder ren, sort typografi.
+   ------------------------------------------------------- */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #000000 !important;
+  caret-color: #000000 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+input.text-red-600:-webkit-autofill,
+input.text-red-600:-webkit-autofill:hover,
+input.text-red-600:-webkit-autofill:focus,
+textarea.text-red-600:-webkit-autofill {
+  -webkit-text-fill-color: #dc2626 !important;
+}
+
 
 
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import SanityImage, { SanityHotspot } from './SanityImage';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { formatTypography } from '@/utils/typography';
+import { renderTypography } from '@/utils/typography';
 
 export interface ExpandingListItem {
   _id: string;
@@ -74,21 +74,28 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
               <button
                 onClick={() => toggleItem(item._id)}
                 aria-expanded={isActive}
-                className="w-full grid grid-cols-1 md:grid-cols-8 gap-x-fm-1 text-left items-start pt-1.5 pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none group"
+                className="w-full grid grid-cols-1 md:grid-cols-8 gap-x-fm-1 text-left items-start pt-1.5 pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-black group"
               >
-                {/* Date + Tag (Kolonne 1-2 på desktop) */}
-                <div className="md:col-span-2 text-black text-[1rem] group-hover:opacity-70 transition-opacity flex items-baseline">
+                {/* Date + Tag: Kolonne 1-2 på desktop. På mobil: dato til venstre, tag helt til høyre (begge i samme størrelse) */}
+                <div className="flex md:flex justify-between md:justify-start items-baseline md:col-span-2 text-black text-[calc(1rem-3px)] md:text-[1rem] group-hover:opacity-70 transition-opacity">
                   <span className="tabular-nums shrink-0">{item.date}</span>
                   {item.tag && (
-                    <span className="ml-[2em] text-[calc(1rem-3px)] whitespace-nowrap">
-                      {translateTag(item.tag)}
-                    </span>
+                    <>
+                      {/* Mobil: Høyrejustert på samme linje som dato */}
+                      <span className="md:hidden whitespace-nowrap text-right ml-auto">
+                        {translateTag(item.tag)}
+                      </span>
+                      {/* Desktop: Etter dato med ml-[2em] */}
+                      <span className="hidden md:inline-block ml-[2em] text-[calc(1rem-3px)] whitespace-nowrap">
+                        {translateTag(item.tag)}
+                      </span>
+                    </>
                   )}
                 </div>
 
-                {/* Title (Original plassering: Kolonne 3-8 på desktop) */}
+                {/* Title (Kolonne 3-8 på desktop) */}
                 <div className="md:col-span-6 text-black text-[1rem] group-hover:opacity-70 transition-opacity">
-                  {formatTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title)}
+                  {renderTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title, locale === 'en' ? 'en-GB' : 'nb')}
                 </div>
               </button>
 
@@ -155,7 +162,7 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
                         <div>
                           <Link 
                             href={item.link}
-                            className="inline-block border-b border-black hover:opacity-60 transition-opacity"
+                            className="inline-block border-b border-black hover:opacity-70 transition-opacity"
                             target={item.link.startsWith('http') ? "_blank" : undefined}
                             rel={item.link.startsWith('http') ? "noopener noreferrer" : undefined}
                           >

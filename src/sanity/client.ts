@@ -34,8 +34,8 @@ export const getFrontpageQuery = `
       client,
       contractor,
       photographer,
-      imageCreditType,
       renderingFirm,
+      team,
       size
     },
     "videoUrl": coalesce(
@@ -105,8 +105,8 @@ export const getProjectsQuery = `
   client,
   contractor,
   photographer,
-  imageCreditType,
   renderingFirm,
+  team,
   size,
   "coverImage": coalesce(coverImage.asset->url, carouselMedia[_type == "image"][0].asset->url, carouselMedia[defined(asset)][0].asset->url, carouselMedia[_type == "carouselVideo"][0].poster.asset->url, contentBlocks[_type == "carouselBlock"][0].items[defined(asset)][0].asset->url, contentBlocks[_type == "imageBlock"][0].image.asset->url, contentBlocks[_type == "columnsBlock"][0].columns[_type == "columnImage"][0].image.asset->url),
   "coverImageLqip": coalesce(coverImage.asset->metadata.lqip, carouselMedia[_type == "image"][0].asset->metadata.lqip, carouselMedia[defined(asset)][0].asset->metadata.lqip, contentBlocks[_type == "carouselBlock"][0].items[defined(asset)][0].asset->metadata.lqip, contentBlocks[_type == "imageBlock"][0].image.asset->metadata.lqip, contentBlocks[_type == "columnsBlock"][0].columns[_type == "columnImage"][0].image.asset->metadata.lqip),
@@ -137,8 +137,8 @@ export const getProjectBySlugQuery = `
   client,
   contractor,
   photographer,
-  imageCreditType,
   renderingFirm,
+  team,
   size,
   heroTextColor,
   carouselMedia[] {
@@ -150,7 +150,7 @@ export const getProjectBySlugQuery = `
       "videoUrl": select(asset->_type == "sanity.fileAsset" || asset->mimeType match "video/*" => asset->url),
       alt,
       caption,
-      "aspectRatio": coalesce(asset->metadata.dimensions.aspectRatio, 1.777),
+      "aspectRatio": coalesce(asset->metadata.dimensions.aspectRatio, null),
       "lqip": asset->metadata.lqip,
       hotspot,
       "filename": asset->originalFilename
@@ -159,7 +159,7 @@ export const getProjectBySlugQuery = `
       "type": "video",
       "videoUrl": video.asset->url,
       "posterUrl": poster.asset->url,
-      "aspectRatio": coalesce(aspectRatio, poster.asset->metadata.dimensions.aspectRatio, 1.777),
+      "aspectRatio": select(aspectRatio > 0 => aspectRatio, defined(poster.asset->metadata.dimensions.aspectRatio) => poster.asset->metadata.dimensions.aspectRatio, null),
       "lqip": poster.asset->metadata.lqip,
       alt,
       "filename": video.asset->originalFilename
@@ -202,7 +202,8 @@ export const getProjectBySlugQuery = `
         alt,
         caption,
         captionEn,
-        "aspectRatio": coalesce(asset->metadata.dimensions.aspectRatio, 1.777),
+        size,
+        "aspectRatio": coalesce(asset->metadata.dimensions.aspectRatio, null),
         "lqip": asset->metadata.lqip,
         hotspot,
         "filename": asset->originalFilename
@@ -211,9 +212,10 @@ export const getProjectBySlugQuery = `
         "type": "video",
         "videoUrl": video.asset->url,
         "posterUrl": poster.asset->url,
-        "aspectRatio": coalesce(aspectRatio, poster.asset->metadata.dimensions.aspectRatio, 1.777),
+        "aspectRatio": select(aspectRatio > 0 => aspectRatio, defined(poster.asset->metadata.dimensions.aspectRatio) => poster.asset->metadata.dimensions.aspectRatio, null),
         "lqip": poster.asset->metadata.lqip,
         alt,
+        size,
         "filename": video.asset->originalFilename
       }
     },
@@ -253,6 +255,28 @@ export const getProjectBySlugQuery = `
       "imageHotspot": image.hotspot,
       "videoUrl": video.asset->url
     }
+  },
+  "relatedNews": *[_type == "news" && (
+    _id in ^.relatedNews[]._ref ||
+    "drafts." + _id in ^.relatedNews[]._ref ||
+    references(^._id) ||
+    ^._id in relatedProjects[]._ref ||
+    relatedProject._ref == ^._id ||
+    project == ^.title ||
+    project == ^.slug.current
+  )] | order(date desc) {
+    _id,
+    title,
+    titleEn,
+    "tag": coalesce(tag, category),
+    date,
+    link,
+    summary,
+    summaryEn,
+    "image": image.asset->url,
+    "imageLqip": image.asset->metadata.lqip,
+    "imageAspectRatio": image.asset->metadata.dimensions.aspectRatio,
+    "imageHotspot": image.hotspot
   }
 }
 `;
@@ -307,6 +331,7 @@ export const getStudioQuery = `
 *[_type == "studio"][0] {
   studioName,
   address,
+  orgNumber,
   contactEmail,
   contactPhone,
   instagram,
@@ -366,12 +391,16 @@ export const getApplicationsQuery = `
 
 // Spørring for fotografer og visualiseringer fra prosjekter til Imprint & Credits
 export const getProjectCreditsQuery = `
-*[_type == "project" && defined(photographer) && photographer != ""] | order(title asc) {
+*[_type == "project" && (
+  (defined(photographer) && photographer != "") ||
+  (defined(renderingFirm) && renderingFirm != "")
+)] | order(title asc) {
   _id,
   title,
   titleEn,
   "slug": slug.current,
-  photographer
+  photographer,
+  renderingFirm
 }
 `;
 

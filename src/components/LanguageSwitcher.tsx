@@ -82,37 +82,62 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      switchLanguage('en');
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      switchLanguage('no');
+    }
+  };
+
   return (
     <div
       ref={containerRef}
-      className={`inline-flex items-center gap-2 text-[0.9375rem] leading-none ${className}`}
+      role="radiogroup"
+      aria-label={locale === 'en' ? 'Language switcher' : 'Språkvelger'}
+      onKeyDown={handleKeyDown}
+      className={`relative inline-flex items-center rounded-full p-[3px] bg-[#f4f4f5] border border-black/[0.04] select-none font-sans ${className}`}
     >
+      {/* Glidende hvit pille-indikator */}
+      <div
+        aria-hidden="true"
+        className={`absolute top-[3px] left-[3px] w-[32px] h-[24px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1),0_1px_1px_rgba(0,0,0,0.06)] transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none ${
+          locale === 'no' ? 'translate-x-0' : 'translate-x-[32px]'
+        }`}
+      />
+
       <button
         type="button"
+        role="radio"
+        tabIndex={locale === 'no' ? 0 : -1}
         onClick={() => switchLanguage('no')}
-        aria-label="Bytt språk til norsk"
-        aria-pressed={locale === 'no'}
-        className={`cursor-pointer transition-opacity text-left ${
+        aria-label="Norsk"
+        aria-checked={locale === 'no'}
+        className={`relative z-10 flex items-center justify-center w-[32px] h-[24px] text-[12px] leading-none uppercase tracking-[0.02em] transition-colors duration-150 cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/20 ${
           locale === 'no'
-            ? 'underline underline-offset-4 decoration-1 font-normal opacity-100 text-black'
-            : 'opacity-40 hover:opacity-80 text-black'
+            ? 'text-neutral-900 font-medium'
+            : 'text-neutral-500 hover:text-neutral-900 font-normal'
         }`}
       >
-        No
+        NO
       </button>
-      <span className="opacity-30 select-none text-black">/</span>
+
       <button
         type="button"
+        role="radio"
+        tabIndex={locale === 'en' ? 0 : -1}
         onClick={() => switchLanguage('en')}
-        aria-label="Switch language to English"
-        aria-pressed={locale === 'en'}
-        className={`cursor-pointer transition-opacity text-left ${
+        aria-label="English"
+        aria-checked={locale === 'en'}
+        className={`relative z-10 flex items-center justify-center w-[32px] h-[24px] text-[12px] leading-none uppercase tracking-[0.02em] transition-colors duration-150 cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/20 ${
           locale === 'en'
-            ? 'underline underline-offset-4 decoration-1 font-normal opacity-100 text-black'
-            : 'opacity-40 hover:opacity-80 text-black'
+            ? 'text-neutral-900 font-medium'
+            : 'text-neutral-500 hover:text-neutral-900 font-normal'
         }`}
       >
-        Eng
+        EN
       </button>
     </div>
   );

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import SanityImage, { SanityHotspot } from '@/components/SanityImage';
 import ProjectSlideshow, { SlideshowImage } from '@/components/ProjectSlideshow';
 import { PortableText } from '@portabletext/react';
-import { formatPortableText } from '@/utils/typography';
+import { formatPortableText, portableTextComponents, renderTypography } from '@/utils/typography';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 export interface ContentBlock {
@@ -81,6 +81,61 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
   const { locale, t } = useLanguage();
   const contentBlocks: ContentBlock[] = studioData?.contentBlocks || [];
 
+  const renderStudioContactDetails = () => {
+    const sName = studioData?.studioName || siteSettings?.studioName || 'Studio Tenev';
+    const addr = studioData?.address || siteSettings?.address || 'Strandgaten 86\n5004 Bergen';
+    const addrLines = addr.split('\n').map((l: string) => l.trim()).filter(Boolean);
+    const rawOrg = studioData?.orgNumber || '932 534 134 MVA';
+    const orgLabel = locale === 'en' ? 'Org. no.' : 'Org. nr.';
+    const mail = studioData?.contactEmail || siteSettings?.contactEmail || 'hello@studiotenev.com';
+    const ph = studioData?.contactPhone || siteSettings?.contactPhone || '+47 950 40 910';
+
+    return (
+      <div className="border-t border-black pt-1.5 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+        <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+          {t('contact')}
+        </h2>
+        <div className="flex flex-col gap-y-[var(--fm)]">
+          <div className="flex flex-col gap-0">
+            <div>{renderTypography(sName, locale === 'en' ? 'en-GB' : 'nb')}</div>
+            {addrLines.map((line: string, i: number) => (
+              <div key={i}>{renderTypography(line, locale === 'en' ? 'en-GB' : 'nb')}</div>
+            ))}
+            <div>
+              {orgLabel}{' '}
+              <span className="tabular-nums whitespace-nowrap">
+                {renderTypography(rawOrg, locale === 'en' ? 'en-GB' : 'nb')}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-0">
+            {mail && (
+              <div>
+                <a
+                  href={`mailto:${mail}`}
+                  className="hover:underline underline-offset-4 decoration-1 whitespace-nowrap cursor-pointer"
+                >
+                  {mail}
+                </a>
+              </div>
+            )}
+            {ph && (
+              <div>
+                <a
+                  href={`tel:${ph.replace(/\s+/g, '')}`}
+                  className="hover:underline underline-offset-4 decoration-1 whitespace-nowrap cursor-pointer tabular-nums"
+                >
+                  {ph}
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="w-full flex flex-col mb-42">
       {contentBlocks && contentBlocks.length > 0 ? (
@@ -95,18 +150,23 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
-                    <div className="text-measure" lang={locale === 'en' ? 'en-GB' : 'nb'}>
+                    <div
+                      className={`text-measure ${!isIntroBlock ? 'border-t border-black pt-1.5' : ''}`}
+                      lang={locale === 'en' ? 'en-GB' : 'nb'}
+                    >
                       {displayTitle && (
-                        <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                        <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                          {displayTitle}
+                        </h2>
                       )}
                       {displayText && (
                         <div className="news-content !m-0 !max-w-none text-[1.125rem] md:text-[1.2rem] leading-(--line-height)" lang={locale === 'en' ? 'en-GB' : 'nb'}>
-                          <PortableText value={formatPortableText(displayText) || displayText} />
+                          <PortableText value={formatPortableText(displayText, locale === 'en' ? 'en-GB' : 'nb') || displayText} components={portableTextComponents} />
                         </div>
                       )}
                       {isIntroBlock && (
-                        <div className="mt-[calc(2*var(--fm))] flex flex-col gap-[calc(0.5*var(--fm))] !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                          <div>
+                        <div className="mt-[calc(2*var(--fm))] flex justify-between md:justify-start items-baseline gap-x-4 md:gap-x-[2em] w-full !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                          <div className="text-left">
                             <Link
                               href="/tjenester"
                               className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block"
@@ -114,10 +174,10 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                               {t('ourServices')}
                             </Link>
                           </div>
-                          <div>
+                          <div className="text-right md:text-left">
                             <Link
                               href="/kontakt"
-                              className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block"
+                              className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block text-right md:text-left"
                             >
                               {t('bookConsultation')}
                             </Link>
@@ -217,8 +277,8 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
-                    <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                    <div className="text-measure border-t border-black pt-1.5 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                      <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <ul className="flex flex-col">
                         {names.map((name, i) => (
                           <li key={i}>{name}</li>
@@ -236,10 +296,10 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
                     <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                      <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <ul className="flex flex-col">
                         {block.items.map((item, i) => (
-                          <li key={i}>{item}</li>
+                          <li key={i}>{renderTypography(item, locale === 'en' ? 'en-GB' : 'nb')}</li>
                         ))}
                       </ul>
                     </div>
@@ -255,7 +315,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
                     <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                      <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <p className="whitespace-pre-wrap">
                         {renderTextWithEmail(displayText || '')}
                       </p>
@@ -275,23 +335,25 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
-                    <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                      <h2 className="font-normal mb-8 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
-                      <div className="mb-8">
-                        <div>{sName}</div>
-                        {addr && <div className="whitespace-pre-wrap">{addr}</div>}
-                      </div>
-                      <div className="mb-8">
-                        {mail && <div><a href={`mailto:${mail}`} className="hover:opacity-70 transition-opacity whitespace-nowrap">{mail}</a></div>}
-                        {ph   && <div><a href={`tel:${ph}`}       className="hover:opacity-70 transition-opacity whitespace-nowrap">{ph}</a></div>}
-                      </div>
-                      {insta && (
-                        <div>
-                          <a href={insta} target="_blank" rel="noopener noreferrer" className="hover:opacity-70 transition-opacity">
-                            Instagram
-                          </a>
+                    <div className="text-measure border-t border-black pt-1.5 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                      <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                      <div className="flex flex-col gap-y-[var(--fm)]">
+                        <div className="flex flex-col gap-0">
+                          <div>{sName}</div>
+                          {addr && <div className="whitespace-pre-wrap">{addr}</div>}
                         </div>
-                      )}
+                        <div className="flex flex-col gap-0">
+                          {mail && <div><a href={`mailto:${mail}`} className="hover:underline underline-offset-4 decoration-1 whitespace-nowrap cursor-pointer">{mail}</a></div>}
+                          {ph   && <div><a href={`tel:${ph}`}       className="hover:underline underline-offset-4 decoration-1 whitespace-nowrap cursor-pointer tabular-nums">{ph}</a></div>}
+                        </div>
+                        {insta && (
+                          <div>
+                            <a href={insta} target="_blank" rel="noopener noreferrer" className="hover:underline underline-offset-4 decoration-1 whitespace-nowrap cursor-pointer">
+                              Instagram
+                            </a>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -299,6 +361,13 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
               return null;
             })}
+            {!contentBlocks.some((b) => b._type === 'contactBlock') && (
+              <div className="md:col-start-3 md:col-span-8">
+                <div className="text-measure">
+                  {renderStudioContactDetails()}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -306,33 +375,36 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
         <div className="px-side-padding pt-content-top">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
             <div className="md:col-start-3 md:col-span-8">
-              <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                <h1 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                  {locale === 'en' ? 'Studio Tenev — Architects Bergen' : 'Studio Tenev — Arkitekt Bergen'}
-                </h1>
-                <p>
-                  {locale === 'en'
-                    ? 'Studio Tenev is an architecture practice established in 2024 by Daniel Tenev, based in the heart of Bergen, Norway. We work on a wide range of projects, from interior architecture and renovation to new construction, private houses, cabins, office buildings, and public and cultural spaces.'
-                    : 'Studio Tenev er et arkitektkontor etablert i 2024 av Daniel Tenev, med base i hjertet av Bergen sentrum. Vi arbeider med et bredt spekter av prosjekter, fra interiørarkitektur og rehabilitering til nybygg, eneboliger, hytter, kontorbygg og offentlige og kulturelle bygg.'}
-                </p>
-                <div className="mt-[calc(2*var(--fm))] flex flex-col gap-[calc(0.5*var(--fm))] !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                  <div>
-                    <Link
-                      href="/tjenester"
-                      className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block"
-                    >
-                      {t('ourServices')}
-                    </Link>
-                  </div>
-                  <div>
-                    <Link
-                      href="/kontakt"
-                      className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block"
-                    >
-                      {t('bookConsultation')}
-                    </Link>
+              <div className="text-measure flex flex-col gap-10 md:gap-14 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) hyphens-none">
+                <div>
+                  <h1 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                    {locale === 'en' ? 'Studio Tenev — Architects Bergen' : 'Studio Tenev — Arkitekt Bergen'}
+                  </h1>
+                  <p>
+                    {locale === 'en'
+                      ? 'Studio Tenev is an architecture practice established in 2024 by Daniel Tenev, based in the heart of Bergen, Norway. We work on a wide range of projects, from interior architecture and renovation to new construction, private houses, cabins, office buildings, and public and cultural spaces.'
+                      : 'Studio Tenev er et arkitektkontor etablert i 2024 av Daniel Tenev, med base i hjertet av Bergen sentrum. Vi arbeider med et bredt spekter av prosjekter, fra interiørarkitektur og rehabilitering til nybygg, eneboliger, hytter, kontorbygg og offentlige og kulturelle bygg.'}
+                  </p>
+                  <div className="mt-[calc(2*var(--fm))] flex justify-between md:justify-start items-baseline gap-x-4 md:gap-x-[2em] w-full !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                    <div className="text-left">
+                      <Link
+                        href="/tjenester"
+                        className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block"
+                      >
+                        {t('ourServices')}
+                      </Link>
+                    </div>
+                    <div className="text-right md:text-left">
+                      <Link
+                        href="/kontakt"
+                        className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block text-right md:text-left"
+                      >
+                        {t('bookConsultation')}
+                      </Link>
+                    </div>
                   </div>
                 </div>
+                {renderStudioContactDetails()}
               </div>
             </div>
           </div>

@@ -106,7 +106,7 @@ export default async function RootLayout({
       addressLocality: "Bergen",
       addressCountry: "NO",
     },
-    email: settings?.contactEmail || "daniel@studiotenev.com",
+    email: settings?.contactEmail || "hello@studiotenev.com",
     telephone: settings?.contactPhone || "+47 950 40 910",
     areaServed: ["Bergen", "Vestland", "Oslo", "Norway"],
     memberOf: {

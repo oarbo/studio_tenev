@@ -123,7 +123,7 @@ export default function BulkMediaSelectInput(props: ArrayOfObjectsInputProps) {
               _ref: asset._id,
             },
           },
-          alt: asset.originalFilename ? asset.originalFilename.replace(/\.[^/.]+$/, '') : '',
+          alt: '',
         };
       }
 
@@ -134,7 +134,7 @@ export default function BulkMediaSelectInput(props: ArrayOfObjectsInputProps) {
           _type: 'reference',
           _ref: asset._id,
         },
-        alt: asset.originalFilename ? asset.originalFilename.replace(/\.[^/.]+$/, '') : '',
+        alt: '',
       };
     });
 

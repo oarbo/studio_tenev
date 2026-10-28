@@ -9,6 +9,7 @@ export interface ProjectCreditItem {
   titleEn?: string;
   slug?: string;
   photographer?: string;
+  renderingFirm?: string;
 }
 
 interface ImprintContentProps {
@@ -30,25 +31,40 @@ export default function ImprintContent({
   const isEn = locale === 'en';
   const currentYear = new Date().getFullYear();
 
-  // Ekstraher unike fotografer og visualiseringsstudioer, alfabetisk sortert
+  // Ekstraher unike fotografer og visualiseringsstudioer, alfabetisk sortert (aldri duplikater)
   const photographersList = useMemo(() => {
-    const names = new Set<string>();
+    const namesMap = new Map<string, string>(); // lowercase -> display name
+
     credits.forEach((item) => {
-      const raw = typeof item === 'string' ? item : item?.photographer;
-      if (raw) {
+      const stringsToProcess: string[] = [];
+      if (typeof item === 'string') {
+        stringsToProcess.push(item);
+      } else if (item) {
+        if (item.photographer) stringsToProcess.push(item.photographer);
+        if (item.renderingFirm) stringsToProcess.push(item.renderingFirm);
+      }
+
+      stringsToProcess.forEach((raw) => {
         raw.split(',').forEach((name) => {
           const trimmed = name.trim();
-          if (trimmed) names.add(trimmed);
+          if (trimmed) {
+            const key = trimmed.toLowerCase();
+            if (!namesMap.has(key)) {
+              namesMap.set(key, trimmed);
+            }
+          }
         });
-      }
+      });
     });
 
+    const uniqueNames = Array.from(namesMap.values());
+
     // Fallback hvis ingen er hentet fra Sanity ennå
-    if (names.size === 0) {
-      ['Elisabeth Heier', 'Ivar Kvaal', 'Mir', 'NRML Studio'].forEach((n) => names.add(n));
+    if (uniqueNames.length === 0) {
+      ['Elisabeth Heier', 'Ivar Kvaal', 'Mir', 'NRML Studio'].forEach((n) => uniqueNames.push(n));
     }
 
-    return Array.from(names).sort((a, b) => a.localeCompare(b, 'nb'));
+    return uniqueNames.sort((a, b) => a.localeCompare(b, 'nb'));
   }, [credits]);
 
   const photographersString = photographersList.join(', ');
@@ -57,11 +73,11 @@ export default function ImprintContent({
     <div className="w-full px-side-padding pt-content-top mb-42">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
         <div className="md:col-start-3 md:col-span-8">
-          <div className="text-measure flex flex-col gap-10 md:gap-14 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+          <div className="text-measure flex flex-col gap-10 md:gap-14 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) hyphens-none">
             {/* Page Title */}
             <div>
               <h1 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                {isEn ? 'Imprint and Privacy policy' : 'Imprint and Privacy policy'}
+                {isEn ? 'Imprint and Privacy policy' : 'Kolofon og personvern'}
               </h1>
             </div>
 
@@ -74,21 +90,13 @@ export default function ImprintContent({
               {isEn ? (
                 <div className="flex flex-col leading-(--line-height)">
                   <p>
-                    In accordance with the EU GDPR (General Data Protection Regulation) requirements
-                    and the Norwegian Personal Data Act, we are committed to protecting and respecting
-                    your privacy. Essential cookies are used on this website but personal information
-                    is not tracked or retained.
+                    We protect your privacy in accordance with GDPR and applicable legislation. This website uses only essential cookies for its operation, and no personal information is retained without consent.
                   </p>
                   <div className="mt-[1.5em]">
                     <h3 className="font-normal mb-0 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">Enquiries</h3>
                     <p>
-                      When you submit an enquiry via our website or contact form, we collect only the
-                      information you provide yourself (name, email address, phone number, and project details).
-                      This information is used solely to respond to your enquiry, discuss potential projects,
-                      or arrange a consultation. We never sell your personal information or share it with
-                      third parties without your explicit consent. You can at any time request access to,
-                      rectification of, or erasure of your personal data by contacting{' '}
-                      <a href={`mailto:${contactEmail}`} className="underline underline-offset-2 hover:opacity-70 whitespace-nowrap">
+                      Information provided in the contact form is used solely for dialogue regarding your project and is never shared with third parties. For access to or deletion of your details, please contact{' '}
+                      <a href={`mailto:${contactEmail}`} className="underline underline-offset-4 decoration-1 hover:opacity-70 whitespace-nowrap">
                         {contactEmail}
                       </a>.
                     </p>
@@ -106,21 +114,13 @@ export default function ImprintContent({
               ) : (
                 <div className="flex flex-col leading-(--line-height)">
                   <p>
-                    I samsvar med EUs personvernforordning (GDPR) og den norske personopplysningsloven
-                    er vi forpliktet til å beskytte og respektere ditt personvern. Nødvendige tekniske
-                    informasjonskapsler benyttes for nettsidens funksjonalitet, men personopplysninger
-                    spores eller lagres ikke uten ditt samtykke.
+                    Vi verner om ditt personvern i tråd med GDPR og norsk lov. Nettsiden benytter kun nødvendige informasjonskapsler for drift, og vi lagrer ingen personopplysninger uten samtykke.
                   </p>
                   <div className="mt-[1.5em]">
                     <h3 className="font-normal mb-0 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">Henvendelser</h3>
                     <p>
-                      Når du sender inn en henvendelse via vårt kontaktskjema, samler vi kun inn den
-                      informasjonen du selv oppgir (navn, e-post, telefonnummer og prosjektopplysninger).
-                      Denne informasjonen brukes utelukkende til å besvare din forespørsel, diskutere prosjektidéer
-                      eller avtale befaring. Vi selger aldri personopplysninger til tredjeparter, og deler ikke
-                      dine opplysninger uten ditt samtykke. Du kan når som helst be om innsyn i, retting eller
-                      sletting av dine opplysninger ved å kontakte{' '}
-                      <a href={`mailto:${contactEmail}`} className="underline underline-offset-2 hover:opacity-70 whitespace-nowrap">
+                      Informasjon du oppgir i kontaktskjemaet brukes utelukkende til dialog om ditt prosjekt, og deles aldri med andre. Ønsker du innsyn eller sletting av dine opplysninger, ta kontakt på{' '}
+                      <a href={`mailto:${contactEmail}`} className="underline underline-offset-4 decoration-1 hover:opacity-70 whitespace-nowrap">
                         {contactEmail}
                       </a>.
                     </p>
@@ -143,78 +143,50 @@ export default function ImprintContent({
               <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                 {isEn ? 'Copyright' : 'Opphavsrett'}
               </h2>
-              <div className="flex flex-col gap-y-4 gap-y-16px leading-(--line-height)">
+              <div className="flex flex-col leading-(--line-height)">
                 <p>
                   &copy;{currentYear} {studioName}. {isEn ? 'All rights reserved.' : 'Alle rettigheter reservert.'}
                 </p>
 
                 {isEn ? (
                   <>
-                    <p>
-                      Unless otherwise indicated, all materials on these pages are copyrighted.
-                      No part of these pages, either text or images may be used for any purpose other
-                      than personal use, unless explicit authorisation is given. Therefore reproduction,
-                      modification, storage in a retrieval system or retransmission, in any form or
-                      by any means – electronic, mechanical or otherwise, for reasons other than personal
-                      use, is strictly prohibited without prior written permission.
+                    <p className="mt-half">
+                      All material on these pages is protected by copyright. Text, images, and drawings may not be copied, distributed, or used without prior written permission.
                     </p>
                     <p>
                       Photography and visualisations have been provided by: {photographersString}.
                     </p>
-                    <p>
-                      We thank all copyright owners for the permission to include their material on our
-                      website. If, despite our efforts, any copyrights and credits have not been correctly
-                      noted, please contact Studio Tenev AS (<a href={`mailto:${contactEmail}`} className="underline underline-offset-2 hover:opacity-70 whitespace-nowrap">{contactEmail}</a>) so that the relevant pages can be updated.
+                    <p className="mt-half">
+                      If a credit is missing or incorrectly noted, please contact us at <a href={`mailto:${contactEmail}`} className="underline underline-offset-4 decoration-1 hover:opacity-70 whitespace-nowrap">{contactEmail}</a> so we can update the page.
                     </p>
                   </>
                 ) : (
                   <>
-                    <p>
-                      Med mindre annet er angitt, er alt materiale på disse sidene opphavsrettslig beskyttet.
-                      Ingen del av disse sidene, verken tekst eller bilder, kan brukes til andre formål enn
-                      personlig bruk, med mindre det foreligger uttrykkelig tillatelse. Reproduksjon, endring,
-                      lagring i et gjenfinningssystem eller videresending, i enhver form eller på enhver måte –
-                      elektronisk, mekanisk eller på annen måte – til andre formål enn personlig bruk, er derfor
-                      strengt forbudt uten skriftlig forhåndstillatelse.
+                    <p className="mt-half">
+                      Alt materiale på disse sidene er opphavsrettslig beskyttet. Tekst, bilder og tegninger kan ikke kopieres, videreformidles eller benyttes uten skriftlig forhåndstillatelse.
                     </p>
                     <p>
                       Fotografier og visualiseringer er levert av: {photographersString}.
                     </p>
-                    <p>
-                      Vi takker alle rettighetshavere for tillatelsen til å inkludere deres materiale på vår
-                      nettside. Dersom noen opphavsrettigheter eller krediteringer mot formodning ikke er oppgitt
-                      korrekt, ber vi om at Studio Tenev AS kontaktes (<a href={`mailto:${contactEmail}`} className="underline underline-offset-2 hover:opacity-70 whitespace-nowrap">{contactEmail}</a>) slik at de aktuelle sidene kan oppdateres.
+                    <p className="mt-half">
+                      Dersom en kreditering mangler eller ikke er oppgitt korrekt, vennligst ta kontakt på <a href={`mailto:${contactEmail}`} className="underline underline-offset-4 decoration-1 hover:opacity-70 whitespace-nowrap">{contactEmail}</a> slik at vi kan oppdatere siden.
                     </p>
                   </>
                 )}
               </div>
             </div>
 
-            {/* 3. Sustainability and accessibility */}
-            <div className="border-t border-black pt-1.5">
-              <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                {isEn ? 'Sustainability and accessibility' : 'Bærekraft og tilgjengelighet'}
-              </h2>
-              <div className="flex flex-col gap-y-4 gap-y-16px leading-(--line-height)">
-                <p>
-                  {isEn
-                    ? 'This website has been designed to be in accordance with accessibility and sustainability best practices to ensure an inclusive and energy-efficient experience. This includes using responsive design features and progressive enhancement, keeping to a strict network performance budget and minimal digital footprint.'
-                    : 'Denne nettsiden er utformet i tråd med beste praksis for tilgjengelighet og digital bærekraft for å sikre en inkluderende og energieffektiv opplevelse. Dette inkluderer responsiv design, progressiv forbedring, strengt ytelsesbudsjett og et lavt digitalt klimaavtrykk.'}
-                </p>
-              </div>
-            </div>
-
-            {/* 4. Website */}
+            {/* 3. Website */}
             <div className="border-t border-black pt-1.5">
               <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                 {isEn ? 'Website' : 'Nettside'}
               </h2>
               <p className="leading-(--line-height)">
-                Designed and built by Øystein Arbo studio
+                {isEn ? 'Designed and built by Øystein Arbo studio' : 'Designet og utviklet av Øystein Arbo studio'}
               </p>
             </div>
 
-            {/* 5. Imprint */}
+            {/* 4. Imprint */}
             <div className="border-t border-black pt-1.5">
               <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                 {isEn ? 'Imprint' : 'Impressum'}

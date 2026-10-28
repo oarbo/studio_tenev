@@ -133,8 +133,11 @@ export default function WorkFilter({ items, initialTag }: WorkFilterProps) {
 
   return (
     <div className="w-full flex flex-col pt-0">
-      {/* Mobile-only category buttons */}
-      <div className="flex md:hidden items-center justify-start gap-[1em] mb-4 text-[1rem] overflow-x-auto whitespace-nowrap scrollbar-none px-side-padding">
+      {/* Category filter menu (centered, can wrap over multiple lines) */}
+      <nav
+        aria-label="Kategorier"
+        className="w-full flex flex-wrap items-center justify-center gap-x-[1.25em] gap-y-2 pt-content-top pb-8 md:pb-12 text-[1rem] leading-tight text-center px-side-padding"
+      >
         {categories.map((cat) => {
           const isActive = activeCategory === cat.key;
           return (
@@ -143,14 +146,14 @@ export default function WorkFilter({ items, initialTag }: WorkFilterProps) {
               type="button"
               onClick={() => setCategory(cat.key)}
               className={`cursor-pointer whitespace-nowrap hover:underline hover:underline-offset-4 hover:decoration-1 ${
-                isActive ? 'underline underline-offset-4 decoration-1 font-normal' : 'opacity-60'
+                isActive ? 'underline underline-offset-4 decoration-1 font-normal text-black' : 'text-black/60 font-normal'
               }`}
             >
               {cat.label}
             </button>
           );
         })}
-      </div>
+      </nav>
 
       <div className="w-full min-h-[calc(100vh-10rem)] min-h-[calc(100dvh-10rem)]">
         <ProjectList

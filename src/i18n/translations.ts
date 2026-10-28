@@ -9,15 +9,9 @@ export interface Translations {
   // Footer
   backToTop: string;
   information: string;
-  termsAndConditions: string;
   privacyPolicy: string;
-  privacyNotice: string;
-  privacyNoticeLink: string;
   address: string;
   contact: string;
-  language: string;
-  allRightsReserved: string;
-  orgNr: string;
 
   // Work & Projects
   name: string;
@@ -29,6 +23,7 @@ export interface Translations {
   client: string;
   contractor: string;
   photographer: string;
+  rendering: string;
   images: string;
   country: string;
   use: string;
@@ -63,15 +58,9 @@ export const translations: Record<Locale, Translations> = {
 
     backToTop: 'Til toppen',
     information: 'Informasjon',
-    termsAndConditions: 'Imprint and Privacy policy',
-    privacyPolicy: 'Imprint and Privacy policy',
-    privacyNotice: 'Ved å sende inn godtar du vår',
-    privacyNoticeLink: 'personvernerklæring',
+    privacyPolicy: 'Kolofon og personvern',
     address: 'Adresse',
     contact: 'Kontakt',
-    language: 'Språk',
-    allRightsReserved: 'Alle rettigheter reservert',
-    orgNr: 'Org nr',
 
     name: 'Navn',
     type: 'Type',
@@ -82,6 +71,7 @@ export const translations: Record<Locale, Translations> = {
     client: 'Oppdragsgiver',
     contractor: 'Entreprenør',
     photographer: 'Fotograf',
+    rendering: 'Rendring',
     images: 'Bilder',
     country: 'Land',
     use: 'Formål',
@@ -110,15 +100,9 @@ export const translations: Record<Locale, Translations> = {
 
     backToTop: 'Back to top',
     information: 'Information',
-    termsAndConditions: 'Imprint and Privacy policy',
     privacyPolicy: 'Imprint and Privacy policy',
-    privacyNotice: 'By submitting, you agree to our',
-    privacyNoticeLink: 'privacy policy',
     address: 'Address',
     contact: 'Contact',
-    language: 'Language',
-    allRightsReserved: 'All rights reserved',
-    orgNr: 'Org. no.',
 
     name: 'Name',
     type: 'Type',
@@ -129,6 +113,7 @@ export const translations: Record<Locale, Translations> = {
     client: 'Client',
     contractor: 'Contractor',
     photographer: 'Photographer',
+    rendering: 'Rendering',
     images: 'Images',
     country: 'Country',
     use: 'Use',

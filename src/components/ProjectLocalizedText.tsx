@@ -3,7 +3,7 @@
 import React from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PortableText } from '@portabletext/react';
-import { formatTypography, formatPortableText } from '@/utils/typography';
+import { formatPortableText, renderTypography, portableTextComponents } from '@/utils/typography';
 
 export function ProjectLocalizedTextBlock({
   title,
@@ -19,18 +19,17 @@ export function ProjectLocalizedTextBlock({
   metadataNode?: React.ReactNode;
 }) {
   const { locale } = useLanguage();
-  const rawTitle = locale === 'en' ? (titleEn || title) : title;
-  const currentTitle = rawTitle ? formatTypography(rawTitle) : undefined;
-  const rawText = locale === 'en' && Array.isArray(textEn) && textEn.length > 0 ? textEn : text;
-  const currentText = rawText ? (formatPortableText(rawText) || rawText) : undefined;
   const lang = locale === 'en' ? 'en-GB' : 'nb';
+  const rawTitle = locale === 'en' ? (titleEn || title) : title;
+  const rawText = locale === 'en' && Array.isArray(textEn) && textEn.length > 0 ? textEn : text;
+  const currentText = rawText ? (formatPortableText(rawText, lang) || rawText) : undefined;
 
   return (
     <div className="text-measure" lang={lang}>
-      {currentTitle && <h2 className="font-normal mb-4 text-[1.33rem]">{currentTitle}</h2>}
+      {rawTitle && <h2 className="font-normal mb-4 text-[1.33rem]">{renderTypography(rawTitle, lang)}</h2>}
       {currentText && (
         <div className="news-content !m-0 !max-w-none text-[1.125rem] md:text-[1.2rem] leading-(--line-height)" lang={lang}>
-          <PortableText value={currentText} />
+          <PortableText value={currentText} components={portableTextComponents} />
         </div>
       )}
       {metadataNode && (
@@ -52,11 +51,10 @@ export function ProjectLocalizedCaption({
   className?: string;
 }) {
   const { locale } = useLanguage();
-  const rawCaption = locale === 'en' ? (captionEn || caption) : caption;
-  const currentCaption = rawCaption ? formatTypography(rawCaption) : undefined;
   const lang = locale === 'en' ? 'en-GB' : 'nb';
+  const rawCaption = locale === 'en' ? (captionEn || caption) : caption;
 
-  if (!currentCaption) return null;
+  if (!rawCaption) return null;
 
   return (
     <div
@@ -64,7 +62,7 @@ export function ProjectLocalizedCaption({
       className={className || "mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height)"}
       style={{ color: 'var(--secondary-color)' }}
     >
-      {currentCaption}
+      {renderTypography(rawCaption, lang)}
     </div>
   );
 }

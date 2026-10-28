@@ -6,7 +6,6 @@ import WorkFilter from '@/components/WorkFilter';
 import ProjectCarousel from '@/components/ProjectCarousel';
 import { ProjectListItem } from '@/components/ProjectList';
 import { SanityHotspot } from '@/components/SanityImage';
-import { PortableText } from '@portabletext/react';
 import type { PortableTextBlock } from '@portabletext/types';
 
 export const revalidate = 60;
@@ -42,6 +41,7 @@ interface ProjectData {
   client?: string;
   contractor?: string;
   photographer?: string;
+  team?: string[];
   size?: { value: number; unit: string };
   coverImage?: string;
   coverImageLqip?: string;
@@ -123,7 +123,7 @@ export default async function ProjectsPage() {
     <Layout noPadding={true}>
       <div className="w-full flex flex-col mb-fm-5">
         <h1 className="sr-only">Work — Prosjekter av Studio Tenev</h1>
-        <div id="project-carousel" className="w-full">
+        <div id="project-carousel" className="w-full hidden md:block">
           <ProjectCarousel items={carouselItems} />
         </div>
         {projectItems.length > 0 && (
