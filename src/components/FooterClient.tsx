@@ -201,14 +201,14 @@ export default function FooterClient({
             &nbsp;
           </div>
           <LanguageSwitcher />
-          <div className="mt-[calc(1.4em-20px)] -ml-[15px]">
+          <div className="mt-[calc(1.4em-20px)] ml-0">
             <img
               src="/nal_liggende_rgb_pos.png"
               alt="NAL Logo"
               width={160}
-              height={42}
+              height={33}
               loading="lazy"
-              className="w-[154px] max-w-none h-auto grayscale contrast-[500%] object-contain block"
+              className="w-[154px] max-w-none h-auto object-contain block"
             />
           </div>
         </div>
