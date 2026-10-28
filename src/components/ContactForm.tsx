@@ -3,6 +3,72 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { AsYouType } from 'libphonenumber-js';
+
+function formatPhoneNumber(raw: string): string {
+  if (!raw) return '';
+  let str = raw.trimStart();
+  if (str.startsWith('00')) {
+    str = '+' + str.slice(2);
+  }
+  const hasPlus = str.startsWith('+');
+  const digits = str.replace(/\D/g, '');
+
+  if (!digits) {
+    return hasPlus ? '+' : '';
+  }
+
+  // Handle Norwegian prefix (+47)
+  if (hasPlus && digits.startsWith('47')) {
+    const national = digits.slice(2);
+    if (!national) {
+      return str.endsWith(' ') ? '+47 ' : '+47';
+    }
+
+    const isMobile = /^[49]/.test(national);
+    if (isMobile) {
+      // Official mobile format: 3 + 2 + 3 (### ## ###)
+      const p1 = national.slice(0, 3);
+      const p2 = national.slice(3, 5);
+      const p3 = national.slice(5, 8);
+      const rest = national.slice(8);
+      let res = '+47 ' + p1;
+      if (p2) res += ' ' + p2;
+      if (p3) res += ' ' + p3;
+      if (rest) res += ' ' + rest;
+      return res;
+    } else {
+      // Official landline format: 2 + 2 + 2 + 2 (## ## ## ##)
+      const p1 = national.slice(0, 2);
+      const p2 = national.slice(2, 4);
+      const p3 = national.slice(4, 6);
+      const p4 = national.slice(6, 8);
+      const rest = national.slice(8);
+      let res = '+47 ' + p1;
+      if (p2) res += ' ' + p2;
+      if (p3) res += ' ' + p3;
+      if (p4) res += ' ' + p4;
+      if (rest) res += ' ' + rest;
+      return res;
+    }
+  }
+
+  // If user entered without +, but typed 8 Norwegian mobile digits
+  if (!hasPlus && digits.length <= 8 && /^[49]/.test(digits)) {
+    const p1 = digits.slice(0, 3);
+    const p2 = digits.slice(3, 5);
+    const p3 = digits.slice(5, 8);
+    let res = p1;
+    if (p2) res += ' ' + p2;
+    if (p3) res += ' ' + p3;
+    return res;
+  }
+
+  // Official international formatting for any other country code
+  const inputToFormat = hasPlus ? '+' + digits : digits;
+  const asYouType = new AsYouType();
+  return asYouType.input(inputToFormat);
+}
 
 interface ContactFormProps {
   onSuccess?: () => void;
@@ -58,6 +124,41 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
     if (phone.trim() === '+47' || phone.trim() === '+') {
       setPhone('');
     }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    const rawValue = input.value;
+    const selectionStart = input.selectionStart ?? rawValue.length;
+
+    const digitsBeforeCursor = rawValue.slice(0, selectionStart).replace(/\D/g, '').length;
+    const hadPlusBeforeCursor = rawValue.slice(0, selectionStart).includes('+');
+
+    const formatted = formatPhoneNumber(rawValue);
+    setPhone(formatted);
+
+    if (fieldErrors.phone) {
+      setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+    }
+
+    requestAnimationFrame(() => {
+      let newPos = 0;
+      if (digitsBeforeCursor === 0) {
+        newPos = hadPlusBeforeCursor && formatted.startsWith('+') ? 1 : 0;
+      } else {
+        let digitCount = 0;
+        for (let i = 0; i < formatted.length; i++) {
+          if (/\d/.test(formatted[i])) {
+            digitCount++;
+          }
+          if (digitCount === digitsBeforeCursor) {
+            newPos = i + 1;
+            break;
+          }
+        }
+      }
+      input.setSelectionRange(newPos, newPos);
+    });
   };
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -359,12 +460,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
               aria-describedby={fieldErrors.phone ? 'error-phone' : undefined}
               onFocus={handlePhoneFocus}
               onBlur={handlePhoneBlur}
-              onChange={(e) => {
-                setPhone(e.target.value);
-                if (fieldErrors.phone) {
-                  setFieldErrors((prev) => ({ ...prev, phone: undefined }));
-                }
-              }}
+              onChange={handlePhoneChange}
               className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none ${
                 fieldErrors.phone ? 'text-red-600' : 'text-black'
               }`}
