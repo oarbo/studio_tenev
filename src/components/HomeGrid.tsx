@@ -99,8 +99,8 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                 {/* Media Layer (Video or Image) */}
                 {item.videoUrl ? (
                   <>
-                    {/* Mobil: Bevares uendret */}
-                    <div className="md:hidden relative w-full overflow-hidden bg-gray-50" style={{ aspectRatio }}>
+                    {/* Mobil: Vises i full bredde i sitt naturlige format uten cropping */}
+                    <div className="md:hidden relative w-full overflow-hidden">
                       <video
                         src={item.videoUrl}
                         preload="metadata"
@@ -108,7 +108,7 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                         muted
                         loop
                         playsInline
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="block w-full h-auto"
                       />
                     </div>
                     {/* Desktop: Vises i sin opprinnelige oppløsning uten forstørring eller cropping, nøyaktig som tidligere */}

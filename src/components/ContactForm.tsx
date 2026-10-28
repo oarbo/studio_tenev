@@ -337,7 +337,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
                   setFieldErrors((prev) => ({ ...prev, firstName: undefined }));
                 }
               }}
-              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none ${
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none rounded-none ${
                 fieldErrors.firstName ? 'text-red-600' : 'text-black'
               }`}
             />
@@ -379,7 +379,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
                   setFieldErrors((prev) => ({ ...prev, lastName: undefined }));
                 }
               }}
-              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none ${
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none rounded-none ${
                 fieldErrors.lastName ? 'text-red-600' : 'text-black'
               }`}
             />
@@ -426,7 +426,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
                   setFieldErrors((prev) => ({ ...prev, email: undefined }));
                 }
               }}
-              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none ${
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none rounded-none ${
                 fieldErrors.email ? 'text-red-600' : 'text-black'
               }`}
             />
@@ -461,7 +461,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
               onFocus={handlePhoneFocus}
               onBlur={handlePhoneBlur}
               onChange={handlePhoneChange}
-              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none ${
+              className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none rounded-none ${
                 fieldErrors.phone ? 'text-red-600' : 'text-black'
               }`}
             />
@@ -505,7 +505,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
                 setFieldErrors((prev) => ({ ...prev, message: undefined }));
               }
             }}
-            className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] focus:outline-none focus-visible:ring-1 focus-visible:ring-black md:focus-visible:ring-0 md:focus:ring-0 md:outline-none rounded-none resize-none overflow-hidden leading-(--line-height) ${
+            className={`w-full bg-transparent pb-1 text-[1.125rem] md:text-[1.2rem] outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none rounded-none resize-none overflow-hidden leading-(--line-height) ${
               fieldErrors.message ? 'text-red-600' : 'text-black'
             }`}
           />
