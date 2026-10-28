@@ -233,39 +233,42 @@ export default function ProjectList({
     label: string, 
     sortKey: string, 
     colSpan: string, 
-    mobileHidden: boolean = false,
-    alignRight: boolean = false
+    mobileHidden: boolean = false
   ) => {
     const isActive = sortBy === sortKey;
-    const arrowBefore = sortKey === 'date';
+    const isDate = sortKey === 'date';
     
     return (
       <button 
         type="button"
         onClick={() => onSort && onSort(sortKey)}
-        className={`${colSpan} ${mobileHidden ? 'hidden md:flex' : 'flex'} items-center ${alignRight ? 'justify-end text-right' : 'justify-start text-left'} hover:opacity-70 transition-opacity cursor-pointer font-normal`}
+        className={`${colSpan} ${mobileHidden ? 'hidden md:flex' : 'flex'} items-center ${
+          isDate ? 'justify-end md:justify-between text-right md:text-left' : 'justify-between text-left'
+        } hover:opacity-70 transition-opacity cursor-pointer font-normal`}
       >
-        <span className={`inline-flex items-center gap-[1em] ${alignRight ? 'justify-end' : 'justify-start'}`}>
-          {isActive && arrowBefore && (
-            <span className="flex-shrink-0 opacity-50 relative top-[1px]">
-              {sortDir === 'asc' ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-              )}
-            </span>
-          )}
-          <span>{label}</span>
-          {isActive && !arrowBefore && (
-            <span className="flex-shrink-0 opacity-50 relative top-[1px]">
-              {sortDir === 'asc' ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-              )}
-            </span>
-          )}
-        </span>
+        {/* Mobilvisning for Year: pil foran teksten som på mobil */}
+        {isActive && isDate && (
+          <span className="md:hidden flex-shrink-0 opacity-50 relative top-[1px] mr-1.5">
+            {sortDir === 'asc' ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            )}
+          </span>
+        )}
+
+        <span>{label}</span>
+
+        {/* Desktopvisning: opprinnelig pil (20x20, top-[2px]) plassert på høyre ytterkant av kolonnen */}
+        {isActive && (
+          <span className={`flex-shrink-0 opacity-50 relative top-[2px] ${isDate ? 'hidden md:inline-flex' : ''}`}>
+            {sortDir === 'asc' ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            )}
+          </span>
+        )}
       </button>
     );
   };
@@ -333,8 +336,8 @@ export default function ProjectList({
             {renderSortHeader(t('name'), 'name', 'flex-1 md:flex-initial md:col-start-3 md:col-span-2')}
             {renderSortHeader(t('type'), 'type', 'md:col-span-2', true)}
             {renderSortHeader(t('size'), 'size', 'md:col-span-1', true)}
+            {renderSortHeader(t('year'), 'date', 'flex-shrink-0 md:col-span-1')}
             {renderSortHeader(t('status'), 'status', 'md:col-span-2', true)}
-            {renderSortHeader(t('year'), 'date', 'flex-shrink-0 md:col-span-1', false, true)}
           </div>
         </div>
 
@@ -391,14 +394,14 @@ export default function ProjectList({
                       {item.size?.value ? `${item.size.value}\u00A0${(item.size.unit || 'm²').trim()}` : ''}
                     </div>
 
+                    {/* Year */}
+                    <div className="flex-shrink-0 md:col-span-1 tabular-nums whitespace-nowrap text-right md:text-left group-hover:opacity-70 transition-opacity">
+                      {dateStr || ''}
+                    </div>
+
                     {/* Status (hidden on mobile) */}
                     <div className="hidden md:block md:col-span-2 group-hover:opacity-70 transition-opacity">
                       {displayStatus}
-                    </div>
-
-                    {/* Year */}
-                    <div className="flex-shrink-0 md:col-span-1 tabular-nums whitespace-nowrap text-right group-hover:opacity-70 transition-opacity">
-                      {dateStr || ''}
                     </div>
                   </div>
                 ) : (
@@ -420,14 +423,14 @@ export default function ProjectList({
                       {item.size?.value ? `${item.size.value}\u00A0${(item.size.unit || 'm²').trim()}` : ''}
                     </div>
 
+                    {/* Year */}
+                    <div className="flex-shrink-0 md:col-span-1 tabular-nums whitespace-nowrap text-right md:text-left">
+                      {dateStr || ''}
+                    </div>
+
                     {/* Status (hidden on mobile) */}
                     <div className="hidden md:block md:col-span-2">
                       {displayStatus}
-                    </div>
-
-                    {/* Year */}
-                    <div className="flex-shrink-0 md:col-span-1 tabular-nums whitespace-nowrap text-right">
-                      {dateStr || ''}
                     </div>
                   </div>
                 )}
