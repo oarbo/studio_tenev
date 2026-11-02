@@ -266,15 +266,24 @@ export default function ProjectList({
             : 'justify-start md:justify-between text-left'
         } hover:opacity-70 transition-opacity cursor-pointer font-normal`}
       >
-        {/* Mobilvisning for Year: pil foran teksten */}
+        {/* Mobil- og tablet-visning for Year: pil foran teksten (1.5 for mobil, 1em for tablet) */}
         {isActive && isDate && (
-          <span className="md:hidden flex-shrink-0 opacity-50 relative top-[1px] mr-1.5 leading-none">
-            {sortDir === 'asc' ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            )}
-          </span>
+          <>
+            <span className="md:hidden flex-shrink-0 opacity-50 relative top-[1px] mr-1.5 leading-none">
+              {sortDir === 'asc' ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              )}
+            </span>
+            <span className="hidden md:inline-flex xl:hidden flex-shrink-0 opacity-50 relative top-[2px] mr-[1em]">
+              {sortDir === 'asc' ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              )}
+            </span>
+          </>
         )}
 
         <span>{label}</span>
@@ -290,9 +299,20 @@ export default function ProjectList({
           </span>
         )}
 
-        {/* Desktopvisning: opprinnelig pil (20x20, top-[2px]) plassert på høyre ytterkant av kolonnen */}
+        {/* Tablet-visning for andre kolonner enn Year (Name, etc.): pil på høyre ytterkant av kolonnen */}
+        {isActive && !isDate && (
+          <span className="hidden md:inline-flex xl:hidden flex-shrink-0 opacity-50 relative top-[2px]">
+            {sortDir === 'asc' ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            )}
+          </span>
+        )}
+
+        {/* Desktopvisning (>= 1280px): opprinnelig pil på høyre ytterkant av kolonnen */}
         {isActive && (
-          <span className="hidden md:inline-flex flex-shrink-0 opacity-50 relative top-[2px]">
+          <span className="hidden xl:inline-flex flex-shrink-0 opacity-50 relative top-[2px]">
             {sortDir === 'asc' ? (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
             ) : (
