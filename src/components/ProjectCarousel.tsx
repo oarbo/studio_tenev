@@ -67,8 +67,9 @@ function ProjectCarouselStaticView({ item }: { item: ProjectCarouselItem }) {
                   hotspot={item.image?.hotspot}
                   loading="eager"
                   fetchPriority="high"
+                  quality={90}
                   className="object-cover select-none pointer-events-none"
-                  sizes="(max-width: 768px) 85vw, 55vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 85vw"
                   draggable={false}
                 />
               )}
@@ -138,7 +139,7 @@ function ProjectCarouselInner({
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const targetW = window.innerWidth >= 768
-      ? (window.innerWidth * dpr >= 1400 ? 1920 : 1200)
+      ? (window.innerWidth * dpr >= 1800 ? 2560 : 1920)
       : (window.innerWidth * dpr >= 800 ? 1080 : 750);
 
     const buildUrl = (rawSrc: string, w: number) => {
@@ -146,7 +147,7 @@ function ProjectCarouselInner({
         const u = new URL(rawSrc);
         u.searchParams.set('auto', 'format');
         u.searchParams.set('w', w.toString());
-        u.searchParams.set('q', '80');
+        u.searchParams.set('q', '90');
         u.searchParams.set('fit', 'max');
         return u.href;
       } catch {
@@ -708,8 +709,9 @@ function ProjectCarouselInner({
                             hotspot={item.image?.hotspot}
                             loading="eager"
                             fetchPriority="high"
+                            quality={90}
                             className="object-cover select-none pointer-events-none"
-                            sizes="(max-width: 768px) 85vw, 55vw"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 85vw"
                             draggable={false}
                           />
                         )}
