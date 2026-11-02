@@ -48,61 +48,52 @@ function getSlideItemDimensions(
 ) {
   const ar = overrideAspect || slide.aspectRatio || fallbackAspect;
   const size = slide.size || 'default';
+  const marginClass = singleSlide ? 'mr-0' : 'mr-4 md:mr-[calc(7vw+3.5rem)]';
 
   if (size === 'full') {
     return {
       slideWidth: '100vw',
-      slideMarginClass: singleSlide ? '' : 'mr-4 md:mr-[calc(7vw+3.5rem)]',
+      slideMarginClass: marginClass,
       sizes: '100vw',
     };
   }
 
-  // På desktop i karusellvisning (!singleSlide) skal bildene følge karusellhøyden og ha naturlig proporsjonal bredde,
-  // med romslig margin slik at nabobildene flyter utenfor margen og blør (bleed) ut på begge sider.
-  if (!singleSlide) {
-    return {
-      slideWidth: `calc(var(--carousel-h) * ${ar})`,
-      slideMarginClass: 'mr-4 md:mr-[calc(7vw+3.5rem)]',
-      sizes: '(max-width: 768px) 85vw, 55vw',
-    };
-  }
-
-  if (size === 'large' || size === '8') {
+  if (size === 'large' || size === '8' || size === 'cols8') {
     return {
       slideWidth: 'clamp(320px, calc(8 / 12 * 100vw), calc(100vw - 2rem))',
-      slideMarginClass: singleSlide ? '' : 'mr-4 md:mr-16',
+      slideMarginClass: marginClass,
       sizes: '(max-width: 768px) 100vw, 85vw',
     };
   }
 
-  if (size === 'medium' || size === '6') {
+  if (size === 'medium' || size === '6' || size === 'cols6') {
     return {
       slideWidth: 'clamp(300px, calc(6 / 12 * 100vw), calc(100vw - 2rem))',
-      slideMarginClass: singleSlide ? '' : 'mr-4 md:mr-16',
+      slideMarginClass: marginClass,
       sizes: '(max-width: 768px) 100vw, 67vw',
     };
   }
 
-  if (size === 'small' || size === '4') {
+  if (size === 'small' || size === '4' || size === 'cols4') {
     return {
       slideWidth: 'clamp(240px, calc(4 / 12 * 100vw), calc(100vw - 2rem))',
-      slideMarginClass: singleSlide ? '' : 'mr-4 md:mr-16',
+      slideMarginClass: marginClass,
       sizes: '(max-width: 768px) 100vw, 50vw',
     };
   }
 
-  if (size === 'xsmall' || size === '2') {
+  if (size === 'xsmall' || size === 'x-small' || size === '2' || size === 'cols2') {
     return {
       slideWidth: 'clamp(180px, calc(2 / 12 * 100vw), calc(100vw - 2rem))',
-      slideMarginClass: singleSlide ? '' : 'mr-4 md:mr-16',
+      slideMarginClass: marginClass,
       sizes: '(max-width: 768px) 100vw, 33vw',
     };
   }
 
-  // Default: Standard karusellhøyde og proporsjonal bredde basert på nøyaktig sideforhold
+  // Default: Følger standard karusellhøyde (var(--carousel-h)) og proporsjonal bredde basert på nøyaktig sideforhold
   return {
     slideWidth: `calc(var(--carousel-h) * ${ar})`,
-    slideMarginClass: singleSlide ? '' : 'mr-4 md:mr-[calc(7vw+3.5rem)]',
+    slideMarginClass: marginClass,
     sizes: '(max-width: 768px) 85vw, 55vw',
   };
 }
@@ -163,7 +154,7 @@ function ProjectMediaStaticView({
     <div
       className={`w-full bg-white carousel-hero-container carousel-tablet-view ${
         isInline
-          ? 'py-6 md:py-10'
+          ? 'carousel-inline py-6 md:py-10'
           : 'project-detail-hero pt-20 pb-16'
       } overflow-hidden relative select-none cursor-default`}
     >
@@ -718,12 +709,12 @@ function ProjectMediaCarouselInner({
       onClick={handleSlideClick}
       className={`w-full bg-white carousel-hero-container carousel-tablet-view ${
         isInline
-          ? 'py-6 md:py-10'
+          ? 'carousel-inline py-6 md:py-10'
           : 'project-detail-hero pt-20 pb-16'
       } overflow-hidden relative select-none ${cursorClass}`}
     >
       <div
-        className={`embla overflow-hidden xl:overflow-visible ${cursorClass}`}
+        className={`embla ${singleSlide ? 'overflow-hidden' : 'overflow-hidden xl:overflow-visible'} ${cursorClass}`}
         style={{ height: containerHeightCss }}
         ref={(node) => {
           emblaRef(node);
@@ -751,8 +742,8 @@ function ProjectMediaCarouselInner({
                 className={`embla__slide flex-none relative min-w-0 select-none flex justify-center items-start xl:items-center ${dims.slideMarginClass} ${cursorClass}`}
                 style={{
                   '--aspect': slideAspect,
-                  width: 'var(--slide-w)',
-                  '--slide-w-desktop': dims.slideWidth,
+                  width: singleSlide ? '100%' : 'var(--slide-w)',
+                  '--slide-w-desktop': singleSlide ? '100%' : dims.slideWidth,
                   height: containerHeightCss,
                 } as React.CSSProperties}
               >
@@ -765,10 +756,11 @@ function ProjectMediaCarouselInner({
                       }
                     }
                   }}
-                  className={`relative flex items-center justify-center overflow-hidden w-full h-full carousel-image-container cursor-pointer xl:cursor-inherit ${cursorClass}`}
+                  className={`relative flex items-center justify-center overflow-hidden h-full carousel-image-container cursor-pointer xl:cursor-inherit ${cursorClass}`}
                   style={{
                     '--aspect': slideAspect,
-                    width: '100%',
+                    width: singleSlide ? dims.slideWidth : '100%',
+                    maxWidth: '100%',
                     height: '100%',
                   } as React.CSSProperties}
                 >
@@ -791,7 +783,7 @@ function ProjectMediaCarouselInner({
                           }
                         }
                       }}
-                      className={`w-full h-full ${singleSlide || isDrawings ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
+                      className={`w-full h-full ${singleSlide || isDrawings || isInline ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
                     />
                   ) : slide.url ? (
                     <SanityImage
@@ -802,7 +794,7 @@ function ProjectMediaCarouselInner({
                       hotspot={slide.hotspot}
                       loading="eager"
                       fetchPriority={isInitialSlide ? 'high' : undefined}
-                      className={`${singleSlide || isDrawings ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
+                      className={`${singleSlide || isDrawings || isInline ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
                       sizes={dims.sizes}
                       draggable={false}
                     />

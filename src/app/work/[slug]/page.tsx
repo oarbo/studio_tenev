@@ -722,6 +722,7 @@ export default async function ProjectDetailPage({
                       slides={blockSlides} 
                       title={block.title || project.title} 
                       isDrawings={Boolean(block.isDrawings)}
+                      singleSlide={Boolean(block.singleSlide)}
                       isInline
                     />
                   </section>
@@ -798,7 +799,7 @@ export default async function ProjectDetailPage({
         {/* 3. DRAWINGS & PLANS CAROUSEL (Dersom definert fra legacy galleri) */}
         {drawingSlides.length > 0 && (
           <section className="w-full flex flex-col mb-[4.75rem] md:mb-[6rem]">
-            <ProjectMediaCarousel slides={drawingSlides} title={project.title} isDrawings={true} />
+            <ProjectMediaCarousel slides={drawingSlides} title={project.title} isDrawings={true} isInline />
           </section>
         )}
 

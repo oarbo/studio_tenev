@@ -452,6 +452,10 @@ article p,
     padding-top: var(--carousel-space) !important;
     padding-bottom: 5rem !important;
   }
+  .carousel-hero-container.carousel-inline {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
 }
 
 .embla__slide {
@@ -493,6 +497,10 @@ article p,
     padding-top: 1.25rem !important;
     padding-bottom: 2.75rem !important;
     height: auto !important;
+  }
+  .carousel-tablet-view.carousel-inline {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2.5rem !important;
   }
   @media (min-width: 768px) {
     .carousel-tablet-view {
