@@ -151,7 +151,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
                     <div
-                      className={`text-measure ${!isIntroBlock ? 'border-t border-black pt-1.5' : ''}`}
+                      className={`text-measure ${!isIntroBlock ? 'border-t border-black pt-1.5' : 'border-t border-black pt-1.5 md:border-t-0 md:pt-0'}`}
                       lang={locale === 'en' ? 'en-GB' : 'nb'}
                     >
                       {displayTitle && (
@@ -376,7 +376,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
           <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
             <div className="md:col-start-3 md:col-span-8">
               <div className="text-measure flex flex-col gap-10 md:gap-14 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) hyphens-none">
-                <div>
+                <div className="border-t border-black pt-1.5 md:border-t-0 md:pt-0">
                   <h1 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                     {locale === 'en' ? 'Studio Tenev — Architects Bergen' : 'Studio Tenev — Arkitekt Bergen'}
                   </h1>
