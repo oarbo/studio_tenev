@@ -159,7 +159,7 @@ function ProjectMediaStaticView({
       } overflow-hidden relative select-none cursor-default`}
     >
       <div
-        className="w-full flex justify-center items-start xl:items-center carousel-band"
+        className={`w-full flex justify-center ${isInline ? 'items-center' : 'items-start xl:items-center'} carousel-band`}
         style={{ height: containerHeightCss }}
       >
         <div
@@ -722,7 +722,7 @@ function ProjectMediaCarouselInner({
         }}
       >
         <div
-          className="embla__container flex touch-pan-y items-start xl:items-center"
+          className={`embla__container flex touch-pan-y ${isInline ? 'items-center' : 'items-start xl:items-center'}`}
           style={{ height: containerHeightCss }}
         >
           {infiniteSlides.map((slide, index) => {
@@ -739,7 +739,7 @@ function ProjectMediaCarouselInner({
             return (
               <div
                 key={`${slide.videoUrl || slide.url || index}-${index}`}
-                className={`embla__slide flex-none relative min-w-0 select-none flex justify-center items-start xl:items-center ${dims.slideMarginClass} ${cursorClass}`}
+                className={`embla__slide flex-none relative min-w-0 select-none flex justify-center ${isInline ? 'items-center' : 'items-start xl:items-center'} ${dims.slideMarginClass} ${cursorClass}`}
                 style={{
                   '--aspect': slideAspect,
                   width: singleSlide ? '100%' : 'var(--slide-w)',

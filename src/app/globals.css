@@ -608,6 +608,69 @@ article p,
     height: 100% !important;
     object-fit: cover !important;
   }
+
+  /* Karusell i sidebyggeren (tegninger, planer og bilder):
+     Bildene skal ikke beskjæres (object-fit: contain), gå helt ut til margene på tablet,
+     og sentreres vertikalt. */
+  .carousel-tablet-view.carousel-inline .carousel-image-container video,
+  .carousel-tablet-view.carousel-inline .carousel-image-container img {
+    object-fit: contain !important;
+    object-position: center center !important;
+  }
+
+  @media (min-width: 768px) {
+    .carousel-tablet-view.carousel-inline .carousel-band,
+    .carousel-tablet-view.carousel-inline .carousel-static-wrap,
+    .carousel-tablet-view.carousel-inline .embla__container {
+      height: var(--carousel-h) !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .carousel-tablet-view.carousel-inline .embla__slide {
+      height: var(--carousel-h) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .carousel-tablet-view.carousel-inline .carousel-card,
+    .carousel-tablet-view.carousel-inline .carousel-static-card {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      height: var(--carousel-h) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    .carousel-tablet-view.carousel-inline .carousel-image-container {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      height: var(--carousel-h) !important;
+      max-height: var(--carousel-h) !important;
+      aspect-ratio: auto !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+
+    .carousel-tablet-view.carousel-inline .carousel-image-container video,
+    .carousel-tablet-view.carousel-inline .carousel-image-container img {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+    }
+  }
   .carousel-tablet-view .carousel-caption {
     position: relative !important;
     top: auto !important;
