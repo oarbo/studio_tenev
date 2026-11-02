@@ -105,7 +105,7 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
                 </div>
 
                 {/* Title (Kolonne 4-12 på iPad, 3-8 på stor desktop) */}
-                <div className="md:col-span-9 xl:col-span-6 text-black text-[1.125rem] md:text-[1rem] group-hover:opacity-70 transition-opacity">
+                <div className="md:col-span-9 xl:col-span-6 text-black text-[1.125rem] md:text-[1rem] leading-[calc(1em*var(--line-height)-1px)] md:leading-(--line-height) group-hover:opacity-70 transition-opacity">
                   {renderTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title, locale === 'en' ? 'en-GB' : 'nb')}
                 </div>
               </button>
