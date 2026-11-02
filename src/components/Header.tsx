@@ -438,11 +438,11 @@ export default function Header({
           </Link>
         </div>
 
-        {/* TOP CENTER: Project Title on detail page OR Categories on /work (Desktop only) */}
+        {/* TOP CENTER: Project Title on detail page (Mobil/Tablet only, skjult på Desktop xl:) OR Categories on /work (Desktop only) */}
         {displayProjectTitle ? (
           <div
             ref={titleRef}
-            className={`absolute left-0 translate-x-0 w-full px-side-padding top-[3.75rem] pointer-events-auto items-center justify-center text-center md:left-1/2 md:-translate-x-1/2 md:top-auto md:-mt-[0.4rem] md:h-[2.13rem] md:w-auto md:max-w-[calc(100%-18rem)] md:overflow-hidden md:px-0 ${
+            className={`absolute left-0 translate-x-0 w-full px-side-padding top-[3.75rem] pointer-events-auto items-center justify-center text-center md:left-1/2 md:-translate-x-1/2 md:top-auto md:-mt-[0.4rem] md:h-[2.13rem] md:w-auto md:max-w-[calc(100%-18rem)] md:overflow-hidden md:px-0 xl:hidden ${
               isMobileMenuOpen ? 'hidden md:flex' : 'flex'
             }`}
           >

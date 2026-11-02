@@ -275,27 +275,29 @@ export default async function ProjectDetailPage({
     )
   );
 
-  // Helper renderer for Data Table (Metadata Block)
+  // Helper renderer for Data Table (Metadata Block) - skjules på Desktop (xl:hidden) hvor den nye inforaden vises
   const renderMetadataBlock = (key?: string, style?: React.CSSProperties) => (
-    <ProjectMetadataBlock
-      key={key || 'metadata'}
-      id={key}
-      style={style}
-      projectTitle={project.title}
-      projectTitleEn={project.titleEn}
-      dateStr={dateStr}
-      location={project.location}
-      country={project.country}
-      client={project.client}
-      typeTags={combinedTypeTags}
-      status={project.status}
-      statusEn={project.statusEn}
-      size={project.size}
-      contractor={project.contractor}
-      photographer={project.photographer}
-      renderingFirm={project.renderingFirm}
-      team={project.team}
-    />
+    <div className="xl:hidden">
+      <ProjectMetadataBlock
+        key={key || 'metadata'}
+        id={key}
+        style={style}
+        projectTitle={project.title}
+        projectTitleEn={project.titleEn}
+        dateStr={dateStr}
+        location={project.location}
+        country={project.country}
+        client={project.client}
+        typeTags={combinedTypeTags}
+        status={project.status}
+        statusEn={project.statusEn}
+        size={project.size}
+        contractor={project.contractor}
+        photographer={project.photographer}
+        renderingFirm={project.renderingFirm}
+        team={project.team}
+      />
+    </div>
   );
 
   // Helper for image and video sizing in Sidebygger (Page Builder)
