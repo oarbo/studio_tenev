@@ -36,6 +36,10 @@ export interface Translations {
   categoryResidential: string;
   categoryCommercial: string;
   categoryDestination: string;
+  categoryAllMobile: string;
+  categoryResidentialMobile: string;
+  categoryCommercialMobile: string;
+  categoryDestinationMobile: string;
 
   // Studio & Contact
   ourServices: string;
@@ -84,6 +88,10 @@ export const translations: Record<Locale, Translations> = {
     categoryResidential: 'Bolig',
     categoryCommercial: 'Næring',
     categoryDestination: 'Destinasjonsutvikling',
+    categoryAllMobile: 'Alle',
+    categoryResidentialMobile: 'Bolig',
+    categoryCommercialMobile: 'Næring',
+    categoryDestinationMobile: 'Destinasjon',
 
     ourServices: 'Våre tjenester',
     bookConsultation: 'Bestill gratis befaring',
@@ -126,6 +134,10 @@ export const translations: Record<Locale, Translations> = {
     categoryResidential: 'Residential',
     categoryCommercial: 'Commercial',
     categoryDestination: 'Destination development',
+    categoryAllMobile: 'All',
+    categoryResidentialMobile: 'Living',
+    categoryCommercialMobile: 'Business',
+    categoryDestinationMobile: 'Leisure',
 
     ourServices: 'Our services',
     bookConsultation: 'Book a consultation',
