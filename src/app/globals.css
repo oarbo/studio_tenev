@@ -520,7 +520,7 @@ article p,
     min-width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
-    aspect-ratio: var(--aspect, 1.4) !important;
+    aspect-ratio: 1.4 !important;
   }
   .carousel-tablet-view .carousel-image-container video,
   .carousel-tablet-view .carousel-image-container img {

@@ -5,6 +5,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import SanityImage, { SanityHotspot } from './SanityImage';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { ProjectLocalizedCaption } from './ProjectLocalizedText';
+import MediaLightbox from './MediaLightbox';
 
 export interface ProjectMediaSlide {
   _key?: string;
@@ -122,6 +123,8 @@ function ProjectMediaStaticView({
   singleSlide?: boolean;
   isInline?: boolean;
 }) {
+  const { locale } = useLanguage();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [videoAspect, setVideoAspect] = useState<number | undefined>(() => {
     if (slide.videoUrl && videoAspectCache.has(slide.videoUrl)) {
       return videoAspectCache.get(slide.videoUrl);
@@ -169,7 +172,12 @@ function ProjectMediaStaticView({
         style={{ height: containerHeightCss }}
       >
         <div
-          className="relative flex items-center justify-center overflow-hidden w-full max-w-full md:max-w-[100vw] carousel-image-container carousel-static-card"
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.innerWidth < 1280) {
+              setLightboxOpen(true);
+            }
+          }}
+          className="relative flex items-center justify-center overflow-hidden w-full max-w-full md:max-w-[100vw] carousel-image-container carousel-static-card cursor-pointer xl:cursor-default"
           style={{
             '--aspect': effectiveAspect,
             width: dims.slideWidth,
@@ -221,6 +229,14 @@ function ProjectMediaStaticView({
           />
         </div>
       )}
+      <MediaLightbox
+        slides={[slide]}
+        initialIndex={0}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        title={title}
+        locale={locale}
+      />
     </div>
   );
 }
@@ -242,6 +258,8 @@ function ProjectMediaCarouselInner({
   singleSlide?: boolean;
   isInline?: boolean;
 }) {
+  const { locale } = useLanguage();
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const isTwoSlides = displaySlides.length === 2;
 
   // Beregner dominerende aspektforhold fra bildene i prosjektet som standardverdi før videoer er ferdig lastet
@@ -825,7 +843,15 @@ function ProjectMediaCarouselInner({
                 } as React.CSSProperties}
               >
                 <div
-                  className="relative flex items-center justify-center overflow-hidden w-full h-full carousel-image-container"
+                  onClick={(e) => {
+                    if (typeof window !== 'undefined' && window.innerWidth < 1280) {
+                      if (!didDragStateRef.current) {
+                        e.stopPropagation();
+                        setLightboxIndex(index % displaySlides.length);
+                      }
+                    }
+                  }}
+                  className="relative flex items-center justify-center overflow-hidden w-full h-full carousel-image-container cursor-pointer xl:cursor-auto"
                   style={{
                     '--aspect': slideAspect,
                     width: singleSlide ? 'var(--slide-w)' : '100%',
@@ -889,6 +915,14 @@ function ProjectMediaCarouselInner({
           />
         </div>
       )}
+      <MediaLightbox
+        slides={displaySlides}
+        initialIndex={lightboxIndex ?? 0}
+        isOpen={lightboxIndex !== null}
+        onClose={() => setLightboxIndex(null)}
+        title={title}
+        locale={locale}
+      />
     </div>
   );
 }

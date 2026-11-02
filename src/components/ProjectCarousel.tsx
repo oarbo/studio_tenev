@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useCallback, useRef, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Link from 'next/link';
 import SanityImage, { SanityHotspot } from './SanityImage';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { formatTypography } from '@/utils/typography';
 import { useWorkCategory } from '@/context/WorkCategoryContext';
+import MediaLightbox, { LightboxSlide } from './MediaLightbox';
 
 export interface ProjectCarouselItem {
   _id: string;
@@ -32,10 +33,25 @@ interface ProjectCarouselProps {
  * Bildet midtstilles perfekt i visningsfeltet og fungerer ikke som en karusell.
  */
 function ProjectCarouselStaticView({ item }: { item: ProjectCarouselItem }) {
-  const { locale } = useLanguage();
+  const { locale, t } = useLanguage();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const imgUrl = item.coverImage || item.image?.url;
   const aspectRatio = item.image?.aspectRatio || 1.4;
   const linkHref = item.slug ? `/work/${item.slug}` : `/work#project-${item._id}`;
+
+  const staticSlide: LightboxSlide = {
+    url: imgUrl,
+    alt: item.title,
+    hotspot: item.image?.hotspot,
+    lqip: item.image?.lqip,
+    caption: locale === 'en' && item.titleEn ? item.titleEn : item.title,
+    actionLink: item.slug
+      ? {
+          href: `/work/${item.slug}`,
+          label: t('goToProject'),
+        }
+      : undefined,
+  };
 
   return (
     <div className="w-full bg-white carousel-hero-container carousel-tablet-view pt-20 pb-16 overflow-hidden relative cursor-default select-none">
@@ -73,6 +89,26 @@ function ProjectCarouselStaticView({ item }: { item: ProjectCarouselItem }) {
                   draggable={false}
                 />
               )}
+
+              {/* Zoom-knapp på mobil og tablet for å åpne bildet i lightbox */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setLightboxOpen(true);
+                }}
+                aria-label="Åpne bilde i fullskjerm"
+                title="Åpne bilde"
+                className="absolute bottom-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity xl:hidden pointer-events-auto cursor-pointer"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  <line x1="11" y1="8" x2="11" y2="14"/>
+                  <line x1="8" y1="11" x2="14" y2="11"/>
+                </svg>
+              </button>
             </div>
             {/* Title under */}
             <div className="absolute top-full left-0 right-0 mt-3 carousel-caption text-black text-[1.125rem] font-normal leading-tight truncate hover:underline underline-offset-4 decoration-1 cursor-pointer">
@@ -81,6 +117,15 @@ function ProjectCarouselStaticView({ item }: { item: ProjectCarouselItem }) {
           </Link>
         </div>
       </div>
+
+      <MediaLightbox
+        slides={[staticSlide]}
+        initialIndex={0}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        title={locale === 'en' && item.titleEn ? item.titleEn : item.title}
+        locale={locale}
+      />
     </div>
   );
 }
@@ -96,9 +141,26 @@ function ProjectCarouselInner({
   displayItems: ProjectCarouselItem[];
   allItems: ProjectCarouselItem[];
 }) {
-  const { locale } = useLanguage();
+  const { locale, t } = useLanguage();
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const isOneItem = displayItems.length === 1;
   const isTwoItems = displayItems.length === 2;
+
+  const lightboxSlides: LightboxSlide[] = React.useMemo(() => {
+    return displayItems.map((item) => ({
+      url: item.coverImage || item.image?.url,
+      alt: item.title,
+      hotspot: item.image?.hotspot,
+      lqip: item.image?.lqip,
+      caption: locale === 'en' && item.titleEn ? item.titleEn : item.title,
+      actionLink: item.slug
+        ? {
+            href: `/work/${item.slug}`,
+            label: t('goToProject'),
+          }
+        : undefined,
+    }));
+  }, [displayItems, locale, t]);
 
   // Bygger sekvens for uendelig loop ved flere prosjekter
   const infiniteItems = React.useMemo(() => {
@@ -715,6 +777,26 @@ function ProjectCarouselInner({
                             draggable={false}
                           />
                         )}
+
+                        {/* Zoom-knapp på mobil og tablet for å åpne bildet i lightbox */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setLightboxIndex(index % displayItems.length);
+                          }}
+                          aria-label="Åpne bilde i fullskjerm"
+                          title="Åpne bilde"
+                          className="absolute bottom-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity xl:hidden pointer-events-auto cursor-pointer"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            <line x1="11" y1="8" x2="11" y2="14"/>
+                            <line x1="8" y1="11" x2="14" y2="11"/>
+                          </svg>
+                        </button>
                       </div>
                     </Link>
 
@@ -765,6 +847,14 @@ function ProjectCarouselInner({
           );
         })}
       </div>
+
+      <MediaLightbox
+        slides={lightboxSlides}
+        initialIndex={lightboxIndex ?? 0}
+        isOpen={lightboxIndex !== null}
+        onClose={() => setLightboxIndex(null)}
+        locale={locale}
+      />
     </div>
   );
 }
