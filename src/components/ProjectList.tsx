@@ -366,7 +366,7 @@ export default function ProjectList({
               ${selectedTags.length > 0 ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
             `}
           >
-            <div className="col-span-2 md:col-start-1 md:col-span-12 xl:col-start-5 xl:col-span-6 flex flex-wrap items-center gap-x-3.5 gap-y-1">
+            <div className="col-span-2 md:col-start-6 md:col-span-7 xl:col-start-5 xl:col-span-6 flex flex-wrap items-center gap-x-3.5 gap-y-1">
               {selectedTags.map((tag) => (
                 <button
                   key={tag}
