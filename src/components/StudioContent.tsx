@@ -151,7 +151,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 return (
                   <div key={block._key} className="md:col-start-3 md:col-span-8">
                     <div
-                      className={`text-measure ${!isIntroBlock ? 'border-t border-black pt-1.5' : 'border-t border-black pt-1.5 md:border-t-0 md:pt-0'}`}
+                      className={`text-measure ${!isIntroBlock ? 'border-t border-black pt-1.5' : ''}`}
                       lang={locale === 'en' ? 'en-GB' : 'nb'}
                     >
                       {displayTitle && (
@@ -169,7 +169,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                           <div className="text-left">
                             <Link
                               href="/tjenester"
-                              className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block"
+                              className="underline underline-offset-4 decoration-1 cursor-pointer inline-block"
                             >
                               {t('ourServices')}
                             </Link>
@@ -177,7 +177,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                           <div className="text-right md:text-left">
                             <Link
                               href="/kontakt"
-                              className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block text-right md:text-left"
+                              className="underline underline-offset-4 decoration-1 cursor-pointer inline-block text-right md:text-left"
                             >
                               {t('bookConsultation')}
                             </Link>
@@ -376,7 +376,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
           <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
             <div className="md:col-start-3 md:col-span-8">
               <div className="text-measure flex flex-col gap-10 md:gap-14 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) hyphens-none">
-                <div className="border-t border-black pt-1.5 md:border-t-0 md:pt-0">
+                <div>
                   <h1 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                     {locale === 'en' ? 'Studio Tenev — Architects Bergen' : 'Studio Tenev — Arkitekt Bergen'}
                   </h1>
@@ -389,7 +389,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                     <div className="text-left">
                       <Link
                         href="/tjenester"
-                        className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block"
+                        className="underline underline-offset-4 decoration-1 cursor-pointer inline-block"
                       >
                         {t('ourServices')}
                       </Link>
@@ -397,7 +397,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                     <div className="text-right md:text-left">
                       <Link
                         href="/kontakt"
-                        className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block text-right md:text-left"
+                        className="underline underline-offset-4 decoration-1 cursor-pointer inline-block text-right md:text-left"
                       >
                         {t('bookConsultation')}
                       </Link>
