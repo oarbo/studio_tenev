@@ -317,6 +317,12 @@ function ProjectMediaCarouselInner({
 
   // Bygger sekvens for ekte uendelig rullering
   const infiniteSlides = React.useMemo(() => {
+    if (singleSlide) {
+      if (displaySlides.length === 2) {
+        return [...displaySlides, ...displaySlides];
+      }
+      return displaySlides;
+    }
     if (isTwoSlides) {
       const [A, B] = displaySlides;
       // Viser B både før og etter A, med nok elementer til at Embla kan loope sømløst begge veier
@@ -327,7 +333,7 @@ function ProjectMediaCarouselInner({
       repeated = [...repeated, ...displaySlides];
     }
     return repeated;
-  }, [displaySlides, isTwoSlides]);
+  }, [displaySlides, isTwoSlides, singleSlide]);
 
   // Finner største høydebehov blant bildene:
   // Dersom ett eller flere bilder er satt til 'full', defineres karusellens faste høyde
@@ -347,8 +353,8 @@ function ProjectMediaCarouselInner({
     ? `max(var(--carousel-h), calc(100vw / ${minFullscreenAspect}))`
     : 'var(--carousel-h)';
 
-  // Hvis 2 bilder, starter vi på index 1 (A), slik at bilde 2 (B) ligger til venstre (index 0) og til høyre (index 2)
-  const startIndex = isTwoSlides ? 1 : 0;
+  // Hvis 2 bilder i fler-bilde karusellmodus (!singleSlide), starter vi på index 1 (A)
+  const startIndex = isTwoSlides && !singleSlide ? 1 : 0;
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     startIndex,
@@ -371,7 +377,7 @@ function ProjectMediaCarouselInner({
     if (!emblaApi) return;
     const onSelect = () => {
       const snap = emblaApi.selectedScrollSnap();
-      if (isTwoSlides) {
+      if (isTwoSlides && !singleSlide) {
         setActiveIndex(snap % 2 === 1 ? 0 : 1);
       } else {
         setActiveIndex(snap % displaySlides.length);
@@ -382,7 +388,7 @@ function ProjectMediaCarouselInner({
     return () => {
       emblaApi.off('select', onSelect);
     };
-  }, [emblaApi, isTwoSlides, displaySlides.length]);
+  }, [emblaApi, isTwoSlides, singleSlide, displaySlides.length]);
 
   const activeSlide = displaySlides[activeIndex];
 
@@ -710,14 +716,16 @@ function ProjectMediaCarouselInner({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       onClick={handleSlideClick}
-      className={`w-full bg-white ${
+      className={`w-full bg-white ${singleSlide ? 'is-single-slide' : ''} ${
         isInline
-          ? 'px-side-padding md:px-0 py-4 md:py-6'
+          ? 'px-side-padding md:px-0 py-4 md:py-6 overflow-hidden'
           : 'carousel-hero-container carousel-tablet-view project-detail-hero pt-20 pb-16 overflow-hidden relative select-none'
       } ${cursorClass}`}
     >
       <div
-        className={`embla overflow-hidden xl:overflow-visible ${cursorClass}`}
+        className={`embla ${
+          singleSlide ? 'overflow-hidden' : 'overflow-hidden xl:overflow-visible'
+        } ${cursorClass}`}
         style={{ height: containerHeightCss }}
         ref={(node) => {
           emblaRef(node);
@@ -742,7 +750,11 @@ function ProjectMediaCarouselInner({
             return (
               <div
                 key={`${slide.videoUrl || slide.url || index}-${index}`}
-                className={`embla__slide flex-none relative min-w-0 select-none flex justify-center items-start xl:items-center ${dims.slideMarginClass} ${cursorClass}`}
+                className={`embla__slide ${
+                  singleSlide
+                    ? 'flex-[0_0_100%] min-w-full max-w-full w-full mr-0'
+                    : `flex-none min-w-0 ${dims.slideMarginClass}`
+                } relative select-none flex justify-center items-start xl:items-center ${cursorClass}`}
                 style={{
                   '--aspect': slideAspect,
                   width: singleSlide ? '100%' : 'var(--slide-w)',
@@ -759,10 +771,11 @@ function ProjectMediaCarouselInner({
                       }
                     }
                   }}
-                  className={`relative flex items-center justify-center overflow-hidden w-full h-full carousel-image-container cursor-pointer xl:cursor-inherit ${cursorClass}`}
+                  className={`relative flex items-center justify-center overflow-hidden h-full carousel-image-container cursor-pointer xl:cursor-inherit ${cursorClass}`}
                   style={{
                     '--aspect': slideAspect,
-                    width: singleSlide ? 'var(--slide-w)' : '100%',
+                    width: singleSlide ? dims.slideWidth : '100%',
+                    maxWidth: '100%',
                     height: '100%',
                   } as React.CSSProperties}
                 >
