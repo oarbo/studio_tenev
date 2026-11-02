@@ -448,15 +448,15 @@ export default function Header({
                     pathname.startsWith(link.href + '/') ||
                     (link.key === 'work' && pathname.startsWith('/projects/'));
                     
-                  // Sidetittel fader raskt ut (150ms), menytittel 1, 2 og 3 fader raskt inn en etter en med 250ms forsinkelse
-                  const delayMs = isMobileMenuOpen ? 80 + idx * 250 : 0;
+                  // Sidetittel fader raskt ut, menytittel 1, 2 og 3 fader raskt inn en etter en med 100ms forsinkelse
+                  const delayMs = isMobileMenuOpen ? 50 + idx * 100 : 0;
 
                   return (
                     <li
                       key={link.key}
                       style={{
                         transitionProperty: 'opacity',
-                        transitionDuration: isMobileMenuOpen ? '180ms' : '100ms',
+                        transitionDuration: isMobileMenuOpen ? '140ms' : '80ms',
                         transitionTimingFunction: 'ease-out',
                         transitionDelay: `${delayMs}ms`,
                       }}
