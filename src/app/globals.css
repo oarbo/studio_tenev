@@ -489,12 +489,17 @@ article p,
   }
 
   /* For prosjektsiden på mobil og tablet (< 1280px):
-     På oversiktssiden (/work) ligger WorkCategoryNav over karusellen med
-     pt-[calc(4.25rem+1em)], slik at toppen av bildet treffer calc(6.75rem + 1em).
-     På prosjektsiden uten kategorimeny sikrer vi nøyaktig samme Y-plassering: */
+     På mobil (< 768px) treffer toppen av bildet nøyaktig 9rem (144px),
+     samme topplinje som førstebildet på hovedsiden (pt-24 + pt-12).
+     På tablet (≥ 768px) treffer bildet calc(6.75rem + 1em): */
   .project-detail-hero {
-    padding-top: calc(6.75rem + 1em) !important;
+    padding-top: 9rem !important;
     padding-bottom: 2.75rem !important;
+  }
+  @media (min-width: 768px) {
+    .project-detail-hero {
+      padding-top: calc(6.75rem + 1em) !important;
+    }
   }
 
   .carousel-tablet-view .carousel-band,
