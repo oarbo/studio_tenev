@@ -126,7 +126,7 @@ export default async function ProjectsPage() {
         <h1 className="sr-only">Work — Prosjekter av Studio Tenev</h1>
 
         {/* Tablet-only Category Navigation (plasseres med full bredde mellom header og karusell på 768px – 1279px) */}
-        <div className="w-full hidden md:flex xl:hidden justify-center items-center pt-[4.25rem] pb-0 px-side-padding">
+        <div className="w-full hidden md:flex xl:hidden justify-center items-center pt-[calc(4.25rem+1em)] pb-0 px-side-padding">
           <WorkCategoryNav />
         </div>
 
