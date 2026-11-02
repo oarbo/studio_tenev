@@ -432,7 +432,7 @@ export default function Header({
             href="/"
             prefetch={true}
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal ${isMobileMenuOpen ? '!text-black' : textColorClass}`}
+            className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal uppercase ${isMobileMenuOpen ? '!text-black' : textColorClass}`}
           >
             Studio Tenev
           </Link>
