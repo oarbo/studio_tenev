@@ -242,6 +242,17 @@ p.mt-half {
   margin-top: var(--fm-half) !important;
 }
 
+/* Automatisk skjuling av desktop-tag i nyhetslisten når datokolonnen blir for smal */
+.news-date-col {
+  container-type: inline-size;
+}
+
+@container (max-width: 230px) {
+  .news-desktop-tag {
+    display: none !important;
+  }
+}
+
 .news-content p,
 .prose p,
 article p,

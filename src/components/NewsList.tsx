@@ -78,17 +78,17 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
             id={`news-${item._id}`}
             className="w-full grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 group scroll-mt-32"
           >
-            {/* Inner Container: List Item (Kolonne 3-10 av 12) */}
-            <div className={`md:col-start-3 md:col-span-8 border-black ${index === 0 ? 'border-t' : ''} ${index === items.length - 1 ? '' : 'border-b'}`}>
+            {/* Inner Container: List Item (Full bredde på iPad, kolonne 3-10 på stor desktop) */}
+            <div className={`col-span-1 md:col-span-12 xl:col-start-3 xl:col-span-8 border-black ${index === 0 ? 'border-t' : ''} ${index === items.length - 1 ? '' : 'border-b'}`}>
               
               {/* Header / Closed State */}
               <button
                 onClick={() => toggleItem(item._id)}
                 aria-expanded={isActive}
-                className="w-full grid grid-cols-1 md:grid-cols-8 gap-x-fm-1 text-left items-start pt-1.5 pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-black group"
+                className="w-full grid grid-cols-1 md:grid-cols-12 xl:grid-cols-8 gap-x-fm-1 text-left items-start pt-1.5 pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-black group"
               >
-                {/* Date + Tag: Kolonne 1-2 på desktop. På mobil: dato til venstre, tag helt til høyre (begge i samme størrelse) */}
-                <div className="flex md:flex justify-between md:justify-start items-baseline md:col-span-2 text-black text-[calc(1rem-3px)] md:text-[1rem] group-hover:opacity-70 transition-opacity">
+                {/* Date + Tag: Kolonne 1-3 på iPad, 1-2 på stor desktop. På mobil: dato til venstre, tag helt til høyre */}
+                <div className="news-date-col flex md:flex justify-between md:justify-start items-baseline md:col-span-3 xl:col-span-2 text-black text-[calc(1rem-3px)] md:text-[1rem] group-hover:opacity-70 transition-opacity">
                   <span className="tabular-nums shrink-0">{item.date}</span>
                   {item.tag && (
                     <>
@@ -96,16 +96,16 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
                       <span className="md:hidden whitespace-nowrap text-right ml-auto">
                         {translateTag(item.tag)}
                       </span>
-                      {/* Desktop: Etter dato med ml-[2em] */}
-                      <span className="hidden md:inline-block ml-[2em] text-[calc(1rem-3px)] whitespace-nowrap">
+                      {/* Desktop: Etter dato med ml-[2em], skjules automatisk hvis datokolonnen er for smal for å forhindre kollisjon */}
+                      <span className="news-desktop-tag hidden md:inline-block ml-[2em] text-[calc(1rem-3px)] whitespace-nowrap">
                         {translateTag(item.tag)}
                       </span>
                     </>
                   )}
                 </div>
 
-                {/* Title (Kolonne 3-8 på desktop) */}
-                <div className="md:col-span-6 text-black text-[1rem] group-hover:opacity-70 transition-opacity">
+                {/* Title (Kolonne 4-12 på iPad, 3-8 på stor desktop) */}
+                <div className="md:col-span-9 xl:col-span-6 text-black text-[1rem] group-hover:opacity-70 transition-opacity">
                   {renderTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title, locale === 'en' ? 'en-GB' : 'nb')}
                 </div>
               </button>
@@ -119,7 +119,7 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
                 }`}
               >
                 <div className="overflow-hidden min-h-0">
-                  <div className="w-full grid grid-cols-1 md:grid-cols-8 gap-x-fm-1 pb-8 md:pb-10">
+                  <div className="w-full grid grid-cols-1 md:grid-cols-12 xl:grid-cols-8 gap-x-fm-1 pb-8 md:pb-10">
                     {/* Mobile Image */}
                     <div className="md:hidden w-full mb-6">
                       {item.image && (
@@ -141,7 +141,7 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
                     </div>
 
                     {/* Desktop Image */}
-                    <div className="hidden md:block md:col-span-2 relative pr-4 md:pt-[0.28em]">
+                    <div className="hidden md:block md:col-span-3 xl:col-span-2 relative pr-4 md:pt-[0.28em]">
                       {item.image && (
                         <div 
                           className="relative w-full"
@@ -162,7 +162,7 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
                     
                     {/* Text Content */}
                     <div
-                      className="md:col-span-6 text-black text-[1rem] flex flex-col items-start"
+                      className="md:col-span-9 xl:col-span-6 text-black text-[1rem] flex flex-col items-start"
                       style={{ gap: 'var(--fm-half)' }}
                     >
                       <div className="text-measure-left">
