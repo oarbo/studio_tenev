@@ -88,7 +88,7 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
                 className="w-full grid grid-cols-1 md:grid-cols-12 xl:grid-cols-8 gap-x-fm-1 text-left items-start pt-1.5 pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-black group"
               >
                 {/* Date + Tag: Kolonne 1-3 på iPad, 1-2 på stor desktop. På mobil: dato til venstre, tag helt til høyre */}
-                <div className="news-date-col flex md:flex justify-between md:justify-start items-baseline md:col-span-3 xl:col-span-2 text-black text-[1.125rem] md:text-[1rem] group-hover:opacity-70 transition-opacity">
+                <div className="news-date-col flex md:flex justify-between md:justify-start items-baseline md:col-span-3 xl:col-span-2 text-black text-[calc(1rem-3px)] md:text-[1rem] group-hover:opacity-70 transition-opacity">
                   <span className="tabular-nums shrink-0">{item.date}</span>
                   {item.tag && (
                     <>
