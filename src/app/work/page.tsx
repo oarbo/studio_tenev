@@ -125,13 +125,9 @@ export default async function ProjectsPage() {
       <div className="w-full flex flex-col mb-fm-5 relative">
         <h1 className="sr-only">Work — Prosjekter av Studio Tenev</h1>
 
-        {/* Category Navigation on Mobile and Tablet:
-            På mobil (<768px) flyter den over det blanke feltet (absolute z-10) slik at den ikke dytter karusellen ned.
-            På tablet (768px-1279px) beholder den sin dedikerte blokkavstand pt-[calc(4.25rem+1em)]. */}
-        <div className="w-full hidden md:flex xl:hidden justify-center items-center pt-[calc(4.25rem+1em)] pb-0 px-side-padding">
-          <WorkCategoryNav />
-        </div>
-        <div className="w-full flex md:hidden justify-center items-center absolute top-0 left-0 right-0 z-10 pt-[1.3em] pb-0 px-side-padding pointer-events-auto">
+        {/* Category Navigation on Mobile and Tablet (< 1280px):
+            Plassert på linjen under sidetittel og meny, slik som på tablet. */}
+        <div className="w-full flex xl:hidden justify-center items-center pt-[calc(4.25rem+1em)] pb-0 px-side-padding">
           <WorkCategoryNav />
         </div>
 

@@ -447,40 +447,39 @@ article p,
 
 /* -------------------------------------------------------
    MOBIL- OG TABLET-VISNING FOR PROSJEKTKARUSELL (< 1280px)
-   Viser nøyaktig ett bilde i full bredde mellom sidemargene
-   med naturlig sideforhold uten å dominere hele skjermhøyden.
+   Viser nøyaktig ett bilde i full bredde helt ut til sidemargene
+   med naturlig sideforhold.
    ------------------------------------------------------- */
 @media (max-width: 1279.98px) {
   .carousel-tablet-view {
-    padding-left: var(--spacing-side-padding) !important;
-    padding-right: var(--spacing-side-padding) !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
     padding-top: 1.25rem !important;
     padding-bottom: 2.75rem !important;
     height: auto !important;
   }
-  /* For prosjektsiden på tablet (768px – 1279.98px):
+  @media (min-width: 768px) {
+    .carousel-tablet-view {
+      padding-left: 2rem !important;
+      padding-right: 2rem !important;
+    }
+  }
+  @media (min-width: 1024px) {
+    .carousel-tablet-view {
+      padding-left: 3.75rem !important;
+      padding-right: 3.75rem !important;
+    }
+  }
+
+  /* For prosjektsiden på mobil og tablet (< 1280px):
      På oversiktssiden (/work) ligger WorkCategoryNav over karusellen med
      pt-[calc(4.25rem+1em)], slik at toppen av bildet treffer calc(6.75rem + 1em).
      På prosjektsiden uten kategorimeny sikrer vi nøyaktig samme Y-plassering: */
-  @media (min-width: 768px) {
-    .project-detail-hero {
-      padding-top: calc(6.75rem + 1em) !important;
-      padding-bottom: 2.75rem !important;
-    }
+  .project-detail-hero {
+    padding-top: calc(6.75rem + 1em) !important;
+    padding-bottom: 2.75rem !important;
   }
-  /* Mobil-spesifikk proporsjonal avstand (< 768px):
-     Både oversikt (/work) og detaljside (/work/[slug]) deler
-     nøyaktig samme topp-padding (4.25rem), bildehøyde og bunnpadding (2rem) */
-  @media (max-width: 767.98px) {
-    .carousel-tablet-view,
-    .project-detail-hero {
-      padding-left: var(--spacing-side-padding) !important;
-      padding-right: var(--spacing-side-padding) !important;
-      padding-top: 4.25rem !important;
-      padding-bottom: 2rem !important;
-      height: auto !important;
-    }
-  }
+
   .carousel-tablet-view .carousel-band,
   .carousel-tablet-view .carousel-static-wrap,
   .carousel-tablet-view .embla__container {
@@ -496,8 +495,18 @@ article p,
     min-width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
-    margin-right: var(--spacing-side-padding) !important;
+    margin-right: 1rem !important;
     align-items: flex-start !important;
+  }
+  @media (min-width: 768px) {
+    .carousel-tablet-view .embla__slide {
+      margin-right: 2rem !important;
+    }
+  }
+  @media (min-width: 1024px) {
+    .carousel-tablet-view .embla__slide {
+      margin-right: 3.75rem !important;
+    }
   }
   .carousel-tablet-view .carousel-static-card {
     width: 100% !important;
@@ -508,9 +517,10 @@ article p,
   }
   .carousel-tablet-view .carousel-image-container {
     width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
     aspect-ratio: var(--aspect, 1.4) !important;
-    max-height: 48vh !important;
   }
   .carousel-tablet-view .carousel-image-container video,
   .carousel-tablet-view .carousel-image-container img {
