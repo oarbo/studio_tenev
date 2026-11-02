@@ -691,7 +691,13 @@ export default async function ProjectDetailPage({
         {/* 2. SIDEBYGGER / INNHOLDSBLOKKER */}
         {project.contentBlocks && project.contentBlocks.length > 0 ? (
           <div id="project-details" className="w-full">
-            {contentSections.map((sec) => {
+            {contentSections.map((sec, secIdx) => {
+              const nextSec = contentSections[secIdx + 1];
+              const isBeforeCarousel = nextSec && nextSec.type === 'carousel';
+              const mbClass = sec.type === 'carousel' || isBeforeCarousel
+                ? 'mb-[1.6rem] md:mb-[6rem]'
+                : 'mb-[4.75rem] md:mb-[6rem]';
+
               if (sec.type === 'carousel') {
                 const block = sec.block;
                 const blockSlides: ProjectMediaSlide[] = (block.items || []).map((item) => ({
@@ -710,7 +716,7 @@ export default async function ProjectDetailPage({
                 }));
 
                 return (
-                  <section key={sec.id} className="w-full mb-[4.75rem] md:mb-[6rem]">
+                  <section key={sec.id} className={`w-full ${mbClass}`}>
                     {block.title && (
                       <div className="px-side-padding mb-4">
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1">
@@ -730,7 +736,7 @@ export default async function ProjectDetailPage({
               }
 
               return (
-                <div key={sec.id} className="px-side-padding mb-[4.75rem] md:mb-[6rem]">
+                <div key={sec.id} className={`px-side-padding ${mbClass}`}>
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
                     {sec.blocks.map((block) => renderGridBlock(block))}
                   </div>
@@ -798,7 +804,7 @@ export default async function ProjectDetailPage({
 
         {/* 3. DRAWINGS & PLANS CAROUSEL (Dersom definert fra legacy galleri) */}
         {drawingSlides.length > 0 && (
-          <section className="w-full flex flex-col mb-[4.75rem] md:mb-[6rem]">
+          <section className="w-full flex flex-col mb-[1.6rem] md:mb-[6rem]">
             <ProjectMediaCarousel slides={drawingSlides} title={project.title} isDrawings={true} isInline />
           </section>
         )}

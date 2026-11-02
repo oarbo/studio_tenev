@@ -506,8 +506,14 @@ article p,
     height: auto !important;
   }
   .carousel-tablet-view.carousel-inline {
-    padding-top: 1.5rem !important;
-    padding-bottom: 2.5rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.85rem !important;
+  }
+  @media (min-width: 768px) {
+    .carousel-tablet-view.carousel-inline {
+      padding-top: 1.5rem !important;
+      padding-bottom: 2.5rem !important;
+    }
   }
   @media (min-width: 768px) {
     .carousel-tablet-view {
@@ -584,6 +590,29 @@ article p,
     aspect-ratio: 3 / 4 !important;
     margin-left: auto !important;
     margin-right: auto !important;
+  }
+
+  /* Mobil (< 768px): For karusell i sidebyggeren (tegninger/planer) tilpasses proporsjonene slik at overflødig tomrom fjernes */
+  @media (max-width: 767.98px) {
+    .carousel-tablet-view.carousel-inline {
+      --carousel-h: min(48vh, calc((100vw - 2rem) / 1.4));
+    }
+    .carousel-tablet-view.carousel-inline .carousel-card,
+    .carousel-tablet-view.carousel-inline .carousel-static-card {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    .carousel-tablet-view.carousel-inline .carousel-image-container {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: var(--carousel-h) !important;
+      max-height: var(--carousel-h) !important;
+      aspect-ratio: auto !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
   }
 
   /* Tablet (768px – 1279.98px): full bredde helt ut til margene, beskjær innholdet (object-fit: cover) */
