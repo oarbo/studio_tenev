@@ -115,9 +115,11 @@ export default function FooterClient({
       </div>
 
       {/* =========================================================
-          DESKTOPVISNING (>= md): 12-kolonne grid som før
+          TABLET OG DESKTOP (>= md): 12-kolonne grid
+          Tablet: text-[0.875rem] (mindre enn body/desktop, men større enn mobil)
+          Desktop (>= xl): text-[1rem]
           ========================================================= */}
-      <div className="hidden md:grid md:grid-cols-12 gap-x-fm-1 gap-y-8 text-[1rem] leading-(--line-height)">
+      <div className="hidden md:grid md:grid-cols-12 gap-x-fm-1 gap-y-8 text-[0.875rem] xl:text-[1rem] leading-(--line-height)">
         {/* Col 1 */}
         <div className="md:col-start-1 md:col-span-3">
           <FooterBackToTop />
