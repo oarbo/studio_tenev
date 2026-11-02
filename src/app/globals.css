@@ -446,16 +446,16 @@ article p,
 }
 
 /* -------------------------------------------------------
-   TABLET-VISNING FOR PROSJEKTKARUSELL (768px – 1279px)
+   MOBIL- OG TABLET-VISNING FOR PROSJEKTKARUSELL (< 1280px)
    Viser nøyaktig ett bilde i full bredde mellom sidemargene
    med naturlig sideforhold uten å dominere hele skjermhøyden.
    ------------------------------------------------------- */
-@media (min-width: 768px) and (max-width: 1279.98px) {
+@media (max-width: 1279.98px) {
   .carousel-tablet-view {
     padding-left: var(--spacing-side-padding) !important;
     padding-right: var(--spacing-side-padding) !important;
     padding-top: 1.25rem !important;
-    padding-bottom: 3.5rem !important;
+    padding-bottom: 2.75rem !important;
     height: auto !important;
   }
   .carousel-tablet-view .carousel-band,
@@ -485,7 +485,7 @@ article p,
     width: 100% !important;
     height: auto !important;
     aspect-ratio: var(--aspect, 1.4) !important;
-    max-height: 52vh !important;
+    max-height: 48vh !important;
   }
   .carousel-tablet-view .carousel-caption {
     position: relative !important;

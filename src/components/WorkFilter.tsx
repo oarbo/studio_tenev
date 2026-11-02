@@ -133,28 +133,6 @@ export default function WorkFilter({ items, initialTag }: WorkFilterProps) {
 
   return (
     <div className="w-full flex flex-col pt-0">
-      {/* Category filter menu - Mobile only */}
-      <nav
-        aria-label="Kategorier"
-        className="w-full flex flex-wrap items-center justify-center gap-x-[1.25em] gap-y-2 pt-content-top pb-8 md:hidden text-[1rem] leading-tight text-center px-side-padding"
-      >
-        {categories.map((cat) => {
-          const isActive = activeCategory === cat.key;
-          return (
-            <button
-              key={cat.key}
-              type="button"
-              onClick={() => setCategory(cat.key)}
-              className={`cursor-pointer whitespace-nowrap hover:underline hover:underline-offset-4 hover:decoration-1 ${
-                isActive ? 'underline underline-offset-4 decoration-1 font-normal text-black' : 'text-black/60 font-normal'
-              }`}
-            >
-              {cat.label}
-            </button>
-          );
-        })}
-      </nav>
-
       <div className="w-full min-h-[calc(100vh-10rem)] min-h-[calc(100dvh-10rem)]">
         <ProjectList
           items={sortedItems}

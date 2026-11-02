@@ -125,12 +125,12 @@ export default async function ProjectsPage() {
       <div className="w-full flex flex-col mb-fm-5">
         <h1 className="sr-only">Work — Prosjekter av Studio Tenev</h1>
 
-        {/* Tablet-only Category Navigation (plasseres med full bredde mellom header og karusell på 768px – 1279px) */}
-        <div className="w-full hidden md:flex xl:hidden justify-center items-center pt-[calc(4.25rem+1em)] pb-0 px-side-padding">
+        {/* Category Navigation on Mobile and Tablet (plasseres med full bredde mellom header og karusell for alle skjermer < 1280px) */}
+        <div className="w-full flex xl:hidden justify-center items-center pt-[calc(4.25rem+1em)] pb-0 px-side-padding">
           <WorkCategoryNav />
         </div>
 
-        <div id="project-carousel" className="w-full hidden md:block">
+        <div id="project-carousel" className="w-full block">
           <ProjectCarousel items={carouselItems} />
         </div>
         {projectItems.length > 0 && (
