@@ -340,16 +340,9 @@ export default function Header({
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  // Lås scrolling i bakgrunnen når mobilmenyen er åpen (iOS, Android og desktop)
+  // Escape-tast for å lukke mobilmenyen
   useEffect(() => {
     if (isMobileMenuOpen) {
-      const scrollY = window.scrollY;
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           setIsMobileMenuOpen(false);
@@ -359,12 +352,6 @@ export default function Header({
 
       return () => {
         window.removeEventListener('keydown', handleKeyDown);
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        window.scrollTo(0, scrollY);
       };
     }
   }, [isMobileMenuOpen]);
@@ -417,7 +404,7 @@ export default function Header({
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
             aria-label={isMobileMenuOpen ? (locale === 'en' ? 'Close menu' : 'Lukk meny') : (locale === 'en' ? 'Open menu' : 'Åpne meny')}
-            className={`flex md:hidden items-center justify-end text-[1.33rem] font-normal leading-tight cursor-pointer hover:underline underline-offset-4 decoration-1 bg-transparent border-0 p-0 ${isMobileMenuOpen ? '!text-black' : textColorClass}`}
+            className={`flex md:hidden items-center justify-end text-[1.33rem] font-normal leading-tight cursor-pointer hover:underline underline-offset-4 decoration-1 bg-transparent border-0 p-0 ${textColorClass}`}
           >
             {isMobileMenuOpen ? (locale === 'en' ? 'Close' : 'Lukk') : (locale === 'en' ? 'Menu' : 'Meny')}
           </button>
@@ -429,33 +416,52 @@ export default function Header({
           ref={leftRef}
           className="absolute left-0 px-side-padding pointer-events-auto flex items-center"
         >
-          {/* Sidetittel / Logo: alltid på desktop; på mobil kun når menyen er lukket */}
-          <Link
-            href="/"
-            prefetch={true}
-            onClick={() => setIsMobileMenuOpen(false)}
-            className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal uppercase ${
-              isMobileMenuOpen ? 'hidden md:block !text-black' : textColorClass
-            }`}
-          >
-            Studio Tenev
-          </Link>
+          <div className="relative flex items-center">
+            {/* Sidetittel / Logo: fader raskt ut på mobil når menyen åpnes (ingen bevegelse) */}
+            <Link
+              href="/"
+              prefetch={true}
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{
+                transitionProperty: 'opacity',
+                transitionDuration: '150ms',
+                transitionTimingFunction: 'ease-out',
+              }}
+              className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal uppercase ${textColorClass} ${
+                isMobileMenuOpen ? 'opacity-0 pointer-events-none md:opacity-100 md:pointer-events-auto' : 'opacity-100'
+              }`}
+            >
+              Studio Tenev
+            </Link>
 
-          {/* Mobilmeny: tar over plassen til sidetittel til venstre og går vannrett ut med 1em mellomrom */}
-          {isMobileMenuOpen && (
+            {/* Mobilmeny: tar over plassen til sidetittel til venstre og fader raskt inn en etter en med 250ms forsinkelse */}
             <nav 
               aria-label={locale === 'en' ? 'Mobile navigation' : 'Mobilnavigasjon'}
-              className="flex md:hidden text-[1.33rem] font-normal leading-tight !text-black"
+              className={`absolute left-0 top-0 flex md:hidden text-[1.33rem] font-normal leading-tight ${textColorClass} ${
+                isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'
+              }`}
             >
               <ul className="flex gap-[1em] leading-tight whitespace-nowrap">
-                {navLinks.map((link) => {
+                {navLinks.map((link, idx) => {
                   const isActive = 
                     pathname === link.href || 
                     pathname.startsWith(link.href + '/') ||
                     (link.key === 'work' && pathname.startsWith('/projects/'));
                     
+                  // Sidetittel fader raskt ut (150ms), menytittel 1, 2 og 3 fader raskt inn en etter en med 250ms forsinkelse
+                  const delayMs = isMobileMenuOpen ? 80 + idx * 250 : 0;
+
                   return (
-                    <li key={link.key}>
+                    <li
+                      key={link.key}
+                      style={{
+                        transitionProperty: 'opacity',
+                        transitionDuration: isMobileMenuOpen ? '180ms' : '100ms',
+                        transitionTimingFunction: 'ease-out',
+                        transitionDelay: `${delayMs}ms`,
+                      }}
+                      className={isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}
+                    >
                       <Link
                         href={link.href}
                         prefetch={true}
@@ -469,7 +475,7 @@ export default function Header({
                 })}
               </ul>
             </nav>
-          )}
+          </div>
         </div>
 
         {/* TOP CENTER: Categories on /work (Desktop only) */}
@@ -507,26 +513,14 @@ export default function Header({
         ) : null}
       </header>
 
-      {/* Fullskjerm minimalistisk mobilmeny-bakgrunn */}
+      {/* Gjennomsiktig klikkområde som lukker menyen ved trykk hvor som helst på siden */}
       {isMobileMenuOpen && (
         <div
           id="mobile-menu"
-          role="dialog"
-          aria-modal="true"
-          aria-label={locale === 'en' ? 'Mobile navigation' : 'Mobilnavigasjon'}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setIsMobileMenuOpen(false);
-            }
-          }}
-          className="fixed inset-0 z-[9998] bg-white text-black flex flex-col justify-end px-side-padding pb-8 md:hidden overscroll-contain animate-in fade-in duration-200"
-          onTouchMove={(e) => e.stopPropagation()}
-        >
-          {/* Språkvelger nederst på mobilmenyen */}
-          <div className="w-full flex justify-center py-2">
-            <LanguageSwitcher />
-          </div>
-        </div>
+          aria-hidden="true"
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 z-[9998] bg-transparent md:hidden"
+        />
       )}
     </>
   );
