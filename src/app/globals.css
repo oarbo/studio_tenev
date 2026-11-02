@@ -410,14 +410,27 @@ article p,
   }
 }
 
-@media (min-width: 768px) {
+/* -------------------------------------------------------
+   DESKTOP-VISNING FOR PROSJEKTKARUSELL (≥ 1280px)
+   Beholder toppplasseringen, øker bildehøyden og tilpasser
+   bunnen slik at nøyaktig 1 linje av listen under titter opp.
+   ------------------------------------------------------- */
+@media (min-width: 1280px) {
   .carousel-hero-container {
     --carousel-space: clamp(4.5rem, 12vh, 8rem);
     --carousel-space: clamp(4.5rem, 12dvh, 8rem);
-    --carousel-h: max(220px, calc(100vh - (2 * var(--carousel-space)) - 3.5rem));
-    --carousel-h: max(220px, calc(100dvh - (2 * var(--carousel-space)) - 3.5rem));
+    /* 
+      100vh minus toppplassering minus plass til:
+      - Bildecaption under bildet (~2rem)
+      - Pusterom til listen (padding-bottom: 2.75rem)
+      - Tabelloverskrift (~2.25rem)
+      - 1 linje / prosjektrad med skillelinje (~2.25rem)
+      Totalt ~9.25rem under bildet
+    */
+    --carousel-h: max(320px, calc(100vh - var(--carousel-space) - 9.25rem));
+    --carousel-h: max(320px, calc(100dvh - var(--carousel-space) - 9.25rem));
     padding-top: var(--carousel-space) !important;
-    padding-bottom: var(--carousel-space) !important;
+    padding-bottom: 2.75rem !important;
   }
 }
 
