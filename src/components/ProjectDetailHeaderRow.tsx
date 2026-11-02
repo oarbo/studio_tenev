@@ -89,21 +89,22 @@ export default function ProjectDetailHeaderRow({ project }: ProjectDetailHeaderR
   ];
 
   return (
-    <div className="w-full px-side-padding text-[1rem] text-black">
+    <div className="w-full px-side-padding text-[1.125rem] md:text-[1rem] text-black">
       {/* ----------------------------------------------------
           MOBILVISNING (< 768px):
           Tabell med Name <tab> input, linje, type <tab> input osv.
           Venstrejustert tag (label) og høyrejustert input (value).
+          Samme skriftstørrelse som brødtekst (1.125rem) og 100% sort.
           ---------------------------------------------------- */}
       <div className="flex md:hidden flex-col w-full font-normal">
         {mobileRows.map((row, idx) => (
           <div key={row.label} className="w-full">
             <div className="w-full border-t border-black" />
-            <div className="w-full flex justify-between items-baseline gap-4 py-1.5 text-left">
-              <span className="flex-shrink-0 text-left text-black/60 font-normal">
+            <div className="w-full flex justify-between items-baseline gap-4 py-1.5 text-left text-black">
+              <span className="flex-shrink-0 text-left text-black font-normal">
                 {row.label}
               </span>
-              <span className="text-right font-normal">
+              <span className="text-right text-black font-normal">
                 {row.valueNode}
               </span>
             </div>
