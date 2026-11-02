@@ -186,8 +186,8 @@ export default function FooterClient({
           </ul>
         </div>
 
-        {/* Col 4: Språkvalg */}
-        <div className="col-start-10 col-span-3 flex flex-col items-start">
+        {/* Col 4: Språkvalg (høyrejustert til høyremargen på tablet) */}
+        <div className="col-start-10 col-span-3 flex flex-col items-end">
           <LanguageSwitcher />
         </div>
       </div>
