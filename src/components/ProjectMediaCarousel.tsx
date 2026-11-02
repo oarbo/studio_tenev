@@ -161,11 +161,11 @@ function ProjectMediaStaticView({
 
   return (
     <div
-      className={`w-full bg-white ${
+      className={`w-full bg-white carousel-hero-container carousel-tablet-view ${
         isInline
-          ? 'px-side-padding md:px-0 py-4 md:py-6'
-          : 'carousel-hero-container carousel-tablet-view project-detail-hero pt-20 pb-16 overflow-hidden relative select-none cursor-default'
-      }`}
+          ? 'py-6 md:py-10'
+          : 'project-detail-hero pt-20 pb-16'
+      } overflow-hidden relative select-none cursor-default`}
     >
       <div
         className="w-full flex justify-center items-start xl:items-center carousel-band"
@@ -716,16 +716,14 @@ function ProjectMediaCarouselInner({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       onClick={handleSlideClick}
-      className={`w-full bg-white ${singleSlide ? 'is-single-slide' : ''} ${
+      className={`w-full bg-white carousel-hero-container carousel-tablet-view ${
         isInline
-          ? 'px-side-padding md:px-0 py-4 md:py-6 overflow-hidden'
-          : 'carousel-hero-container carousel-tablet-view project-detail-hero pt-20 pb-16 overflow-hidden relative select-none'
-      } ${cursorClass}`}
+          ? 'py-6 md:py-10'
+          : 'project-detail-hero pt-20 pb-16'
+      } overflow-hidden relative select-none ${cursorClass}`}
     >
       <div
-        className={`embla ${
-          singleSlide ? 'overflow-hidden' : 'overflow-hidden xl:overflow-visible'
-        } ${cursorClass}`}
+        className={`embla overflow-hidden xl:overflow-visible ${cursorClass}`}
         style={{ height: containerHeightCss }}
         ref={(node) => {
           emblaRef(node);
@@ -750,14 +748,10 @@ function ProjectMediaCarouselInner({
             return (
               <div
                 key={`${slide.videoUrl || slide.url || index}-${index}`}
-                className={`embla__slide ${
-                  singleSlide
-                    ? 'flex-[0_0_100%] min-w-full max-w-full w-full mr-0'
-                    : `flex-none min-w-0 ${dims.slideMarginClass}`
-                } relative select-none flex justify-center items-start xl:items-center ${cursorClass}`}
+                className={`embla__slide flex-none relative min-w-0 select-none flex justify-center items-start xl:items-center ${dims.slideMarginClass} ${cursorClass}`}
                 style={{
                   '--aspect': slideAspect,
-                  width: singleSlide ? '100%' : 'var(--slide-w)',
+                  width: 'var(--slide-w)',
                   '--slide-w-desktop': dims.slideWidth,
                   height: containerHeightCss,
                 } as React.CSSProperties}
@@ -771,11 +765,10 @@ function ProjectMediaCarouselInner({
                       }
                     }
                   }}
-                  className={`relative flex items-center justify-center overflow-hidden h-full carousel-image-container cursor-pointer xl:cursor-inherit ${cursorClass}`}
+                  className={`relative flex items-center justify-center overflow-hidden w-full h-full carousel-image-container cursor-pointer xl:cursor-inherit ${cursorClass}`}
                   style={{
                     '--aspect': slideAspect,
-                    width: singleSlide ? dims.slideWidth : '100%',
-                    maxWidth: '100%',
+                    width: '100%',
                     height: '100%',
                   } as React.CSSProperties}
                 >
@@ -798,7 +791,7 @@ function ProjectMediaCarouselInner({
                           }
                         }
                       }}
-                      className={`w-full h-full ${singleSlide ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
+                      className={`w-full h-full ${singleSlide || isDrawings ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
                     />
                   ) : slide.url ? (
                     <SanityImage
@@ -809,7 +802,7 @@ function ProjectMediaCarouselInner({
                       hotspot={slide.hotspot}
                       loading="eager"
                       fetchPriority={isInitialSlide ? 'high' : undefined}
-                      className={`${singleSlide ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
+                      className={`${singleSlide || isDrawings ? 'object-contain' : 'object-contain md:object-cover'} select-none pointer-events-none`}
                       sizes={dims.sizes}
                       draggable={false}
                     />

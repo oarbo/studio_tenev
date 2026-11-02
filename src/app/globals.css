@@ -392,30 +392,6 @@ article p,
 }
 
 /* -------------------------------------------------------
-   SLIDESHOW-MODUS (singleSlide = true)
-   Viser kun ett bilde om gangen, 100% midtstilt,
-   uten at nabobilder noensinne skimtes på sidene.
-   ------------------------------------------------------- */
-.is-single-slide .embla {
-  overflow: hidden !important;
-}
-
-.is-single-slide .embla__slide {
-  flex: 0 0 100% !important;
-  width: 100% !important;
-  min-width: 100% !important;
-  max-width: 100% !important;
-  margin-right: 0 !important;
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-.is-single-slide.carousel-tablet-view .embla__slide {
-  margin-right: 0 !important;
-}
-
-/* -------------------------------------------------------
    RESPONSIV KARUSELL-HØYDE & BALANSERT LUFT (OVER/UNDER)
    Holder avstanden over og under bildet relativt lik uansett vindushøyde på desktop,
    slik at neste seksjon (listen / teksten) alltid titter frem 'above the fold'.
