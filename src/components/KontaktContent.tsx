@@ -40,7 +40,7 @@ export default function KontaktContent() {
                   {isEn ? 'Contact' : 'Kontakt'}
                 </h1>
 
-                <div className="flex flex-col gap-4 mb-8 md:mb-12">
+                <div className="mb-8 md:mb-12">
                   <p>
                     {isEn
                       ? 'Tell us about your plans – we are happy to arrange a site visit or invite you to our office to explore the possibilities for your project.'

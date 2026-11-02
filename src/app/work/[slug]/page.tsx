@@ -409,14 +409,14 @@ export default async function ProjectDetailPage({
       imageAspectRatio: n.imageAspectRatio,
       imageHotspot: n.imageHotspot,
       content: n.summary ? (
-        <div className="flex flex-col gap-y-[var(--fm)]">
+        <div className="flex flex-col">
           {n.summary.split(/\n\s*\n/).map((para, i) => (
             <p key={i}>{renderTypography(para.trim(), 'nb')}</p>
           ))}
         </div>
       ) : null,
       contentEn: n.summaryEn ? (
-        <div className="flex flex-col gap-y-[var(--fm)]">
+        <div className="flex flex-col">
           {n.summaryEn.split(/\n\s*\n/).map((para, i) => (
             <p key={i}>{renderTypography(para.trim(), 'en')}</p>
           ))}

@@ -184,7 +184,7 @@ export default function ServicesList() {
                 }`}
               >
                 <div className="overflow-hidden min-h-0">
-                  <div className="w-full pb-6 md:pb-8 pt-1 flex flex-col gap-4 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                  <div className="w-full pb-6 md:pb-8 pt-1 flex flex-col text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                     {description.split('\n\n').map((para, i) => (
                       <p key={i} className="leading-(--line-height)">
                         {para}

@@ -17,7 +17,7 @@ export default function TjenesterContent() {
               {isEn ? 'Services' : 'Tjenester'}
             </h1>
             
-            <div className="flex flex-col gap-4 mb-10 md:mb-14">
+            <div className="mb-10 md:mb-14">
               <p>
                 {isEn
                   ? 'Studio Tenev offers comprehensive architectural design for both private and commercial clients – from initial concepts and zoning analysis to detailed construction documents and site supervision.'
