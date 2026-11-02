@@ -216,6 +216,16 @@ a[href^="tel:"],
   line-height: var(--line-height);
 }
 
+/* Tablet (768px til < 1280px): la bodytekst gå hele bredden fra venstre til høyremarg */
+@media (min-width: 768px) and (max-width: 1279.98px) {
+  .text-measure,
+  .text-measure-left,
+  .news-content,
+  .prose {
+    max-width: 100% !important;
+  }
+}
+
 /* Frittstående avsnitt utenfor grid-kontekst */
 .prose p,
 .prose li,

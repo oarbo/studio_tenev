@@ -284,7 +284,7 @@ export default async function ProjectDetailPage({
       return { gridClass: 'col-span-full md:full-bleed-block', sizes: '100vw' };
     }
     if (size === 'large' || size === '8' || size === 'cols8') {
-      return { gridClass: 'md:col-start-3 md:col-span-8', sizes: '(max-width: 768px) 100vw, 85vw' };
+      return { gridClass: 'md:col-span-12 xl:col-start-3 xl:col-span-8', sizes: '(max-width: 768px) 100vw, 85vw' };
     }
     if (size === 'medium' || size === '6' || size === 'cols6') {
       return { gridClass: 'md:col-start-4 md:col-span-6', sizes: '(max-width: 768px) 100vw, 67vw' };
@@ -441,7 +441,7 @@ export default async function ProjectDetailPage({
     if (block._type === 'textBlock' && (block.text || block.title || block.textEn || block.titleEn)) {
       const isMainTextBlock = block._key === firstTextBlock?._key;
       return (
-        <div key={block._key} className="md:col-start-3 md:col-span-8 text-[1rem] text-black">
+        <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8 text-[1rem] text-black">
           <ProjectLocalizedTextBlock
             title={block.title}
             titleEn={block.titleEn}
@@ -625,7 +625,7 @@ export default async function ProjectDetailPage({
     /* Prosjekt-metadata (Dersom prosjektet ikke har noen tekstblokk i sidebyggeren) */
     if (block._type === 'metadataBlock') {
       return (
-        <div key={block._key} className="md:col-start-3 md:col-span-8 text-[1rem] text-black">
+        <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8 text-[1rem] text-black">
           <div className="text-measure">
             {renderMetadataBlock(block._key)}
           </div>
@@ -714,7 +714,7 @@ export default async function ProjectDetailPage({
                     {block.title && (
                       <div className="px-side-padding mb-4">
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1">
-                          <h3 className="md:col-start-3 md:col-span-8 text-[1rem] font-medium">{block.title}</h3>
+                          <h3 className="md:col-span-12 xl:col-start-3 xl:col-span-8 text-[1rem] font-medium">{block.title}</h3>
                         </div>
                       </div>
                     )}
@@ -742,7 +742,7 @@ export default async function ProjectDetailPage({
           <div id="project-details" className="px-side-padding mb-[4.75rem] md:mb-[6rem]">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
               {project.body ? (
-                <div className="md:col-start-3 md:col-span-8 text-[1rem] text-black">
+                <div className="md:col-span-12 xl:col-start-3 xl:col-span-8 text-[1rem] text-black">
                   <div className="text-measure">
                     <div className="news-content !m-0 !max-w-none text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                       <PortableText value={formatPortableText(project.body) || project.body} components={portableTextComponents} />
@@ -753,7 +753,7 @@ export default async function ProjectDetailPage({
                   </div>
                 </div>
               ) : (
-                <div className="md:col-start-3 md:col-span-8 text-[1rem] text-black">
+                <div className="md:col-span-12 xl:col-start-3 xl:col-span-8 text-[1rem] text-black">
                   <div className="text-measure">
                     {renderMetadataBlock('fallback-metadata')}
                   </div>
@@ -762,7 +762,7 @@ export default async function ProjectDetailPage({
 
               {/* Legacy Gallery Images (Stacked) dersom prosjektet har det */}
               {project.gallery && project.gallery.length > 0 && (
-                <div className="md:col-start-3 md:col-span-8 flex flex-col gap-6">
+                <div className="md:col-span-12 xl:col-start-3 xl:col-span-8 flex flex-col gap-6">
                   {project.gallery.map((img, idx) => (
                     <div key={idx} className="flex flex-col">
                       <div 

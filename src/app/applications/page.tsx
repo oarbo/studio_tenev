@@ -19,7 +19,7 @@ export default async function ApplicationsPage() {
     <Layout noPadding>
       <div className="w-full px-side-padding pt-content-top mb-42">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1">
-          <div className="md:col-start-3 md:col-span-8">
+          <div className="md:col-span-12 xl:col-start-3 xl:col-span-8">
             <div className="text-measure text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
               <h1 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">Applications</h1>
               {applications?.text ? (

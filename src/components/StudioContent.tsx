@@ -40,7 +40,7 @@ function studioImageGridClass(size?: string): { gridClass: string; sizes: string
     return { gridClass: 'col-span-full', sizes: '100vw' };
   }
   if (size === 'large' || size === '8' || size === 'cols8') {
-    return { gridClass: 'md:col-start-3 md:col-span-8', sizes: '(max-width: 768px) 100vw, 85vw' };
+    return { gridClass: 'md:col-span-12 xl:col-start-3 xl:col-span-8', sizes: '(max-width: 768px) 100vw, 85vw' };
   }
   if (size === 'medium' || size === '6' || size === 'cols6') {
     return { gridClass: 'md:col-start-4 md:col-span-6', sizes: '(max-width: 768px) 100vw, 67vw' };
@@ -149,7 +149,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : block.title;
 
                 return (
-                  <div key={block._key} className="md:col-start-3 md:col-span-8">
+                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
                     <div
                       className={`text-measure ${!isIntroBlock ? 'border-t border-black pt-1.5' : ''}`}
                       lang={locale === 'en' ? 'en-GB' : 'nb'}
@@ -194,7 +194,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 const displayCaption = (locale === 'en' && block.captionEn) ? block.captionEn : block.caption;
 
                 return (
-                  <div key={block._key} className="md:col-start-3 md:col-span-8">
+                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
                     <div className="text-measure group">
                       <div
                         className="relative w-full bg-gray-100"
@@ -228,7 +228,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 const displayCaption = (locale === 'en' && block.captionEn) ? block.captionEn : block.caption;
 
                 return (
-                  <div key={block._key} className="md:col-start-3 md:col-span-8">
+                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
                     <div className="text-measure group">
                       <div className="relative w-full bg-gray-100 aspect-video">
                         <video
@@ -276,7 +276,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : (block.title || t('team'));
 
                 return (
-                  <div key={block._key} className="md:col-start-3 md:col-span-8">
+                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
                     <div className="text-measure border-t border-black pt-1.5 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                       <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <ul className="flex flex-col">
@@ -294,7 +294,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : (block.title || t('previousTeam'));
 
                 return (
-                  <div key={block._key} className="md:col-start-3 md:col-span-8">
+                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
                     <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                       <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <ul className="flex flex-col">
@@ -313,7 +313,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 const displayText = (locale === 'en' && block.textEn) ? block.textEn : block.text;
 
                 return (
-                  <div key={block._key} className="md:col-start-3 md:col-span-8">
+                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
                     <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                       <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <p className="whitespace-pre-wrap">
@@ -334,7 +334,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : (block.title || t('contact'));
 
                 return (
-                  <div key={block._key} className="md:col-start-3 md:col-span-8">
+                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
                     <div className="text-measure border-t border-black pt-1.5 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                       <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <div className="flex flex-col gap-y-[var(--fm)]">
@@ -362,7 +362,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
               return null;
             })}
             {!contentBlocks.some((b) => b._type === 'contactBlock') && (
-              <div className="md:col-start-3 md:col-span-8">
+              <div className="md:col-span-12 xl:col-start-3 xl:col-span-8">
                 <div className="text-measure">
                   {renderStudioContactDetails()}
                 </div>
@@ -374,7 +374,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
         /* Fallback-layout i 12-kolonne grid */
         <div className="px-side-padding pt-content-top">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
-            <div className="md:col-start-3 md:col-span-8">
+            <div className="md:col-span-12 xl:col-start-3 xl:col-span-8">
               <div className="text-measure flex flex-col gap-10 md:gap-14 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) hyphens-none">
                 <div>
                   <h1 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
