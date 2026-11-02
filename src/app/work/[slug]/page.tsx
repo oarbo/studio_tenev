@@ -8,6 +8,7 @@ import ProjectSlideshow, { SlideshowImage } from '@/components/ProjectSlideshow'
 import ProjectMediaCarousel, { ProjectMediaSlide } from '@/components/ProjectMediaCarousel';
 import NewsList, { ExpandingListItem } from '@/components/NewsList';
 import ProjectMetadataBlock from '@/components/ProjectMetadataBlock';
+import ProjectDetailHeaderRow from '@/components/ProjectDetailHeaderRow';
 import MoreProjectsSection from '@/components/MoreProjectsSection';
 import { ProjectLocalizedTextBlock, ProjectLocalizedCaption } from '@/components/ProjectLocalizedText';
 import { client, getProjectBySlugQuery, getAllProjectsSummaryQuery, getAllProjectSlugsQuery } from '@/sanity/client';
@@ -701,6 +702,11 @@ export default async function ProjectDetailPage({
             <ProjectMediaCarousel slides={photoSlides} title={project.title} />
           </section>
         )}
+
+        {/* Desktop-only: Project List Info Row under Carousel */}
+        <div className="hidden xl:block w-full mb-[4.75rem] md:mb-[6rem]">
+          <ProjectDetailHeaderRow project={project} />
+        </div>
 
         {/* 2. SIDEBYGGER / INNHOLDSBLOKKER */}
         {project.contentBlocks && project.contentBlocks.length > 0 ? (
