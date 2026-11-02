@@ -165,8 +165,8 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                         </div>
                       )}
                       {isIntroBlock && (
-                        <div className="mt-[calc(2*var(--fm))] flex justify-between md:justify-start items-baseline gap-x-4 md:gap-x-[2em] w-full !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                          <div className="text-left">
+                        <div className="mt-[calc(2*var(--fm))] flex justify-start items-baseline gap-x-[2em] w-full !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                          <div>
                             <Link
                               href="/tjenester"
                               className="underline underline-offset-4 decoration-1 cursor-pointer inline-block"
@@ -174,10 +174,10 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                               {t('ourServices')}
                             </Link>
                           </div>
-                          <div className="text-right md:text-left">
+                          <div>
                             <Link
                               href="/kontakt"
-                              className="underline underline-offset-4 decoration-1 cursor-pointer inline-block text-right md:text-left"
+                              className="underline underline-offset-4 decoration-1 cursor-pointer inline-block"
                             >
                               {t('bookConsultation')}
                             </Link>
@@ -385,8 +385,8 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                       ? 'Studio Tenev is an architecture practice established in 2024 by Daniel Tenev, based in the heart of Bergen, Norway. We work on a wide range of projects, from interior architecture and renovation to new construction, private houses, cabins, office buildings, and public and cultural spaces.'
                       : 'Studio Tenev er et arkitektkontor etablert i 2024 av Daniel Tenev, med base i hjertet av Bergen sentrum. Vi arbeider med et bredt spekter av prosjekter, fra interiørarkitektur og rehabilitering til nybygg, eneboliger, hytter, kontorbygg og offentlige og kulturelle bygg.'}
                   </p>
-                  <div className="mt-[calc(2*var(--fm))] flex justify-between md:justify-start items-baseline gap-x-4 md:gap-x-[2em] w-full !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                    <div className="text-left">
+                  <div className="mt-[calc(2*var(--fm))] flex justify-start items-baseline gap-x-[2em] w-full !indent-0 [text-indent:0] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                    <div>
                       <Link
                         href="/tjenester"
                         className="underline underline-offset-4 decoration-1 cursor-pointer inline-block"
@@ -394,10 +394,10 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                         {t('ourServices')}
                       </Link>
                     </div>
-                    <div className="text-right md:text-left">
+                    <div>
                       <Link
                         href="/kontakt"
-                        className="underline underline-offset-4 decoration-1 cursor-pointer inline-block text-right md:text-left"
+                        className="underline underline-offset-4 decoration-1 cursor-pointer inline-block"
                       >
                         {t('bookConsultation')}
                       </Link>
