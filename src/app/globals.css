@@ -460,14 +460,14 @@ article p,
   }
   @media (min-width: 768px) {
     .carousel-tablet-view {
-      padding-left: 2rem !important;
-      padding-right: 2rem !important;
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
     }
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 992px) {
     .carousel-tablet-view {
-      padding-left: 3.75rem !important;
-      padding-right: 3.75rem !important;
+      padding-left: 2rem !important;
+      padding-right: 2rem !important;
     }
   }
 
@@ -500,12 +500,12 @@ article p,
   }
   @media (min-width: 768px) {
     .carousel-tablet-view .embla__slide {
-      margin-right: 2rem !important;
+      margin-right: 1.5rem !important;
     }
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 992px) {
     .carousel-tablet-view .embla__slide {
-      margin-right: 3.75rem !important;
+      margin-right: 2rem !important;
     }
   }
   .carousel-tablet-view .carousel-static-card {
