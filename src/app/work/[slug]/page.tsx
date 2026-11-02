@@ -240,7 +240,7 @@ export default async function ProjectDetailPage({
     });
     if (matchingUse.length > 0 && prjUse) {
       categoryTitle = prjUse;
-      selectedProjects = matchingUse.slice(0, 5);
+      selectedProjects = matchingUse.slice(0, 6);
     }
   }
 
@@ -254,14 +254,14 @@ export default async function ProjectDetailPage({
     });
     if (matchingType.length > 0 && prjType) {
       categoryTitle = prjType;
-      selectedProjects = matchingType.slice(0, 5);
+      selectedProjects = matchingType.slice(0, 6);
     }
   }
 
-  // General fallback: More projects (only projects with images, up to 5)
+  // General fallback: More projects (only projects with images, up to 6 on desktop, 4 on tablet)
   if (selectedProjects.length === 0) {
     categoryTitle = 'projects';
-    selectedProjects = otherProjects.slice(0, 5);
+    selectedProjects = otherProjects.slice(0, 6);
   }
 
   const combinedTypeTags = Array.from(

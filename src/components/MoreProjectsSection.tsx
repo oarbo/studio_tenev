@@ -35,12 +35,13 @@ export default function MoreProjectsSection({ projects, categoryTitle }: MorePro
             {locale === 'en' ? (categoryTitle ? `More ${categoryTitle}` : 'More projects') : 'Flere prosjekter'}
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-fm-1 gap-y-8">
-            {projects.map((p) => {
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-x-fm-1 gap-y-8">
+            {projects.map((p, index) => {
               const title = (locale === 'en' && p.titleEn) ? p.titleEn : p.title;
+              const visibilityClass = index >= 4 ? 'flex md:hidden xl:flex' : 'flex';
 
               return (
-                <Link key={p._id} href={`/work/${p.slug}`} prefetch={true} className="flex flex-col gap-2 group">
+                <Link key={p._id} href={`/work/${p.slug}`} prefetch={true} className={`${visibilityClass} flex-col gap-2 group`}>
                   <div className="relative w-full aspect-4/3 bg-gray-100 overflow-hidden">
                     {p.coverImage ? (
                       <SanityImage 
@@ -50,7 +51,7 @@ export default function MoreProjectsSection({ projects, categoryTitle }: MorePro
                         lqip={p.coverImageLqip}
                         hotspot={p.coverImageHotspot}
                         className="object-cover group-hover:opacity-70 transition-opacity duration-150 ease-out"
-                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 16vw"
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-100" />
