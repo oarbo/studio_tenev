@@ -275,30 +275,8 @@ export default async function ProjectDetailPage({
     )
   );
 
-  // Helper renderer for Data Table (Metadata Block) - skjules på Tablet og Desktop (md:hidden) hvor den nye inforaden vises
-  const renderMetadataBlock = (key?: string, style?: React.CSSProperties) => (
-    <div className="md:hidden">
-      <ProjectMetadataBlock
-        key={key || 'metadata'}
-        id={key}
-        style={style}
-        projectTitle={project.title}
-        projectTitleEn={project.titleEn}
-        dateStr={dateStr}
-        location={project.location}
-        country={project.country}
-        client={project.client}
-        typeTags={combinedTypeTags}
-        status={project.status}
-        statusEn={project.statusEn}
-        size={project.size}
-        contractor={project.contractor}
-        photographer={project.photographer}
-        renderingFirm={project.renderingFirm}
-        team={project.team}
-      />
-    </div>
-  );
+  // Helper renderer for Data Table (Metadata Block) - skjules overalt da den nye tabell-inforaden erstatter den
+  const renderMetadataBlock = (_key?: string, _style?: React.CSSProperties) => null;
 
   // Helper for image and video sizing in Sidebygger (Page Builder)
   const getGridClassAndSizes = (size?: string) => {
@@ -705,8 +683,8 @@ export default async function ProjectDetailPage({
           </section>
         )}
 
-        {/* Project List Info Row under Carousel (Tablet og Desktop) */}
-        <div className="hidden md:block w-full mb-[4.75rem] md:mb-[6rem]">
+        {/* Project List Info Row under Carousel (Mobil, Tablet og Desktop) */}
+        <div className="w-full mb-[3.5rem] md:mb-[6rem]">
           <ProjectDetailHeaderRow project={project} />
         </div>
 

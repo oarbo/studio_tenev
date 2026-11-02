@@ -438,23 +438,8 @@ export default function Header({
           </Link>
         </div>
 
-        {/* TOP CENTER: Project Title on detail page (Mobil only, skjult på Tablet og Desktop md:hidden) OR Categories on /work (Desktop only) */}
-        {displayProjectTitle ? (
-          <div
-            ref={titleRef}
-            className={`absolute left-0 translate-x-0 w-full px-side-padding top-[3.75rem] pointer-events-auto items-center justify-center text-center md:hidden ${
-              isMobileMenuOpen ? 'hidden' : 'flex'
-            }`}
-          >
-            <span
-              className={`leading-tight text-[1.15rem] font-normal [text-wrap:balance] text-center whitespace-normal ${textColorClass}`}
-            >
-              {typeof displayProjectTitle === 'string'
-                ? renderTypography(displayProjectTitle, locale === 'en' ? 'en-GB' : 'nb')
-                : displayProjectTitle}
-            </span>
-          </div>
-        ) : pathname === '/work' ? (
+        {/* TOP CENTER: Categories on /work (Desktop only) */}
+        {pathname === '/work' && !displayProjectTitle ? (
           <div
             ref={titleRef}
             className="absolute left-1/2 -translate-x-1/2 pointer-events-auto hidden xl:block pt-[0.29rem]"
