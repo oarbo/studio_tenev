@@ -20,7 +20,7 @@ export default function WorkCategoryNav({ className = '' }: WorkCategoryNavProps
   ];
 
   return (
-    <nav aria-label="Kategorier" className={`w-full text-[1.125rem] md:text-[1rem] font-normal ${className}`}>
+    <nav aria-label="Kategorier" className={`w-full text-[1.125rem] md:text-[1.2rem] xl:text-[1rem] font-normal ${className}`}>
       <ul className="flex flex-wrap justify-center items-center gap-x-[0.85em] md:gap-x-[1.25em] gap-y-2 leading-tight whitespace-nowrap">
         {categories.map((cat) => {
           const isActive = activeCategory === cat.key;
