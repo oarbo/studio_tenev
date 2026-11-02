@@ -32,37 +32,37 @@ export default function ProjectDetailHeaderRow({ project }: ProjectDetailHeaderR
 
   return (
     <div className="w-full px-side-padding text-[1rem] text-black">
-      {/* Table Header Row */}
+      {/* Table Header Row: matcher kolonneoppsettet i ProjectList for tablet (12 cols) og desktop (12 cols med innhold i col 3-10) */}
       <div className="grid grid-cols-12 gap-x-fm-1 pb-1.5 font-normal">
-        <div className="col-start-3 col-span-2 text-left">
+        <div className="col-span-5 xl:col-start-3 xl:col-span-2 text-left">
           {t('name')}
         </div>
-        <div className="col-span-2 text-left">
+        <div className="col-span-4 xl:col-span-2 text-left">
           {t('type')}
         </div>
-        <div className="col-span-1 text-left">
+        <div className="col-span-1 xl:col-span-1 text-left">
           {t('size')}
         </div>
-        <div className="col-span-1 text-left">
+        <div className="col-span-2 xl:col-span-1 text-right xl:text-left">
           {t('year')}
         </div>
-        <div className="col-span-2 text-left">
+        <div className="hidden xl:block xl:col-span-2 text-left">
           {t('status')}
         </div>
       </div>
 
       {/* Skillelinje */}
       <div className="grid grid-cols-12 gap-x-fm-1">
-        <div className="col-start-3 col-span-8 border-t border-black" />
+        <div className="col-span-12 xl:col-start-3 xl:col-span-8 border-t border-black" />
       </div>
 
       {/* Prosjektets rad */}
       <div className="grid grid-cols-12 gap-x-fm-1 pt-1.5 pb-[calc(0.5*var(--fm))] text-left items-baseline font-normal">
-        <div className="col-start-3 col-span-2">
+        <div className="col-span-5 xl:col-start-3 xl:col-span-2">
           {renderTypography(displayTitle, locale === 'en' ? 'en-GB' : 'nb')}
         </div>
 
-        <div className="col-span-2">
+        <div className="col-span-4 xl:col-span-2">
           {projectTags.map((tag, idx) => (
             <React.Fragment key={tag}>
               <Link
@@ -76,15 +76,15 @@ export default function ProjectDetailHeaderRow({ project }: ProjectDetailHeaderR
           ))}
         </div>
 
-        <div className="col-span-1 tabular-nums whitespace-nowrap">
+        <div className="col-span-1 xl:col-span-1 tabular-nums whitespace-nowrap">
           {project.size?.value ? `${project.size.value}\u00A0${(project.size.unit || 'm²').trim()}` : ''}
         </div>
 
-        <div className="col-span-1 tabular-nums whitespace-nowrap">
+        <div className="col-span-2 xl:col-span-1 tabular-nums whitespace-nowrap text-right xl:text-left">
           {dateStr || ''}
         </div>
 
-        <div className="col-span-2">
+        <div className="hidden xl:block xl:col-span-2">
           {displayStatus}
         </div>
       </div>

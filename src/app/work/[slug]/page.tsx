@@ -275,9 +275,9 @@ export default async function ProjectDetailPage({
     )
   );
 
-  // Helper renderer for Data Table (Metadata Block) - skjules på Desktop (xl:hidden) hvor den nye inforaden vises
+  // Helper renderer for Data Table (Metadata Block) - skjules på Tablet og Desktop (md:hidden) hvor den nye inforaden vises
   const renderMetadataBlock = (key?: string, style?: React.CSSProperties) => (
-    <div className="xl:hidden">
+    <div className="md:hidden">
       <ProjectMetadataBlock
         key={key || 'metadata'}
         id={key}
@@ -705,8 +705,8 @@ export default async function ProjectDetailPage({
           </section>
         )}
 
-        {/* Desktop-only: Project List Info Row under Carousel */}
-        <div className="hidden xl:block w-full mb-[4.75rem] md:mb-[6rem]">
+        {/* Project List Info Row under Carousel (Tablet og Desktop) */}
+        <div className="hidden md:block w-full mb-[4.75rem] md:mb-[6rem]">
           <ProjectDetailHeaderRow project={project} />
         </div>
 
