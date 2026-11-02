@@ -458,6 +458,16 @@ article p,
     padding-bottom: 2.75rem !important;
     height: auto !important;
   }
+  /* For prosjektsiden på tablet (768px – 1279.98px):
+     På oversiktssiden (/work) ligger WorkCategoryNav over karusellen med
+     pt-[calc(4.25rem+1em)], slik at toppen av bildet treffer calc(6.75rem + 1em).
+     På prosjektsiden uten kategorimeny sikrer vi nøyaktig samme Y-plassering: */
+  @media (min-width: 768px) {
+    .project-detail-hero {
+      padding-top: calc(6.75rem + 1em) !important;
+      padding-bottom: 2.75rem !important;
+    }
+  }
   /* Mobil-spesifikk proporsjonal avstand (< 768px):
      Både oversikt (/work) og detaljside (/work/[slug]) deler
      nøyaktig samme topp-padding (4.25rem), bildehøyde og bunnpadding (2rem) */
@@ -470,44 +480,12 @@ article p,
       padding-bottom: 2rem !important;
       height: auto !important;
     }
-    .project-detail-hero .embla__container {
-      align-items: flex-start !important;
-      height: auto !important;
-    }
-    .project-detail-hero .embla {
-      height: auto !important;
-    }
-    .project-detail-hero .embla__slide {
-      width: 100% !important;
-      min-width: 100% !important;
-      max-width: 100% !important;
-      height: auto !important;
-      margin-right: var(--spacing-side-padding) !important;
-    }
-    .project-detail-hero .embla__slide > div {
-      width: 100% !important;
-      height: auto !important;
-    }
-    .project-detail-hero .embla__slide video,
-    .project-detail-hero .embla__slide img {
-      width: 100% !important;
-      height: auto !important;
-      aspect-ratio: var(--aspect, 1.4) !important;
-      max-height: 48vh !important;
-      object-fit: cover !important;
-    }
-    .project-detail-hero .carousel-caption {
-      position: relative !important;
-      top: auto !important;
-      left: auto !important;
-      right: auto !important;
-      margin-top: 0.75rem !important;
-    }
   }
   .carousel-tablet-view .carousel-band,
   .carousel-tablet-view .carousel-static-wrap,
   .carousel-tablet-view .embla__container {
     height: auto !important;
+    align-items: flex-start !important;
   }
   .carousel-tablet-view .embla {
     overflow: hidden !important;
@@ -519,6 +497,7 @@ article p,
     max-width: 100% !important;
     height: auto !important;
     margin-right: var(--spacing-side-padding) !important;
+    align-items: flex-start !important;
   }
   .carousel-tablet-view .carousel-static-card {
     width: 100% !important;
@@ -532,6 +511,12 @@ article p,
     height: auto !important;
     aspect-ratio: var(--aspect, 1.4) !important;
     max-height: 48vh !important;
+  }
+  .carousel-tablet-view .carousel-image-container video,
+  .carousel-tablet-view .carousel-image-container img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
   }
   .carousel-tablet-view .carousel-caption {
     position: relative !important;

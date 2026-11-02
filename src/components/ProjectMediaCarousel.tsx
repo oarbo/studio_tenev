@@ -158,22 +158,23 @@ function ProjectMediaStaticView({
 
   return (
     <div
-      className={`w-full bg-white px-side-padding md:px-0 ${
+      className={`w-full bg-white ${
         isInline
-          ? 'py-4 md:py-6'
-          : 'carousel-hero-container project-detail-hero pt-[calc(6.75rem+1em)] md:pt-20 pb-8 md:pb-16'
-      } overflow-hidden relative select-none cursor-default`}
+          ? 'px-side-padding md:px-0 py-4 md:py-6'
+          : 'carousel-hero-container carousel-tablet-view project-detail-hero pt-20 pb-16 overflow-hidden relative select-none cursor-default'
+      }`}
     >
       <div
-        className="w-full flex justify-center items-center"
+        className="w-full flex justify-center items-start xl:items-center carousel-band"
         style={{ height: containerHeightCss }}
       >
         <div
-          className="relative flex items-center justify-center overflow-hidden w-full max-w-full md:max-w-[100vw]"
+          className="relative flex items-center justify-center overflow-hidden w-full max-w-full md:max-w-[100vw] carousel-image-container carousel-static-card"
           style={{
+            '--aspect': effectiveAspect,
             width: dims.slideWidth,
             height: '100%',
-          }}
+          } as React.CSSProperties}
         >
           {slide.videoUrl ? (
             <video
@@ -213,7 +214,7 @@ function ProjectMediaStaticView({
         </div>
       </div>
       {(slide.caption || slide.captionEn) && (
-        <div className="w-full px-side-padding mt-4 text-center cursor-default select-text">
+        <div className="w-full px-side-padding mt-4 text-center cursor-default select-text carousel-caption">
           <ProjectLocalizedCaption
             caption={slide.caption}
             captionEn={slide.captionEn}
@@ -783,14 +784,14 @@ function ProjectMediaCarouselInner({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       onClick={handleSlideClick}
-      className={`w-full bg-white px-side-padding md:px-0 ${
+      className={`w-full bg-white ${
         isInline
-          ? 'py-4 md:py-6'
-          : 'carousel-hero-container project-detail-hero pt-[calc(6.75rem+1em)] md:pt-20 pb-8 md:pb-16'
-      } overflow-hidden relative select-none ${cursorClass}`}
+          ? 'px-side-padding md:px-0 py-4 md:py-6'
+          : 'carousel-hero-container carousel-tablet-view project-detail-hero pt-20 pb-16 overflow-hidden relative select-none'
+      } ${cursorClass}`}
     >
       <div
-        className={`embla overflow-hidden md:overflow-visible ${cursorClass}`}
+        className={`embla overflow-hidden xl:overflow-visible ${cursorClass}`}
         style={{ height: containerHeightCss }}
         ref={(node) => {
           emblaRef(node);
@@ -798,12 +799,13 @@ function ProjectMediaCarouselInner({
         }}
       >
         <div
-          className="embla__container flex touch-pan-y items-center"
+          className="embla__container flex touch-pan-y items-start xl:items-center"
           style={{ height: containerHeightCss }}
         >
           {infiniteSlides.map((slide, index) => {
             const isInitialSlide = index === startIndex;
             const dynamicAspect = slide.videoUrl ? videoAspects[slide.videoUrl] : undefined;
+            const slideAspect = dynamicAspect || slide.aspectRatio || 1.4;
             const dims = getSlideItemDimensions(
               slide,
               singleSlide,
@@ -814,16 +816,18 @@ function ProjectMediaCarouselInner({
             return (
               <div
                 key={`${slide.videoUrl || slide.url || index}-${index}`}
-                className={`embla__slide flex-none relative min-w-0 select-none flex justify-center items-center ${dims.slideMarginClass}`}
+                className={`embla__slide flex-none relative min-w-0 select-none flex justify-center items-start xl:items-center ${dims.slideMarginClass}`}
                 style={{
+                  '--aspect': slideAspect,
                   width: singleSlide ? '100%' : 'var(--slide-w)',
                   '--slide-w-desktop': dims.slideWidth,
                   height: containerHeightCss,
                 } as React.CSSProperties}
               >
                 <div
-                  className="relative flex items-center justify-center overflow-hidden w-full h-full"
+                  className="relative flex items-center justify-center overflow-hidden w-full h-full carousel-image-container"
                   style={{
+                    '--aspect': slideAspect,
                     width: singleSlide ? 'var(--slide-w)' : '100%',
                     height: '100%',
                   } as React.CSSProperties}
@@ -871,7 +875,7 @@ function ProjectMediaCarouselInner({
       </div>
       {(activeSlide?.caption || activeSlide?.captionEn) && (
         <div
-          className="w-full px-side-padding mt-4 text-center cursor-default select-text relative z-10"
+          className="w-full px-side-padding mt-4 text-center cursor-default select-text relative z-10 carousel-caption"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
           onPointerMove={(e) => {
