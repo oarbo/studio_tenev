@@ -535,6 +535,7 @@ article p,
   @media (min-width: 768px) {
     .carousel-tablet-view .embla__slide {
       margin-right: 1.5rem !important;
+      align-items: stretch !important;
     }
   }
   @media (min-width: 992px) {
@@ -542,6 +543,7 @@ article p,
       margin-right: 2rem !important;
     }
   }
+  /* Mobil (< 768px): 3:4 portrait sentrert */
   .carousel-tablet-view .carousel-card,
   .carousel-tablet-view .carousel-static-card {
     width: calc(var(--carousel-h) * 3 / 4) !important;
@@ -559,6 +561,30 @@ article p,
     margin-left: auto !important;
     margin-right: auto !important;
   }
+
+  /* Tablet (768px – 1279.98px): full bredde helt ut til margene, beskjær innholdet (object-fit: cover) */
+  @media (min-width: 768px) {
+    .carousel-tablet-view .carousel-card,
+    .carousel-tablet-view .carousel-static-card {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    .carousel-tablet-view .carousel-image-container {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+      height: var(--carousel-h) !important;
+      max-height: var(--carousel-h) !important;
+      aspect-ratio: auto !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+  }
+
   .carousel-tablet-view .carousel-image-container video,
   .carousel-tablet-view .carousel-image-container img {
     width: 100% !important;
