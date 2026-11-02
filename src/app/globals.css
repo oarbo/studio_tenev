@@ -510,12 +510,6 @@ article p,
     padding-bottom: 0.85rem !important;
   }
   @media (min-width: 768px) {
-    .carousel-tablet-view.carousel-inline {
-      padding-top: 1.5rem !important;
-      padding-bottom: 2.5rem !important;
-    }
-  }
-  @media (min-width: 768px) {
     .carousel-tablet-view {
       padding-left: 1.5rem !important;
       padding-right: 1.5rem !important;
@@ -612,6 +606,17 @@ article p,
       aspect-ratio: auto !important;
       margin-left: 0 !important;
       margin-right: 0 !important;
+    }
+  }
+
+  /* Tablet (768px – 1279.98px): For karusell i sidebyggeren tilpasses høyden så overflødig tomrom over/under tegninger fjernes */
+  @media (min-width: 768px) and (max-width: 1279.98px) {
+    .carousel-tablet-view.carousel-inline {
+      --carousel-h: min(54vh, calc((100vw - 3rem) / 1.5));
+    }
+    .carousel-tablet-view.carousel-inline .carousel-image-container {
+      height: var(--carousel-h) !important;
+      max-height: var(--carousel-h) !important;
     }
   }
 

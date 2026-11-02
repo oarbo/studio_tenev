@@ -695,7 +695,7 @@ export default async function ProjectDetailPage({
               const nextSec = contentSections[secIdx + 1];
               const isBeforeCarousel = nextSec && nextSec.type === 'carousel';
               const mbClass = sec.type === 'carousel' || isBeforeCarousel
-                ? 'mb-[1.6rem] md:mb-[6rem]'
+                ? 'mb-[1.6rem] md:mb-[2rem] xl:mb-[6rem]'
                 : 'mb-[4.75rem] md:mb-[6rem]';
 
               if (sec.type === 'carousel') {
@@ -804,7 +804,7 @@ export default async function ProjectDetailPage({
 
         {/* 3. DRAWINGS & PLANS CAROUSEL (Dersom definert fra legacy galleri) */}
         {drawingSlides.length > 0 && (
-          <section className="w-full flex flex-col mb-[1.6rem] md:mb-[6rem]">
+          <section className="w-full flex flex-col mb-[1.6rem] md:mb-[2rem] xl:mb-[6rem]">
             <ProjectMediaCarousel slides={drawingSlides} title={project.title} isDrawings={true} isInline />
           </section>
         )}
