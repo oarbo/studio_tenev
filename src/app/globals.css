@@ -432,6 +432,51 @@ article p,
 }
 
 /* -------------------------------------------------------
+   TABLET-VISNING FOR PROSJEKTKARUSELL (768px – 1279px)
+   Viser nøyaktig ett bilde i full bredde mellom sidemargene
+   med naturlig sideforhold uten å dominere hele skjermhøyden.
+   ------------------------------------------------------- */
+@media (min-width: 768px) and (max-width: 1279.98px) {
+  .carousel-tablet-view {
+    padding-left: var(--spacing-side-padding) !important;
+    padding-right: var(--spacing-side-padding) !important;
+    padding-top: 3.5rem !important;
+    padding-bottom: 3.5rem !important;
+    height: auto !important;
+  }
+  .carousel-tablet-view .carousel-band,
+  .carousel-tablet-view .carousel-static-wrap,
+  .carousel-tablet-view .embla__container {
+    height: auto !important;
+  }
+  .carousel-tablet-view .embla {
+    overflow: hidden !important;
+    height: auto !important;
+  }
+  .carousel-tablet-view .embla__slide,
+  .carousel-tablet-view .carousel-static-card {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin-right: 0 !important;
+  }
+  .carousel-tablet-view .carousel-image-container {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: var(--aspect, 1.4) !important;
+    max-height: 52vh !important;
+  }
+  .carousel-tablet-view .carousel-caption {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin-top: 0.75rem !important;
+  }
+}
+
+/* -------------------------------------------------------
    FJERN NETTLESERENS GULE/BLÅ AUTOFILL-BAKGRUNN (Safari & Chrome)
    Overskriver nettleserens standard styling slik at autoutfylte felter
    forblir 100% hvite og beholder ren, sort typografi.

@@ -255,7 +255,7 @@ export default function ProjectList({
         onClick={() => onSort && onSort(sortKey)}
         className={`${colSpan} ${mobileHidden ? 'hidden md:flex' : 'flex'} items-center ${
           isDate 
-            ? 'justify-end md:justify-between text-right md:text-left' 
+            ? 'justify-end md:justify-end xl:justify-between text-right md:text-right xl:text-left' 
             : 'justify-start md:justify-between text-left'
         } hover:opacity-70 transition-opacity cursor-pointer font-normal`}
       >
@@ -357,11 +357,11 @@ export default function ProjectList({
 
           {/* Table Header Row */}
           <div className="flex justify-between items-baseline md:grid md:grid-cols-12 gap-x-fm-1 text-[1rem] text-black pb-1.5">
-            {renderSortHeader(t('name'), 'name', 'flex-1 md:flex-initial md:col-span-4 xl:col-start-3 xl:col-span-2')}
-            {renderSortHeader(t('type'), 'type', 'md:col-span-3 xl:col-span-2', true)}
-            {renderSortHeader(t('size'), 'size', 'md:col-span-2 xl:col-span-1', true)}
-            {renderSortHeader(t('year'), 'date', 'flex-shrink-0 md:col-span-1 xl:col-span-1')}
-            {renderSortHeader(t('status'), 'status', 'md:col-span-2 xl:col-span-2', true)}
+            {renderSortHeader(t('name'), 'name', 'flex-1 md:flex-initial md:col-span-5 xl:col-start-3 xl:col-span-2')}
+            {renderSortHeader(t('type'), 'type', 'md:col-span-4 xl:col-span-2', true)}
+            {renderSortHeader(t('size'), 'size', 'md:col-span-1 xl:col-span-1', true)}
+            {renderSortHeader(t('year'), 'date', 'flex-shrink-0 md:col-span-2 xl:col-span-1')}
+            {renderSortHeader(t('status'), 'status', 'hidden xl:flex xl:col-span-2', true)}
           </div>
         </div>
 
@@ -403,28 +403,28 @@ export default function ProjectList({
                       type="button"
                       aria-expanded={isExpanded}
                       onClick={() => toggleItem(item._id)}
-                      className="flex-1 min-w-0 pr-4 whitespace-nowrap truncate md:whitespace-normal md:overflow-visible md:col-span-4 xl:col-span-2 md:pr-0 font-normal text-left group-hover:opacity-70 transition-opacity bg-transparent border-0 p-0 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-black"
+                      className="flex-1 min-w-0 pr-4 whitespace-nowrap truncate md:whitespace-normal md:overflow-visible md:col-span-5 xl:col-span-2 md:pr-0 font-normal text-left group-hover:opacity-70 transition-opacity bg-transparent border-0 p-0 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-black"
                     >
                       {renderTypography(displayTitle, locale === 'en' ? 'en-GB' : 'nb')}
                     </button>
 
                     {/* Type (hidden on mobile; each tag is individually clickable) */}
-                    <div className="hidden md:block md:col-span-3 xl:col-span-2">
+                    <div className="hidden md:block md:col-span-4 xl:col-span-2">
                       {renderTagList(projectTags)}
                     </div>
 
                     {/* Size (hidden on mobile) */}
-                    <div className="hidden md:block md:col-span-2 xl:col-span-1 tabular-nums whitespace-nowrap group-hover:opacity-70 transition-opacity">
+                    <div className="hidden md:block md:col-span-1 xl:col-span-1 tabular-nums whitespace-nowrap group-hover:opacity-70 transition-opacity">
                       {item.size?.value ? `${item.size.value}\u00A0${(item.size.unit || 'm²').trim()}` : ''}
                     </div>
 
                     {/* Year */}
-                    <div className="flex-shrink-0 md:col-span-1 xl:col-span-1 tabular-nums whitespace-nowrap text-right md:text-left group-hover:opacity-70 transition-opacity">
+                    <div className="flex-shrink-0 md:col-span-2 xl:col-span-1 tabular-nums whitespace-nowrap text-right xl:text-left group-hover:opacity-70 transition-opacity">
                       {dateStr || ''}
                     </div>
 
-                    {/* Status (hidden on mobile) */}
-                    <div className="hidden md:block md:col-span-2 xl:col-span-2 group-hover:opacity-70 transition-opacity">
+                    {/* Status (hidden on mobile and tablet, shown on xl desktop) */}
+                    <div className="hidden xl:block xl:col-span-2 group-hover:opacity-70 transition-opacity">
                       {displayStatus}
                     </div>
                   </div>
@@ -433,27 +433,27 @@ export default function ProjectList({
                     className="col-span-2 md:col-span-12 xl:col-start-3 xl:col-span-8 flex justify-between items-baseline md:grid md:grid-cols-12 xl:grid-cols-8 gap-x-fm-1 pt-1.5 pb-[calc(0.5*var(--fm))] text-left cursor-default"
                   >
                     {/* Name */}
-                    <div className="flex-1 min-w-0 pr-4 whitespace-nowrap truncate md:whitespace-normal md:overflow-visible md:col-span-4 xl:col-span-2 md:pr-0 font-normal">
+                    <div className="flex-1 min-w-0 pr-4 whitespace-nowrap truncate md:whitespace-normal md:overflow-visible md:col-span-5 xl:col-span-2 md:pr-0 font-normal">
                       {renderTypography(displayTitle, locale === 'en' ? 'en-GB' : 'nb')}
                     </div>
 
                     {/* Type (hidden on mobile; each tag is individually clickable) */}
-                    <div className="hidden md:block md:col-span-3 xl:col-span-2">
+                    <div className="hidden md:block md:col-span-4 xl:col-span-2">
                       {renderTagList(projectTags)}
                     </div>
 
                     {/* Size (hidden on mobile) */}
-                    <div className="hidden md:block md:col-span-2 xl:col-span-1 tabular-nums whitespace-nowrap">
+                    <div className="hidden md:block md:col-span-1 xl:col-span-1 tabular-nums whitespace-nowrap">
                       {item.size?.value ? `${item.size.value}\u00A0${(item.size.unit || 'm²').trim()}` : ''}
                     </div>
 
                     {/* Year */}
-                    <div className="flex-shrink-0 md:col-span-1 xl:col-span-1 tabular-nums whitespace-nowrap text-right md:text-left">
+                    <div className="flex-shrink-0 md:col-span-2 xl:col-span-1 tabular-nums whitespace-nowrap text-right xl:text-left">
                       {dateStr || ''}
                     </div>
 
-                    {/* Status (hidden on mobile) */}
-                    <div className="hidden md:block md:col-span-2 xl:col-span-2">
+                    {/* Status (hidden on mobile and tablet, shown on xl desktop) */}
+                    <div className="hidden xl:block xl:col-span-2">
                       {displayStatus}
                     </div>
                   </div>

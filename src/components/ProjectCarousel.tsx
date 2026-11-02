@@ -38,14 +38,15 @@ function ProjectCarouselStaticView({ item }: { item: ProjectCarouselItem }) {
   const linkHref = item.slug ? `/work/${item.slug}` : `/work#project-${item._id}`;
 
   return (
-    <div className="w-full bg-white carousel-hero-container pt-20 pb-16 overflow-hidden relative cursor-default select-none">
-      <div className="w-full flex justify-center items-center h-[var(--carousel-h)]" style={{ height: 'var(--carousel-h)' }}>
+    <div className="w-full bg-white carousel-hero-container carousel-tablet-view pt-20 pb-16 overflow-hidden relative cursor-default select-none">
+      <div className="w-full flex justify-center items-center h-[var(--carousel-h)] carousel-static-wrap" style={{ height: 'var(--carousel-h)' }}>
         <div
-          className="relative select-none h-[var(--carousel-h)]"
+          className="relative select-none h-[var(--carousel-h)] carousel-static-card"
           style={{
+            '--aspect': aspectRatio,
             width: `calc(var(--carousel-h) * ${aspectRatio})`,
             height: 'var(--carousel-h)',
-          }}
+          } as React.CSSProperties}
         >
           <Link
             href={linkHref}
@@ -54,7 +55,7 @@ function ProjectCarouselStaticView({ item }: { item: ProjectCarouselItem }) {
             draggable={false}
           >
             <div
-              className="relative w-full overflow-hidden bg-gray-50"
+              className="relative w-full overflow-hidden bg-gray-50 carousel-image-container"
               style={{ height: 'var(--carousel-h)' }}
             >
               {imgUrl && (
@@ -73,7 +74,7 @@ function ProjectCarouselStaticView({ item }: { item: ProjectCarouselItem }) {
               )}
             </div>
             {/* Title under */}
-            <div className="absolute top-full left-0 right-0 mt-3 text-black text-[1rem] md:text-[1.125rem] font-normal leading-tight truncate hover:underline underline-offset-4 decoration-1 cursor-pointer">
+            <div className="absolute top-full left-0 right-0 mt-3 carousel-caption text-black text-[1rem] md:text-[1.125rem] font-normal leading-tight truncate hover:underline underline-offset-4 decoration-1 cursor-pointer">
               {formatTypography(locale === 'en' && item.titleEn ? item.titleEn : item.title)}
             </div>
           </Link>
@@ -625,7 +626,7 @@ function ProjectCarouselInner({
         lastPointerYRef.current = null;
         setHoveredRole('default');
       }}
-      className="w-full bg-white carousel-hero-container pt-20 pb-16 overflow-hidden relative select-none cursor-default"
+      className="w-full bg-white carousel-hero-container carousel-tablet-view pt-20 pb-16 overflow-hidden relative select-none cursor-default"
     >
       {/* Det horisontale båndet med bildene hvor pil (<, >) og kryss (+) er aktivt */}
       <div
@@ -633,7 +634,7 @@ function ProjectCarouselInner({
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onClick={handleBandClick}
-        className={`relative w-full h-[var(--carousel-h)] ${cursorClass}`}
+        className={`relative w-full h-[var(--carousel-h)] carousel-band ${cursorClass}`}
         style={{ height: 'var(--carousel-h)' }}
       >
         <div className="embla overflow-visible h-[var(--carousel-h)]" style={{ height: 'var(--carousel-h)' }} ref={emblaRef}>
@@ -695,7 +696,7 @@ function ProjectCarouselInner({
                       draggable={false}
                     >
                       <div
-                        className={`relative w-full overflow-hidden bg-gray-50 ${cursorClass}`}
+                        className={`relative w-full overflow-hidden bg-gray-50 carousel-image-container ${cursorClass}`}
                         style={{ height: 'var(--carousel-h)' }}
                       >
                         {imgUrl && (
@@ -716,7 +717,7 @@ function ProjectCarouselInner({
                     </Link>
 
                     {/* Prosjekttekst / caption under bildet - alltid vanlig pointer uten pil/kryss */}
-                    <div className="absolute top-full left-0 right-0 mt-3 cursor-default select-none pointer-events-auto">
+                    <div className="absolute top-full left-0 right-0 mt-3 carousel-caption cursor-default select-none pointer-events-auto">
                       <Link
                         href={linkHref}
                         prefetch={true}
