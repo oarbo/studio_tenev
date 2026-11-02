@@ -728,7 +728,7 @@ function ProjectCarouselInner({
                       if (el) cardRefs.current.set(`${item._id}-${index}`, el);
                       else cardRefs.current.delete(`${item._id}-${index}`);
                     }}
-                    className="w-full h-full will-change-transform relative"
+                    className="w-full h-full will-change-transform relative carousel-card"
                   >
                     {/* Bilde-lenke (aktivt område med karusell-peker) */}
                     <Link

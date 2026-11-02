@@ -447,10 +447,27 @@ article p,
 
 /* -------------------------------------------------------
    MOBIL- OG TABLET-VISNING FOR PROSJEKTKARUSELL (< 1280px)
-   Viser nøyaktig ett bilde i full bredde helt ut til sidemargene
-   med naturlig sideforhold.
+   Alle bildene i karusellene er i høydeformat (3:4 portrait)
+   og følger proporsjonalt høyden på karusellen fra desktop-siden.
+   Bildene beskjæres (object-fit: cover) for å passe formen likt,
+   og kan klikkes på for full visning med zoom i lightbox.
    ------------------------------------------------------- */
 @media (max-width: 1279.98px) {
+  .carousel-hero-container {
+    --carousel-space: clamp(3.5rem, 9vh, 5.5rem);
+    --carousel-space: clamp(3.5rem, 9dvh, 5.5rem);
+    --carousel-h: max(320px, min(calc(100vh - var(--carousel-space) - 8.5rem), calc((100vw - 2rem) * 4 / 3)));
+    --carousel-h: max(320px, min(calc(100dvh - var(--carousel-space) - 8.5rem), calc((100dvw - 2rem) * 4 / 3)));
+  }
+  @media (min-width: 768px) {
+    .carousel-hero-container {
+      --carousel-space: clamp(4.5rem, 12vh, 8rem);
+      --carousel-space: clamp(4.5rem, 12dvh, 8rem);
+      --carousel-h: max(360px, calc(100vh - var(--carousel-space) - 9.25rem));
+      --carousel-h: max(360px, calc(100dvh - var(--carousel-space) - 9.25rem));
+    }
+  }
+
   .carousel-tablet-view {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
@@ -496,7 +513,9 @@ article p,
     max-width: 100% !important;
     height: auto !important;
     margin-right: 1rem !important;
-    align-items: flex-start !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
   }
   @media (min-width: 768px) {
     .carousel-tablet-view .embla__slide {
@@ -508,19 +527,22 @@ article p,
       margin-right: 2rem !important;
     }
   }
+  .carousel-tablet-view .carousel-card,
   .carousel-tablet-view .carousel-static-card {
-    width: 100% !important;
-    min-width: 100% !important;
+    width: calc(var(--carousel-h) * 3 / 4) !important;
     max-width: 100% !important;
     height: auto !important;
-    margin-right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
   .carousel-tablet-view .carousel-image-container {
-    width: 100% !important;
-    min-width: 100% !important;
+    width: calc(var(--carousel-h) * 3 / 4) !important;
     max-width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 1.4 !important;
+    height: var(--carousel-h) !important;
+    max-height: var(--carousel-h) !important;
+    aspect-ratio: 3 / 4 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
   .carousel-tablet-view .carousel-image-container video,
   .carousel-tablet-view .carousel-image-container img {
@@ -533,6 +555,7 @@ article p,
     top: auto !important;
     left: auto !important;
     right: auto !important;
+    width: 100% !important;
     margin-top: 0.75rem !important;
   }
 }
