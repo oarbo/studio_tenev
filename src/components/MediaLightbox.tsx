@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
 import SanityImage, { SanityHotspot } from './SanityImage';
 
 export interface LightboxSlide {
@@ -92,18 +91,6 @@ export default function MediaLightbox({
     setPosition({ x: 0, y: 0 });
     setCurrentIndex((prev) => (prev < slides.length - 1 ? prev + 1 : 0));
   }, [slides.length]);
-
-  const zoomIn = () => {
-    setScale((prev) => Math.min(prev + 0.5, 4));
-  };
-
-  const zoomOut = () => {
-    setScale((prev) => {
-      const next = Math.max(prev - 0.5, 1);
-      if (next === 1) setPosition({ x: 0, y: 0 });
-      return next;
-    });
-  };
 
   const resetZoom = () => {
     setScale(1);
@@ -215,66 +202,26 @@ export default function MediaLightbox({
       aria-label="Bildevisning"
       className="fixed inset-0 z-[99999] bg-black/95 backdrop-blur-sm text-white flex flex-col justify-between select-none animate-in fade-in duration-200"
     >
-      {/* Topplinje: Tittel / teller / zoom / lukk */}
+      {/* Topplinje: Teller og prosjektnavn / lukk */}
       <div className="w-full flex items-center justify-between px-4 md:px-6 py-4 z-20 bg-gradient-to-b from-black/80 to-transparent">
-        <div className="flex items-center gap-3 text-[0.875rem] font-mono opacity-80">
-          <span>{currentIndex + 1} / {slides.length}</span>
-          {title && <span className="hidden sm:inline opacity-60">· {title}</span>}
+        <div className="flex items-center gap-3 text-white font-sans text-[0.9375rem] md:text-[1rem] leading-none">
+          <span className="tabular-nums">{currentIndex + 1}&nbsp;/&nbsp;{slides.length}</span>
+          {title && <span>{title}</span>}
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          {/* Zoom kontroller */}
-          <button
-            type="button"
-            onClick={zoomOut}
-            disabled={scale <= 1}
-            title="Zoom ut"
-            className="w-9 h-9 flex items-center justify-center hover:opacity-70 transition-opacity disabled:opacity-20 cursor-pointer"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              <line x1="8" y1="11" x2="14" y2="11"/>
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            onClick={resetZoom}
-            title="Tilbakestill zoom"
-            className="px-2 py-1 text-[0.8125rem] font-mono opacity-80 hover:opacity-100 cursor-pointer"
-          >
-            {Math.round(scale * 100)}%
-          </button>
-
-          <button
-            type="button"
-            onClick={zoomIn}
-            disabled={scale >= 4}
-            title="Zoom inn"
-            className="w-9 h-9 flex items-center justify-center hover:opacity-70 transition-opacity disabled:opacity-20 cursor-pointer"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              <line x1="11" y1="8" x2="11" y2="14"/>
-              <line x1="8" y1="11" x2="14" y2="11"/>
-            </svg>
-          </button>
-
-          {/* Lukk-knapp */}
-          <button
-            type="button"
-            onClick={onClose}
-            title="Lukk (Esc)"
-            className="w-9 h-9 ml-2 flex items-center justify-center hover:opacity-70 transition-opacity cursor-pointer"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-        </div>
+        {/* Lukk-knapp */}
+        <button
+          type="button"
+          onClick={onClose}
+          title="Lukk (Esc)"
+          aria-label="Lukk"
+          className="w-9 h-9 flex items-center justify-center text-white hover:opacity-70 transition-opacity cursor-pointer"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
 
       {/* Hovedvisning: Bildet / Videoen ubeskåret */}
@@ -357,27 +304,13 @@ export default function MediaLightbox({
         </div>
       </div>
 
-      {/* Bunnlinje: Bildetekst, handling og hjelpetekst */}
-      <div className="w-full px-4 md:px-6 py-4 z-20 bg-gradient-to-t from-black/80 to-transparent flex flex-col items-center gap-2">
+      {/* Bunnlinje: Bildetekst hvis tilgjengelig (ingen guide-tekst eller handlinger) */}
+      <div className="w-full px-4 md:px-6 py-4 z-20 min-h-[56px] flex items-center justify-center pointer-events-none">
         {caption ? (
-          <p className="text-[0.9375rem] md:text-[1rem] text-white/90 text-center max-w-2xl line-clamp-2">
+          <p className="text-[0.9375rem] md:text-[1rem] font-sans text-white text-center max-w-2xl line-clamp-2">
             {caption}
           </p>
-        ) : (
-          <p className="text-[0.75rem] font-mono text-white/40 text-center">
-            {scale > 1 ? 'Dra for å panorere' : 'Dobbelttrykk eller klyp for å zoome'}
-          </p>
-        )}
-
-        {currentSlide.actionLink && (
-          <Link
-            href={currentSlide.actionLink.href}
-            onClick={onClose}
-            className="mt-1 inline-flex items-center px-4 py-1.5 rounded-full bg-white text-black text-[0.875rem] font-medium hover:bg-white/90 transition-colors pointer-events-auto cursor-pointer"
-          >
-            <span>{currentSlide.actionLink.label}</span>
-          </Link>
-        )}
+        ) : null}
       </div>
     </div>
   );
