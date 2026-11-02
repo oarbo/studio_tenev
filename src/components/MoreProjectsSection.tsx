@@ -31,7 +31,7 @@ export default function MoreProjectsSection({ projects, categoryTitle }: MorePro
     <section className="w-full bg-white text-black pt-12 pb-24 mt-24 md:mt-32">
       <div className="px-side-padding">
         <div className="w-full flex flex-col gap-6">
-          <h2 className="text-[1rem] font-normal leading-tight text-black">
+          <h2 className="text-[1.125rem] md:text-[1rem] font-normal leading-tight text-black">
             {locale === 'en' ? (categoryTitle ? `More ${categoryTitle}` : 'More projects') : 'Flere prosjekter'}
           </h2>
 
@@ -56,7 +56,7 @@ export default function MoreProjectsSection({ projects, categoryTitle }: MorePro
                       <div className="w-full h-full bg-gray-100" />
                     )}
                   </div>
-                  <div className="text-[1rem] leading-tight text-black group-hover:opacity-70 transition-opacity duration-150">
+                  <div className="text-[1.125rem] md:text-[1rem] leading-tight text-black group-hover:opacity-70 transition-opacity duration-150">
                     {renderTypography(title, locale === 'en' ? 'en-GB' : 'nb')}
                   </div>
                 </Link>

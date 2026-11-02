@@ -361,7 +361,7 @@ export default function ProjectList({
             aria-hidden={selectedTags.length === 0}
             className={`
               absolute bottom-full left-0 right-0 pb-2
-              grid grid-cols-2 md:grid-cols-12 gap-x-fm-1 text-[calc(1rem-3px)] text-black
+              grid grid-cols-2 md:grid-cols-12 gap-x-fm-1 text-[1.125rem] md:text-[calc(1rem-3px)] text-black
               transition-opacity duration-150
               ${selectedTags.length > 0 ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
             `}
@@ -383,7 +383,7 @@ export default function ProjectList({
           </div>
 
           {/* Table Header Row */}
-          <div className="flex justify-between items-baseline md:grid md:grid-cols-12 gap-x-fm-1 text-[1rem] text-black pb-1.5">
+          <div className="flex justify-between items-baseline md:grid md:grid-cols-12 gap-x-fm-1 text-[1.125rem] md:text-[1rem] text-black pb-1.5">
             {renderSortHeader(t('name'), 'name', 'flex-1 md:flex-initial md:col-span-5 xl:col-start-3 xl:col-span-2')}
             {renderSortHeader(t('type'), 'type', 'md:col-span-4 xl:col-span-2', true)}
             {renderSortHeader(t('size'), 'size', 'md:col-span-1 xl:col-span-1', true)}
@@ -408,7 +408,7 @@ export default function ProjectList({
             <div
               key={item._id}
               id={`project-${item._id}`}
-              className="w-full block text-[1rem] text-black scroll-mt-32"
+              className="w-full block text-[1.125rem] md:text-[1rem] text-black scroll-mt-32"
             >
               <div className="grid grid-cols-2 md:grid-cols-12 gap-x-fm-1">
                 {/* Continuous Line (Full bredde på iPad, kolonne 3-10 på stor desktop) */}
@@ -550,7 +550,7 @@ export default function ProjectList({
         })}
 
         {items.length === 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-fm-1 pt-8 text-black/60">
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-fm-1 pt-8 text-black/60 text-[1.125rem] md:text-[1rem]">
             <div className="col-span-2 md:col-span-12 xl:col-start-3 xl:col-span-8">
               {t('noProjectsFound')}
             </div>

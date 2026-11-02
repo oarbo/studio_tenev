@@ -75,7 +75,7 @@ function ProjectCarouselStaticView({ item }: { item: ProjectCarouselItem }) {
               )}
             </div>
             {/* Title under */}
-            <div className="absolute top-full left-0 right-0 mt-3 carousel-caption text-black text-[1rem] md:text-[1.125rem] font-normal leading-tight truncate hover:underline underline-offset-4 decoration-1 cursor-pointer">
+            <div className="absolute top-full left-0 right-0 mt-3 carousel-caption text-black text-[1.125rem] font-normal leading-tight truncate hover:underline underline-offset-4 decoration-1 cursor-pointer">
               {formatTypography(locale === 'en' && item.titleEn ? item.titleEn : item.title)}
             </div>
           </Link>
@@ -729,7 +729,7 @@ function ProjectCarouselInner({
                             e.stopPropagation();
                           }
                         }}
-                        className="inline-block text-black text-[1rem] md:text-[1.125rem] font-normal leading-tight truncate hover:underline underline-offset-4 decoration-1 cursor-pointer"
+                        className="inline-block text-black text-[1.125rem] font-normal leading-tight truncate hover:underline underline-offset-4 decoration-1 cursor-pointer"
                       >
                         {formatTypography(locale === 'en' && item.titleEn ? item.titleEn : item.title)}
                       </Link>
