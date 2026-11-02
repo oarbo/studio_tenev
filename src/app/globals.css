@@ -505,6 +505,19 @@ article p,
 }
 
 /* -------------------------------------------------------
+   MOBILVISNING FOR PROSJEKTSIDENS TOPPKARUSELL (< 768px)
+   Gjør plasseringen av selve bildet 100% identisk med
+   plasseringen på prosjektoversikten (/work).
+   På /work: pt-[calc(4.25rem+1em)] + kategorimeny (~1.5rem) + pt-1rem = pt-[calc(6.75rem+1em)]
+   ------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  .project-detail-hero {
+    padding-top: calc(6.75rem + 1em) !important;
+    padding-bottom: 2rem !important;
+  }
+}
+
+/* -------------------------------------------------------
    FJERN NETTLESERENS GULE/BLÅ AUTOFILL-BAKGRUNN (Safari & Chrome)
    Overskriver nettleserens standard styling slik at autoutfylte felter
    forblir 100% hvite og beholder ren, sort typografi.

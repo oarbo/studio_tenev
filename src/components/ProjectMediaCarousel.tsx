@@ -161,7 +161,7 @@ function ProjectMediaStaticView({
       className={`w-full bg-white px-side-padding md:px-0 ${
         isInline
           ? 'py-4 md:py-6'
-          : 'carousel-hero-container pt-[calc(4.25rem+1em)] md:pt-20 pb-8 md:pb-16'
+          : 'carousel-hero-container project-detail-hero pt-[calc(6.75rem+1em)] md:pt-20 pb-8 md:pb-16'
       } overflow-hidden relative select-none cursor-default`}
     >
       <div
@@ -786,7 +786,7 @@ function ProjectMediaCarouselInner({
       className={`w-full bg-white px-side-padding md:px-0 ${
         isInline
           ? 'py-4 md:py-6'
-          : 'carousel-hero-container pt-[calc(4.25rem+1em)] md:pt-20 pb-8 md:pb-16'
+          : 'carousel-hero-container project-detail-hero pt-[calc(6.75rem+1em)] md:pt-20 pb-8 md:pb-16'
       } overflow-hidden relative select-none ${cursorClass}`}
     >
       <div
