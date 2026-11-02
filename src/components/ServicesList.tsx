@@ -202,7 +202,7 @@ export default function ServicesList() {
       <div className="mt-[calc(2*var(--fm))] text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
         <Link
           href="/kontakt"
-          className="hover:underline underline-offset-4 decoration-1 cursor-pointer inline-block"
+          className="underline underline-offset-4 decoration-1 cursor-pointer inline-block"
         >
           {t('bookConsultation')}
         </Link>
