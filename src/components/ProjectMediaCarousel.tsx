@@ -171,7 +171,8 @@ function ProjectMediaStaticView({
           className="relative flex items-center justify-center overflow-hidden w-full max-w-full md:max-w-[100vw] carousel-image-container carousel-static-card cursor-pointer xl:cursor-default"
           style={{
             '--aspect': effectiveAspect,
-            width: dims.slideWidth,
+            width: 'var(--slide-item-w, 100%)',
+            '--slide-item-w-desktop': dims.slideWidth,
             height: '100%',
           } as React.CSSProperties}
         >
@@ -759,7 +760,8 @@ function ProjectMediaCarouselInner({
                   className={`relative flex items-center justify-center overflow-hidden h-full carousel-image-container cursor-pointer xl:cursor-inherit ${cursorClass}`}
                   style={{
                     '--aspect': slideAspect,
-                    width: singleSlide ? dims.slideWidth : '100%',
+                    width: 'var(--slide-item-w, 100%)',
+                    '--slide-item-w-desktop': singleSlide ? dims.slideWidth : '100%',
                     maxWidth: '100%',
                     height: '100%',
                   } as React.CSSProperties}
