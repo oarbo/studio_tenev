@@ -453,7 +453,13 @@ article p,
     overflow: hidden !important;
     height: auto !important;
   }
-  .carousel-tablet-view .embla__slide,
+  .carousel-tablet-view .embla__slide {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin-right: var(--spacing-side-padding) !important;
+  }
   .carousel-tablet-view .carousel-static-card {
     width: 100% !important;
     min-width: 100% !important;
