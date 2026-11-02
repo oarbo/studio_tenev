@@ -391,62 +391,58 @@ function ProjectMediaCarouselInner({
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const didDragStateRef = useRef(false);
 
-  // Desktop tilstandsmaskin for karusell-peker (<, +, >) og klikkresponsivitet
+  // Desktop tilstandsmaskin for karusell-peker (<, >)
   const [isDesktop, setIsDesktop] = useState(false);
-  const [cursorRole, setCursorRole] = useState<'prev' | 'next' | 'center' | 'default'>('default');
-
-  const lastIntentRef = useRef<'next' | 'prev' | null>(null);
-  const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [cursorRole, setCursorRole] = useState<'prev' | 'next' | 'default'>('default');
   const latestMousePosRef = useRef<{ x: number; y: number } | null>(null);
-
-  const SETTLE_DELAY_CLICK_MS = 280;
-  const SETTLE_DELAY_HOVER_MS = 240;
 
   useEffect(() => {
     const checkDesktop = () => {
-      setIsDesktop(typeof window !== 'undefined' && window.innerWidth >= 768);
+      setIsDesktop(typeof window !== 'undefined' && window.innerWidth >= 1280);
     };
     checkDesktop();
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
 
-  // Finner nøyaktige skjermgrenser [left, right] for det sentrerte fokusbildet
-  const getCenterSlideBounds = useCallback((): { left: number; right: number } | null => {
-    if (!emblaApi) return null;
-    const slideNodes = emblaApi.slideNodes?.() as HTMLElement[] | undefined;
-    if (!slideNodes || slideNodes.length === 0) return null;
-
+  // Finner den sentrale aksen (X-posisjon på skjermen) for det aktive/midtstilte bildet
+  const getCenterSlideAxis = useCallback((): number => {
+    if (typeof window === 'undefined') return 0;
     const screenCenter = window.innerWidth / 2;
-    let closestRect: { left: number; right: number } | null = null;
+    if (!emblaApi) return screenCenter;
+
+    const slideNodes = emblaApi.slideNodes?.() as HTMLElement[] | undefined;
+    if (!slideNodes || slideNodes.length === 0) return screenCenter;
+
+    let closestCenter = screenCenter;
     let minDistance = Infinity;
 
     for (let i = 0; i < slideNodes.length; i++) {
       const node = slideNodes[i];
-      const inner = (node.firstElementChild as HTMLElement) || node;
-      const rect = inner.getBoundingClientRect();
+      const imageEl =
+        (node.querySelector('.carousel-image-container') as HTMLElement) ||
+        (node.firstElementChild as HTMLElement) ||
+        node;
+      const rect = imageEl.getBoundingClientRect();
 
+      // Ignorer slides langt utenfor synsfeltet
       if (rect.right <= -50 || rect.left >= window.innerWidth + 50) continue;
-
-      if (rect.left <= screenCenter && rect.right >= screenCenter) {
-        return { left: rect.left, right: rect.right };
-      }
 
       const slideCenter = (rect.left + rect.right) / 2;
       const dist = Math.abs(slideCenter - screenCenter);
       if (dist < minDistance) {
         minDistance = dist;
-        closestRect = { left: rect.left, right: rect.right };
+        closestCenter = slideCenter;
       }
     }
 
-    return closestRect;
+    return closestCenter;
   }, [emblaApi]);
 
-  // Oppdaterer pekerrolle (<, +, >) basert på museposisjon og aktiv retningsintensjon
+  // Oppdaterer peker (< eller >) basert på om musen er til venstre eller høyre for bildets sentrale akse
   const updateCursorOnMove = useCallback(
     (clientX: number, clientY: number) => {
-      if (typeof window === 'undefined' || window.innerWidth < 768) return;
+      if (typeof window === 'undefined' || window.innerWidth < 1280) return;
 
       latestMousePosRef.current = { x: clientX, y: clientY };
 
@@ -454,77 +450,36 @@ function ProjectMediaCarouselInner({
       if (!bandEl) return;
       const bandRect = bandEl.getBoundingClientRect();
 
-      // Utenfor selve bildebåndet vertikalt -> normal cursor
+      // Utenfor bildebåndet vertikalt -> normal cursor
       if (clientY < bandRect.top || clientY > bandRect.bottom) {
         setCursorRole('default');
-        if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-        lastIntentRef.current = null;
         return;
       }
 
-      const screenCenter = window.innerWidth / 2;
-      const bounds = getCenterSlideBounds();
-
-      // 1. Dersom brukeren har klikket med en aktiv retningsintensjon ('next' eller 'prev'):
-      if (lastIntentRef.current === 'next') {
-        const threshold = bounds ? bounds.left : screenCenter;
-        // Hvis musen raskt flyttes over til venstre side, bryt intensjonen umiddelbart til '<'
-        if (clientX < threshold) {
-          lastIntentRef.current = null;
-          if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-          setCursorRole('prev');
-          return;
-        }
-        // Forbli '>' så lenge musen er på høyre side eller over senterbildet under klikk-sekvensen
-        setCursorRole('next');
-        return;
-      }
-
-      if (lastIntentRef.current === 'prev') {
-        const threshold = bounds ? bounds.right : screenCenter;
-        // Hvis musen raskt flyttes over til høyre side, bryt intensjonen umiddelbart til '>'
-        if (clientX > threshold) {
-          lastIntentRef.current = null;
-          if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-          setCursorRole('next');
-          return;
-        }
-        // Forbli '<' under klikk-sekvensen
-        setCursorRole('prev');
-        return;
-      }
-
-      // 2. Normal hovring (ingen aktiv klikk-intensjon):
-      if (!bounds) {
-        setCursorRole(clientX < screenCenter ? 'prev' : 'next');
-        return;
-      }
-
-      if (clientX < bounds.left) {
-        // Til venstre for sentrert bilde (inkludert blankrommet mellom bildene)
-        if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-        setCursorRole('prev');
-      } else if (clientX > bounds.right) {
-        // Til høyre for sentrert bilde (inkludert blankrommet mellom bildene og neste bilde)
-        if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-        setCursorRole('next');
-      } else {
-        // Over det midtstilte fokusbildet:
-        // Dersom pekeren allerede er '+', behold den
-        // Hvis pekeren feies over bildet, behold nåværende retning og start kort timer før '+' vises
-        if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-        settleTimerRef.current = setTimeout(() => {
-          const pos = latestMousePosRef.current;
-          if (!pos) return;
-          const curBounds = getCenterSlideBounds();
-          if (curBounds && pos.x >= curBounds.left && pos.x <= curBounds.right) {
-            setCursorRole('center');
-          }
-        }, SETTLE_DELAY_HOVER_MS);
-      }
+      const centerAxis = getCenterSlideAxis();
+      setCursorRole(clientX < centerAxis ? 'prev' : 'next');
     },
-    [getCenterSlideBounds]
+    [getCenterSlideAxis]
   );
+
+  // Lytter til global musebevegelse for umiddelbar respons over bildebåndet på desktop
+  useEffect(() => {
+    if (!isDesktop) return;
+
+    const handleWindowMouseMove = (e: MouseEvent) => {
+      const bandEl = bandRef.current;
+      if (!bandEl) return;
+      const bandRect = bandEl.getBoundingClientRect();
+      if (e.clientY >= bandRect.top && e.clientY <= bandRect.bottom) {
+        updateCursorOnMove(e.clientX, e.clientY);
+      } else {
+        setCursorRole('default');
+      }
+    };
+
+    window.addEventListener('mousemove', handleWindowMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleWindowMouseMove);
+  }, [isDesktop, updateCursorOnMove]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     pointerStartRef.current = { x: e.clientX, y: e.clientY };
@@ -587,8 +542,8 @@ function ProjectMediaCarouselInner({
 
       if (!emblaApi) return;
 
-      // Mobilvisning: behold eksakt uendret standard touch/klikk-oppførsel
-      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      // Mobil og tablet (< 1280px): standard touch/klikk-oppførsel
+      if (typeof window !== 'undefined' && window.innerWidth < 1280) {
         e.preventDefault();
         centerInViewport();
         const centerAxis = window.innerWidth / 2;
@@ -603,7 +558,7 @@ function ProjectMediaCarouselInner({
         return;
       }
 
-      // Desktop: responsiv retningsbasert klikknavigering
+      // Desktop (>= 1280px): del karusellen i to i den sentrale aksen av bildet
       const bandEl = bandRef.current;
       if (bandEl) {
         const bandRect = bandEl.getBoundingClientRect();
@@ -615,78 +570,34 @@ function ProjectMediaCarouselInner({
       e.preventDefault();
       centerInViewport();
 
-      // Responsiv, kontant og presis scrolling
       const engine = emblaApi.internalEngine();
       if (engine) engine.scrollBody.useDuration(18).useFriction(0.75);
 
-      const screenCenter = window.innerWidth / 2;
-      const bounds = getCenterSlideBounds();
-
-      const isLeft =
-        cursorRole === 'prev' ||
-        (bounds ? e.clientX < bounds.left : e.clientX < screenCenter);
-
-      if (isLeft) {
-        lastIntentRef.current = 'prev';
-        setCursorRole('prev');
+      const centerAxis = getCenterSlideAxis();
+      if (e.clientX < centerAxis) {
         emblaApi.scrollPrev();
       } else {
-        lastIntentRef.current = 'next';
-        setCursorRole('next');
         emblaApi.scrollNext();
       }
-
-      // Nullstiller/starter kort timer: forblir '>' eller '<' under rask klikking,
-      // og morpher til '+' når brukeren stopper over fokusbildet.
-      if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-      settleTimerRef.current = setTimeout(() => {
-        lastIntentRef.current = null;
-        const latestPos = latestMousePosRef.current;
-        if (latestPos) {
-          const currentBounds = getCenterSlideBounds();
-          if (
-            currentBounds &&
-            latestPos.x >= currentBounds.left &&
-            latestPos.x <= currentBounds.right
-          ) {
-            setCursorRole('center');
-          } else if (currentBounds) {
-            setCursorRole(latestPos.x < currentBounds.left ? 'prev' : 'next');
-          }
-        }
-      }, SETTLE_DELAY_CLICK_MS);
     },
-    [emblaApi, centerInViewport, cursorRole, getCenterSlideBounds]
+    [emblaApi, centerInViewport, getCenterSlideAxis]
   );
 
-  // Når karusellen har fullført scrolling og funnet ro, oppdater peker dersom musen står i ro over bildet
+  // Oppdaterer peker når karusellen scroller eller finner ro dersom musen står i ro
   useEffect(() => {
     if (!emblaApi) return;
-    const onSettle = () => {
-      if (lastIntentRef.current === null && latestMousePosRef.current) {
-        const pos = latestMousePosRef.current;
-        const bounds = getCenterSlideBounds();
-        if (bounds) {
-          if (pos.x >= bounds.left && pos.x <= bounds.right) {
-            setCursorRole('center');
-          } else {
-            setCursorRole(pos.x < bounds.left ? 'prev' : 'next');
-          }
-        }
+    const onUpdate = () => {
+      if (latestMousePosRef.current) {
+        updateCursorOnMove(latestMousePosRef.current.x, latestMousePosRef.current.y);
       }
     };
-    emblaApi.on('settle', onSettle);
+    emblaApi.on('settle', onUpdate);
+    emblaApi.on('scroll', onUpdate);
     return () => {
-      emblaApi.off('settle', onSettle);
+      emblaApi.off('settle', onUpdate);
+      emblaApi.off('scroll', onUpdate);
     };
-  }, [emblaApi, getCenterSlideBounds]);
-
-  // Rydd opp eventuelle timere ved avmontering
-  useEffect(() => {
-    return () => {
-      if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-    };
-  }, []);
+  }, [emblaApi, updateCursorOnMove]);
 
   // Tastaturnavigasjon med venstre / høyre piltaster
   useEffect(() => {
@@ -780,8 +691,6 @@ function ProjectMediaCarouselInner({
       ? 'cursor-carousel-prev'
       : cursorRole === 'next'
       ? 'cursor-carousel-next'
-      : cursorRole === 'center'
-      ? 'cursor-carousel-center'
       : 'cursor-default'
     : '';
 
@@ -793,9 +702,8 @@ function ProjectMediaCarouselInner({
         updateCursorOnMove(e.clientX, e.clientY);
       }}
       onPointerLeave={() => {
+        latestMousePosRef.current = null;
         setCursorRole('default');
-        if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-        lastIntentRef.current = null;
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -834,7 +742,7 @@ function ProjectMediaCarouselInner({
             return (
               <div
                 key={`${slide.videoUrl || slide.url || index}-${index}`}
-                className={`embla__slide flex-none relative min-w-0 select-none flex justify-center items-start xl:items-center ${dims.slideMarginClass}`}
+                className={`embla__slide flex-none relative min-w-0 select-none flex justify-center items-start xl:items-center ${dims.slideMarginClass} ${cursorClass}`}
                 style={{
                   '--aspect': slideAspect,
                   width: singleSlide ? '100%' : 'var(--slide-w)',
@@ -851,7 +759,7 @@ function ProjectMediaCarouselInner({
                       }
                     }
                   }}
-                  className="relative flex items-center justify-center overflow-hidden w-full h-full carousel-image-container cursor-pointer xl:cursor-auto"
+                  className={`relative flex items-center justify-center overflow-hidden w-full h-full carousel-image-container cursor-pointer xl:cursor-inherit ${cursorClass}`}
                   style={{
                     '--aspect': slideAspect,
                     width: singleSlide ? 'var(--slide-w)' : '100%',
