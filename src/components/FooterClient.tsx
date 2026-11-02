@@ -180,7 +180,7 @@ export default function FooterClient({
                 {phone}
               </a>
             </li>
-            <li className="mt-[1.4em]">
+            <li className="mt-[1.4em] whitespace-nowrap">
               &copy; {studioName} {currentYear}
             </li>
           </ul>
@@ -267,7 +267,7 @@ export default function FooterClient({
           <ul className="flex flex-col gap-0">
             <li className="whitespace-nowrap">{contactEmail}</li>
             <li className="whitespace-nowrap">{phone}</li>
-            <li className="mt-[1.4em]">
+            <li className="mt-[1.4em] whitespace-nowrap">
               &copy; {studioName} {currentYear}
             </li>
           </ul>
