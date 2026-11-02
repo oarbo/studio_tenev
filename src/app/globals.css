@@ -458,6 +458,14 @@ article p,
     padding-bottom: 2.75rem !important;
     height: auto !important;
   }
+  /* Mobil-spesifikk proporsjonal avstand (< 768px):
+     Sikrer harmonisk avstand mellom bilde, caption og tabell/liste */
+  @media (max-width: 767.98px) {
+    .carousel-tablet-view {
+      padding-top: 1rem !important;
+      padding-bottom: 2rem !important;
+    }
+  }
   .carousel-tablet-view .carousel-band,
   .carousel-tablet-view .carousel-static-wrap,
   .carousel-tablet-view .embla__container {
