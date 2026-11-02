@@ -412,8 +412,9 @@ article p,
 
 /* -------------------------------------------------------
    DESKTOP-VISNING FOR PROSJEKTKARUSELL (≥ 1280px)
-   Beholder toppplasseringen, øker bildehøyden og tilpasser
-   bunnen slik at nøyaktig 1 linje av listen under titter opp.
+   Beholder toppplasseringen og bildehøyden, men øker avstanden
+   under karusellen slik at kun tabelloverskriften med kategoriene
+   (Name, Type, Size, Year, Status) vises i bunnen av skjermen.
    ------------------------------------------------------- */
 @media (min-width: 1280px) {
   .carousel-hero-container {
@@ -422,15 +423,15 @@ article p,
     /* 
       100vh minus toppplassering minus plass til:
       - Bildecaption under bildet (~2rem)
-      - Pusterom til listen (padding-bottom: 2.75rem)
-      - Tabelloverskrift (~2.25rem)
-      - 1 linje / prosjektrad med skillelinje (~2.25rem)
-      Totalt ~9.25rem under bildet
+      - Pusterom til listen (padding-bottom: 5rem)
+      - Tabelloverskrift (Name, Type, Size, Year, Status) (~2.25rem)
+      Totalt ~9.25rem under bildet forblir uendret slik at bildestørrelsen
+      forblir akkurat like stor som nå.
     */
     --carousel-h: max(320px, calc(100vh - var(--carousel-space) - 9.25rem));
     --carousel-h: max(320px, calc(100dvh - var(--carousel-space) - 9.25rem));
     padding-top: var(--carousel-space) !important;
-    padding-bottom: 2.75rem !important;
+    padding-bottom: 5rem !important;
   }
 }
 
