@@ -249,11 +249,18 @@ export default function ProjectList({
     const isActive = sortBy === sortKey;
     const isDate = sortKey === 'date';
     
+    // Dersom colSpan spesifiserer egen responsiv synlighet (f.eks. 'hidden xl:flex ...'),
+    // respekterer vi det i stedet for standard fallback.
+    const hasCustomDisplay = /(?:^|\s)(?:hidden|flex|block|grid|inline)/.test(colSpan);
+    const displayClass = hasCustomDisplay
+      ? colSpan
+      : `${colSpan} ${mobileHidden ? 'hidden md:flex' : 'flex'}`;
+    
     return (
       <button 
         type="button"
         onClick={() => onSort && onSort(sortKey)}
-        className={`${colSpan} ${mobileHidden ? 'hidden md:flex' : 'flex'} items-center ${
+        className={`${displayClass} items-center ${
           isDate 
             ? 'justify-end md:justify-end xl:justify-between text-right md:text-right xl:text-left' 
             : 'justify-start md:justify-between text-left'
