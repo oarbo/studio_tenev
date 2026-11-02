@@ -373,10 +373,9 @@ export default function MediaLightbox({
           <Link
             href={currentSlide.actionLink.href}
             onClick={onClose}
-            className="mt-1 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-black text-[0.875rem] font-medium hover:bg-white/90 transition-colors pointer-events-auto cursor-pointer"
+            className="mt-1 inline-flex items-center px-4 py-1.5 rounded-full bg-white text-black text-[0.875rem] font-medium hover:bg-white/90 transition-colors pointer-events-auto cursor-pointer"
           >
             <span>{currentSlide.actionLink.label}</span>
-            <span aria-hidden="true">&rarr;</span>
           </Link>
         )}
       </div>
