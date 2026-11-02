@@ -423,19 +423,53 @@ export default function Header({
           </button>
         </div>
 
-        {/* TOP LEFT: Site Title (Logo) */}
+        {/* TOP LEFT: Site Title (Logo) på desktop og når mobilmeny er lukket;
+            Vannrett mobilmeny når menyen er åpen */}
         <div
           ref={leftRef}
-          className="absolute left-0 px-side-padding pointer-events-auto flex flex-col items-start"
+          className="absolute left-0 px-side-padding pointer-events-auto flex items-center"
         >
+          {/* Sidetittel / Logo: alltid på desktop; på mobil kun når menyen er lukket */}
           <Link
             href="/"
             prefetch={true}
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal uppercase ${isMobileMenuOpen ? '!text-black' : textColorClass}`}
+            className={`whitespace-nowrap leading-tight text-[1.33rem] font-normal uppercase ${
+              isMobileMenuOpen ? 'hidden md:block !text-black' : textColorClass
+            }`}
           >
             Studio Tenev
           </Link>
+
+          {/* Mobilmeny: tar over plassen til sidetittel til venstre og går vannrett ut med 1em mellomrom */}
+          {isMobileMenuOpen && (
+            <nav 
+              aria-label={locale === 'en' ? 'Mobile navigation' : 'Mobilnavigasjon'}
+              className="flex md:hidden text-[1.33rem] font-normal leading-tight !text-black"
+            >
+              <ul className="flex gap-[1em] leading-tight whitespace-nowrap">
+                {navLinks.map((link) => {
+                  const isActive = 
+                    pathname === link.href || 
+                    pathname.startsWith(link.href + '/') ||
+                    (link.key === 'work' && pathname.startsWith('/projects/'));
+                    
+                  return (
+                    <li key={link.key}>
+                      <Link
+                        href={link.href}
+                        prefetch={true}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`hover:underline hover:underline-offset-4 hover:decoration-1 ${isActive ? 'underline underline-offset-4 decoration-1' : ''}`}
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          )}
         </div>
 
         {/* TOP CENTER: Categories on /work (Desktop only) */}
@@ -473,31 +507,21 @@ export default function Header({
         ) : null}
       </header>
 
-      {/* Fullskjerm minimalistisk mobilmeny */}
+      {/* Fullskjerm minimalistisk mobilmeny-bakgrunn */}
       {isMobileMenuOpen && (
         <div
           id="mobile-menu"
           role="dialog"
           aria-modal="true"
           aria-label={locale === 'en' ? 'Mobile navigation' : 'Mobilnavigasjon'}
-          className="fixed inset-0 z-[9998] bg-white text-black flex flex-col justify-between px-side-padding pt-[4.75rem] pb-8 md:hidden overscroll-contain animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsMobileMenuOpen(false);
+            }
+          }}
+          className="fixed inset-0 z-[9998] bg-white text-black flex flex-col justify-end px-side-padding pb-8 md:hidden overscroll-contain animate-in fade-in duration-200"
           onTouchMove={(e) => e.stopPropagation()}
         >
-          <nav className="w-full flex flex-col text-[1.33rem] leading-tight font-normal text-center border-t border-black">
-            {navLinks.map((link) => (
-              <div key={link.key} className="w-full border-b border-black py-2">
-                <Link
-                  href={link.href}
-                  prefetch={true}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full hover:underline underline-offset-4 decoration-1"
-                >
-                  {link.name}
-                </Link>
-              </div>
-            ))}
-          </nav>
-
           {/* Språkvelger nederst på mobilmenyen */}
           <div className="w-full flex justify-center py-2">
             <LanguageSwitcher />
