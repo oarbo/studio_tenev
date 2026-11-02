@@ -457,7 +457,7 @@ export default function Header({
         ) : pathname === '/work' ? (
           <div
             ref={titleRef}
-            className="absolute left-1/2 -translate-x-1/2 pointer-events-auto hidden md:block pt-[0.29rem]"
+            className="absolute left-1/2 -translate-x-1/2 pointer-events-auto hidden xl:block pt-[0.29rem]"
           >
             <nav className={`text-[1rem] font-normal ${textColorClass}`}>
               <ul className="flex gap-[1em] leading-tight whitespace-nowrap">

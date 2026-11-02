@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Layout from '@/components/Layout';
 import { client, getProjectsQuery } from '@/sanity/client';
 import WorkFilter from '@/components/WorkFilter';
+import WorkCategoryNav from '@/components/WorkCategoryNav';
 import ProjectCarousel from '@/components/ProjectCarousel';
 import { ProjectListItem } from '@/components/ProjectList';
 import { SanityHotspot } from '@/components/SanityImage';
@@ -123,6 +124,12 @@ export default async function ProjectsPage() {
     <Layout noPadding={true}>
       <div className="w-full flex flex-col mb-fm-5">
         <h1 className="sr-only">Work — Prosjekter av Studio Tenev</h1>
+
+        {/* Tablet-only Category Navigation (plasseres med full bredde mellom header og karusell på 768px – 1279px) */}
+        <div className="w-full hidden md:flex xl:hidden justify-center items-center pt-content-top pb-3 px-side-padding">
+          <WorkCategoryNav />
+        </div>
+
         <div id="project-carousel" className="w-full hidden md:block">
           <ProjectCarousel items={carouselItems} />
         </div>
