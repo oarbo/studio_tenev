@@ -89,7 +89,7 @@ export default function ProjectDetailHeaderRow({ project }: ProjectDetailHeaderR
   ];
 
   return (
-    <div className="w-full px-side-padding text-[1.125rem] md:text-[1.2rem] xl:text-[1rem] text-black">
+    <div className="w-full px-side-padding text-[1.125rem] md:text-[1rem] text-black">
       {/* ----------------------------------------------------
           MOBILVISNING (< 768px):
           Tabell med Name <tab> input, linje, type <tab> input osv.
