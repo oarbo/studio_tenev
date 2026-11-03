@@ -86,7 +86,7 @@ html {
   --text-width-desktop: 42rem;
   /* Tekstmål for forkortet tekst i lister (~15 tegn kortere linjelengde for behagelig lesing) */
   --text-width-list: 34rem;
-  --secondary-color: rgba(0, 0, 0, 0.62);
+  --secondary-color: rgba(0, 0, 0, 0.68);
   --color: #000;
   --background-color: #fff;
 }

@@ -118,7 +118,7 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
         className={`relative z-10 flex items-center justify-center w-[32px] h-[24px] text-[12px] leading-none uppercase tracking-[0.02em] transition-colors duration-150 cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/20 ${
           locale === 'no'
             ? 'text-neutral-900 font-medium'
-            : 'text-neutral-500 hover:text-neutral-900 font-normal'
+            : 'text-neutral-600 hover:text-neutral-900 font-normal'
         }`}
       >
         NO
@@ -134,7 +134,7 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
         className={`relative z-10 flex items-center justify-center w-[32px] h-[24px] text-[12px] leading-none uppercase tracking-[0.02em] transition-colors duration-150 cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/20 ${
           locale === 'en'
             ? 'text-neutral-900 font-medium'
-            : 'text-neutral-500 hover:text-neutral-900 font-normal'
+            : 'text-neutral-600 hover:text-neutral-900 font-normal'
         }`}
       >
         EN

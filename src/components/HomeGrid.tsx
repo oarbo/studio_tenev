@@ -81,7 +81,7 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
         }
 
         const aspectRatio = item.image?.aspectRatio || (item.videoUrl ? 1.77 : 1);
-        const imgWidth = 1200;
+        const imgWidth = 800;
         const imgHeight = Math.round(imgWidth / aspectRatio);
         const gridClass = getGridClasses(index, aspectRatio);
         const isFirstItem = index === 0;
@@ -108,8 +108,11 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                         muted
                         loop
                         playsInline
+                        aria-label={item.title}
                         className="block w-full h-auto"
-                      />
+                      >
+                        <track kind="captions" />
+                      </video>
                     </div>
                     {/* Desktop: Vises i sin opprinnelige oppløsning uten forstørring eller cropping, nøyaktig som tidligere */}
                     <div className="hidden md:inline-block relative max-w-full overflow-hidden">
@@ -120,8 +123,11 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                         muted
                         loop
                         playsInline
+                        aria-label={item.title}
                         className="block max-w-full h-auto max-h-[70vh] object-contain"
-                      />
+                      >
+                        <track kind="captions" />
+                      </video>
                     </div>
                   </>
                 ) : item.image?.url ? (
