@@ -69,21 +69,23 @@ export default function ImprintContent({
 
   const photographersString = photographersList.join(', ');
 
+  const formattedAddress = address.replace(/\n+/g, ', ').trim();
+
   return (
-    <div className="w-full px-side-padding pt-content-top mb-42">
+    <div className="w-full px-side-padding pt-content-top mb-[calc(7*var(--fm))] md:mb-42">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
         <div className="md:col-span-12 xl:col-start-3 xl:col-span-8">
-          <div className="text-measure flex flex-col gap-10 md:gap-14 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) hyphens-none">
+          <div className="text-measure flex flex-col text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) hyphens-none">
             {/* Page Title */}
             <div>
-              <h1 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+              <h1 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                 {isEn ? 'Imprint and Privacy policy' : 'Kolofon og personvern'}
               </h1>
             </div>
 
             {/* 1. Privacy Policy */}
-            <div className="border-t border-black pt-1.5">
-              <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+            <div className="border-t border-black pt-1.5 mt-[calc(3.5*var(--fm))]">
+              <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                 {isEn ? 'Privacy policy' : 'Personvern'}
               </h2>
 
@@ -107,7 +109,7 @@ export default function ImprintContent({
                       This website does not use third-party tracking, advertising cookies, or behavioural profiling.
                     </p>
                   </div>
-                  <p className="mt-4 mt-16px text-[1rem] leading-(--line-height) text-black" style={{ marginTop: '16px' }}>
+                  <p className="mt-[1.5em] text-[calc(1rem-3px)] leading-(--line-height) text-black">
                     Updated October 2026
                   </p>
                 </div>
@@ -131,7 +133,7 @@ export default function ImprintContent({
                       Nettsiden benytter ingen tredjeparts sporings-, markedsførings- eller analysekapsler.
                     </p>
                   </div>
-                  <p className="mt-4 mt-16px text-[1rem] leading-(--line-height) text-black" style={{ marginTop: '16px' }}>
+                  <p className="mt-[1.5em] text-[calc(1rem-3px)] leading-(--line-height) text-black">
                     Sist oppdatert: oktober 2026
                   </p>
                 </div>
@@ -139,8 +141,8 @@ export default function ImprintContent({
             </div>
 
             {/* 2. Copyright */}
-            <div className="border-t border-black pt-1.5">
-              <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+            <div className="border-t border-black pt-1.5 mt-[calc(3.5*var(--fm))]">
+              <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                 {isEn ? 'Copyright' : 'Opphavsrett'}
               </h2>
               <div className="flex flex-col leading-(--line-height)">
@@ -177,8 +179,8 @@ export default function ImprintContent({
             </div>
 
             {/* 3. Website */}
-            <div className="border-t border-black pt-1.5">
-              <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+            <div className="border-t border-black pt-1.5 mt-[calc(3.5*var(--fm))]">
+              <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                 {isEn ? 'Website' : 'Nettside'}
               </h2>
               <p className="leading-(--line-height)">
@@ -187,21 +189,21 @@ export default function ImprintContent({
             </div>
 
             {/* 4. Imprint */}
-            <div className="border-t border-black pt-1.5">
-              <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+            <div className="border-t border-black pt-1.5 mt-[calc(3.5*var(--fm))]">
+              <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                 {isEn ? 'Imprint' : 'Impressum'}
               </h2>
               <div className="leading-(--line-height)">
                 {isEn ? (
                   <>
-                    Studio Tenev AS, registered in Norway<br />
-                    Registered office: Strandgaten 86, 5004 Bergen<br />
+                    {studioName}, registered in Norway<br />
+                    Registered office: {formattedAddress}<br />
                     Organisation number <span className="whitespace-nowrap">932 534 134 MVA</span>
                   </>
                 ) : (
                   <>
-                    Studio Tenev AS, registrert i Foretaksregisteret<br />
-                    Forretningsadresse: Strandgaten 86, 5004 Bergen<br />
+                    {studioName}, registrert i Foretaksregisteret<br />
+                    Forretningsadresse: {formattedAddress}<br />
                     Organisasjonsnummer <span className="whitespace-nowrap">932 534 134 MVA</span>
                   </>
                 )}

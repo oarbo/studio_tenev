@@ -3,6 +3,8 @@ import { client } from '@/sanity/client';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://studiotenev.com';
 
+export const revalidate = 60;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const projects: Array<{ slug?: string; _updatedAt?: string }> = await client
     .fetch(
@@ -55,6 +57,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}/applications`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
     },
   ];
 

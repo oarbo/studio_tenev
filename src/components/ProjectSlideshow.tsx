@@ -259,7 +259,7 @@ export default function ProjectSlideshow({ images, slides, title, size }: Projec
                 </div>
                 {(item.caption || item.captionEn) && (
                   <div
-                    className={`mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height) pointer-events-auto cursor-default select-text ${size === 'full' ? 'px-side-padding' : 'px-0'}`}
+                    className={`mt-[var(--fm)] text-[calc(1rem-3px)] text-center leading-(--line-height) pointer-events-auto cursor-default select-text ${size === 'full' ? 'px-side-padding' : 'px-0'}`}
                     style={{ color: 'var(--secondary-color)' }}
                     onPointerDown={(e) => e.stopPropagation()}
                     onPointerMove={(e) => e.stopPropagation()}

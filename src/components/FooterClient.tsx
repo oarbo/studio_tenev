@@ -32,7 +32,7 @@ export default function FooterClient({
       {/* =========================================================
           MOBILVISNING (< md): 2 kolonner med minimalistisk rytme
           ========================================================= */}
-      <div className="md:hidden grid grid-cols-2 gap-x-4 text-[0.8125rem] sm:text-[0.875rem] leading-(--line-height)">
+      <div className="md:hidden grid grid-cols-2 gap-x-4 text-[calc(0.8125rem+1px)] sm:text-[calc(0.875rem+1px)] leading-(--line-height)">
         {/* Kolonne 1 */}
         <div className="flex flex-col">
           {/* Første linje: Back to top */}
@@ -41,7 +41,7 @@ export default function FooterClient({
           </div>
 
           {/* 1 blanklinje */}
-          <div className="h-[calc(1em*var(--line-height))]" aria-hidden="true" />
+          <div className="h-[var(--fm)]" aria-hidden="true" />
 
           {/* Imprint & Privacy policy, Instagram, Spotify, LinkedIn */}
           <ul className="flex flex-col gap-0">
@@ -88,7 +88,7 @@ export default function FooterClient({
         {/* Kolonne 2: Starter på linje 3 (flukter med Imprint & Privacy policy) */}
         <div className="flex flex-col">
           {/* 2 blanklinjer */}
-          <div className="h-[calc(2em*var(--line-height))]" aria-hidden="true" />
+          <div className="h-[var(--fm-2)]" aria-hidden="true" />
 
           {/* E-post & Telefon */}
           <ul className="flex flex-col gap-0">
@@ -105,7 +105,7 @@ export default function FooterClient({
           </ul>
 
           {/* 2x blanklinje */}
-          <div className="h-[calc(2em*var(--line-height))]" aria-hidden="true" />
+          <div className="h-[var(--fm-2)]" aria-hidden="true" />
 
           {/* Copyright info */}
           <div className="whitespace-nowrap">
@@ -265,8 +265,16 @@ export default function FooterClient({
         <div className="col-start-8 col-span-2">
           <h3 className="mb-[0.7em]">{t('contact')}</h3>
           <ul className="flex flex-col gap-0">
-            <li className="whitespace-nowrap">{contactEmail}</li>
-            <li className="whitespace-nowrap">{phone}</li>
+            <li className="whitespace-nowrap">
+              <a href={`mailto:${contactEmail}`} className="hover:opacity-70 transition-opacity whitespace-nowrap">
+                {contactEmail}
+              </a>
+            </li>
+            <li className="whitespace-nowrap">
+              <a href={phoneHref} className="hover:opacity-70 transition-opacity whitespace-nowrap tabular-nums">
+                {phone}
+              </a>
+            </li>
             <li className="mt-[1.4em] whitespace-nowrap">
               &copy; {studioName} {currentYear}
             </li>

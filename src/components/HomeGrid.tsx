@@ -62,7 +62,7 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
   };
 
   return (
-    <ol className="grid grid-cols-1 md:grid-cols-12 md:gap-x-fm-1 gap-y-16 md:gap-y-32 w-full px-side-padding pb-[15vw] pt-12">
+    <ol className="grid grid-cols-1 md:grid-cols-12 md:gap-x-fm-1 gap-y-16 md:gap-y-32 w-full px-side-padding pt-12">
       {items.map((item, index) => {
         if (!item) return null;
 
@@ -144,7 +144,7 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                 {/* Text Layer (Below Image) */}
                 <div className="mt-4 flex flex-col items-start justify-start w-full">
                   {/* Meta info ABOVE title */}
-                  <div className="text-[0.875rem] leading-[1.3] text-black mb-[calc(0.5rem-5px)] flex flex-row flex-wrap gap-x-4">
+                  <div className="text-[calc(1rem-3px)] leading-(--line-height) text-black mb-1 flex flex-row flex-wrap gap-x-4">
                     <span>
                       {item._type === 'news'
                         ? (item.tag ? translateTag(item.tag) : (locale === 'en' ? 'News' : 'Nyhet'))
@@ -162,7 +162,7 @@ export default function HomeGrid({ items }: { items: GridItemRef[] }) {
                   </div>
                   
                   {/* Title */}
-                  <h2 className="m-0 text-[1.33rem] leading-[calc(1.33rem*1.3-4px)] text-black font-normal">
+                  <h2 className="m-0 text-[1.33rem] leading-tight text-black font-normal">
                     {renderTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title, locale === 'en' ? 'en-GB' : 'nb')}
                   </h2>
                 </div>

@@ -263,10 +263,10 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
   if (status === 'success') {
     return (
       <div className="pt-8 pb-12 border-t border-b border-black">
-        <h2 className="font-normal mb-4">
+        <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
           {isEn ? 'Thank you for reaching out' : 'Takk for din henvendelse'}
         </h2>
-        <p className="mb-6 leading-(--line-height)">
+        <p className="mb-6 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
           {isEn
             ? 'We have received your message and will get back to you as soon as possible to discuss your project.'
             : 'Vi har mottatt meldingen din og vil ta kontakt så snart som mulig for å diskutere prosjektet.'}
@@ -282,7 +282,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
             setFieldErrors({});
             setStatus('idle');
           }}
-          className="text-black underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer text-[1rem]"
+          className="text-black underline underline-offset-4 hover:opacity-70 transition-opacity cursor-pointer text-[1.125rem] md:text-[1.2rem]"
         >
           {isEn ? 'Send another inquiry →' : 'Send en ny henvendelse →'}
         </button>
@@ -313,7 +313,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
               htmlFor="contact-firstname"
               className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isFirstNameFloating
-                  ? 'top-[6px] text-[13px] font-normal'
+                  ? 'top-[6px] text-[calc(1rem-3px)] font-normal'
                   : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
               } ${fieldErrors.firstName ? 'text-red-600' : 'text-black'}`}
             >
@@ -343,7 +343,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
             />
           </div>
           {fieldErrors.firstName && (
-            <p id="error-firstname" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+            <p id="error-firstname" className="absolute left-0 top-full pt-1 text-[calc(1rem-3px)] text-red-600 leading-tight pointer-events-none">
               {fieldErrors.firstName}
             </p>
           )}
@@ -355,7 +355,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
               htmlFor="contact-lastname"
               className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isLastNameFloating
-                  ? 'top-[6px] text-[13px] font-normal'
+                  ? 'top-[6px] text-[calc(1rem-3px)] font-normal'
                   : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
               } ${fieldErrors.lastName ? 'text-red-600' : 'text-black'}`}
             >
@@ -385,7 +385,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
             />
           </div>
           {fieldErrors.lastName && (
-            <p id="error-lastname" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+            <p id="error-lastname" className="absolute left-0 top-full pt-1 text-[calc(1rem-3px)] text-red-600 leading-tight pointer-events-none">
               {fieldErrors.lastName}
             </p>
           )}
@@ -400,7 +400,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
               htmlFor="contact-email"
               className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isEmailFloating
-                  ? 'top-[6px] text-[13px] font-normal'
+                  ? 'top-[6px] text-[calc(1rem-3px)] font-normal'
                   : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
               } ${fieldErrors.email ? 'text-red-600' : 'text-black'}`}
             >
@@ -432,7 +432,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
             />
           </div>
           {fieldErrors.email && (
-            <p id="error-email" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+            <p id="error-email" className="absolute left-0 top-full pt-1 text-[calc(1rem-3px)] text-red-600 leading-tight pointer-events-none">
               {fieldErrors.email}
             </p>
           )}
@@ -444,7 +444,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
               htmlFor="contact-phone"
               className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isPhoneFloating
-                  ? 'top-[6px] text-[13px] font-normal'
+                  ? 'top-[6px] text-[calc(1rem-3px)] font-normal'
                   : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
               } ${fieldErrors.phone ? 'text-red-600' : 'text-black'}`}
             >
@@ -467,7 +467,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
             />
           </div>
           {fieldErrors.phone && (
-            <p id="error-phone" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+            <p id="error-phone" className="absolute left-0 top-full pt-1 text-[calc(1rem-3px)] text-red-600 leading-tight pointer-events-none">
               {fieldErrors.phone}
             </p>
           )}
@@ -481,7 +481,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
             htmlFor="contact-message"
             className={`pointer-events-none absolute left-0 select-none transition-[top,font-size] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               isMessageFloating
-                ? 'top-[6px] text-[13px] font-normal'
+                ? 'top-[6px] text-[calc(1rem-3px)] font-normal'
                 : 'top-5 text-[1.125rem] md:text-[1.2rem] font-normal'
             } ${fieldErrors.message ? 'text-red-600' : 'text-black'}`}
           >
@@ -511,7 +511,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
           />
         </div>
         {fieldErrors.message && (
-          <p id="error-message" className="absolute left-0 top-full pt-1 text-[13px] text-red-600 leading-tight pointer-events-none">
+          <p id="error-message" className="absolute left-0 top-full pt-1 text-[calc(1rem-3px)] text-red-600 leading-tight pointer-events-none">
             {fieldErrors.message}
           </p>
         )}
@@ -519,14 +519,14 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
 
       {/* Generell feilmelding (kun ved server-/nettverksfeil) */}
       {errorMessage && (
-        <p className="text-red-600 text-[0.95rem] border-l-2 border-red-600 pl-3 py-1">
+        <p className="text-red-600 text-[calc(1rem-3px)] border-l-2 border-red-600 pl-3 py-1">
           {errorMessage}
         </p>
       )}
 
       {/* Send-knapp & Personvernerklæring: Mobil er midtstilt stakket, Desktop er på samme linje med matchende baseline */}
       <div className="flex flex-col items-center text-center gap-3 pt-6 md:flex-row md:items-baseline md:justify-between md:text-left md:pt-4">
-        <p className="order-2 md:order-1 text-[0.875rem] text-black leading-tight max-w-[28rem]">
+        <p className="order-2 md:order-1 text-[calc(1rem-3px)] text-black leading-tight max-w-[28rem]">
           {isEn ? (
             <>
               By submitting, you agree to our{' '}
@@ -549,7 +549,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps = {}) {
         <button
           type="submit"
           disabled={status === 'submitting'}
-          className="order-1 md:order-2 border border-black px-6 pt-[calc(0.625rem-3px)] pb-[calc(0.625rem+3px)] text-[1rem] text-black bg-transparent hover:bg-black hover:text-white transition-colors cursor-pointer rounded-none disabled:opacity-50 whitespace-nowrap self-center md:self-auto"
+          className="order-1 md:order-2 border border-black px-6 pt-[calc(0.625rem-2px)] pb-[calc(0.625rem+2px)] md:pt-[calc(0.625rem-3px)] md:pb-[calc(0.625rem+3px)] text-[1rem] text-black bg-transparent hover:bg-black hover:text-white transition-colors cursor-pointer rounded-none disabled:opacity-50 whitespace-nowrap self-center md:self-auto"
         >
           {status === 'submitting'
             ? (isEn ? 'Sending...' : 'Sender...')

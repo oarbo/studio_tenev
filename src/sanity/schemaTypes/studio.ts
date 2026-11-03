@@ -94,7 +94,7 @@ export default defineType({
           fieldsets: [
             {
               name: 'captionGroup',
-              title: 'Bildetekst / Caption (vises på hover)',
+              title: 'Bildetekst / Caption',
               options: { columns: 2 }
             }
           ],
@@ -154,7 +154,7 @@ export default defineType({
           fieldsets: [
             {
               name: 'captionGroup',
-              title: 'Videotekst / Caption (vises på hover)',
+              title: 'Videotekst / Caption',
               options: { columns: 2 }
             }
           ],
@@ -267,12 +267,29 @@ export default defineType({
           type: 'object',
           name: 'teamBlock',
           title: 'Ansatte / Employees (Navneliste)',
+          fieldsets: [
+            {
+              name: 'titleGroup',
+              title: 'Seksjonstittel',
+              options: { columns: 2 }
+            }
+          ],
           fields: [
             defineField({
               name: 'title',
-              title: 'Seksjonstittel',
+              title: 'Norsk',
               type: 'string',
-              initialValue: 'People'
+              initialValue: 'Ansatte',
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
+            }),
+            defineField({
+              name: 'titleEn',
+              title: 'Engelsk',
+              type: 'string',
+              initialValue: 'People',
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
             }),
             defineField({
               name: 'items',
@@ -303,7 +320,7 @@ export default defineType({
             prepare(selection) {
               const count = (selection.items?.length || 0) + (selection.members?.length || 0);
               return {
-                title: selection.title || 'People',
+                title: selection.title || 'Ansatte',
                 subtitle: `${count} navn`
               }
             }
@@ -313,12 +330,29 @@ export default defineType({
           type: 'object',
           name: 'peopleListBlock',
           title: 'Tidligere ansatte / Navneliste',
+          fieldsets: [
+            {
+              name: 'titleGroup',
+              title: 'Seksjonstittel',
+              options: { columns: 2 }
+            }
+          ],
           fields: [
             defineField({
               name: 'title',
-              title: 'Seksjonstittel (f.eks. Former Employees)',
+              title: 'Norsk',
               type: 'string',
-              initialValue: 'Former Employees'
+              initialValue: 'Tidligere ansatte',
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
+            }),
+            defineField({
+              name: 'titleEn',
+              title: 'Engelsk',
+              type: 'string',
+              initialValue: 'Former Employees',
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
             }),
             defineField({
               name: 'items',
@@ -332,7 +366,7 @@ export default defineType({
             prepare(selection) {
               const count = selection.items ? selection.items.length : 0;
               return {
-                title: selection.title || 'Former Employees',
+                title: selection.title || 'Tidligere ansatte',
                 subtitle: `${count} navn`
               }
             }

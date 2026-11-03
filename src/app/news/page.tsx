@@ -15,6 +15,21 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/news',
   },
+  openGraph: {
+    title: 'News — Studio Tenev',
+    description:
+      'Nyheter, publikasjoner, pågående prosjekter og oppdateringer fra Studio Tenev Arkitekter i Bergen.',
+    url: '/news',
+    siteName: 'Studio Tenev',
+    locale: 'nb_NO',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'News — Studio Tenev',
+    description:
+      'Nyheter, publikasjoner, pågående prosjekter og oppdateringer fra Studio Tenev Arkitekter i Bergen.',
+  },
 };
 
 interface NewsData {
@@ -69,10 +84,39 @@ export default async function NewsPage() {
     };
   });
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://studiotenev.com';
+  const newsJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Nyheter, priser og publikasjoner — Studio Tenev',
+    itemListElement: news.map((n: NewsData, idx: number) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      item: {
+        '@type': 'NewsArticle',
+        headline: n.title,
+        alternativeHeadline: n.titleEn && n.titleEn !== n.title ? n.titleEn : undefined,
+        datePublished: n.date,
+        description: [n.summary, n.summaryEn].filter(Boolean).join(' — ') || undefined,
+        image: n.image ? `${n.image}?w=1200&auto=format` : undefined,
+        url: n.link || `${siteUrl}/news#news-${n._id}`,
+        author: {
+          '@type': 'Organization',
+          '@id': `${siteUrl}/#organization`,
+          name: 'Studio Tenev',
+        },
+      },
+    })),
+  };
+
   return (
-    <Layout noPadding stickyHeader={false}>
-      <div className="w-full flex flex-col mb-42 pt-content-top">
-        <h1 className="sr-only">News — Studio Tenev</h1>
+    <Layout noPadding>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(newsJsonLd) }}
+      />
+      <div className="w-full flex flex-col mb-[calc(7*var(--fm))] md:mb-42 pt-content-top">
+        <h1 className="sr-only">News — Nyheter, priser og publikasjoner fra Studio Tenev</h1>
         {expandingItems.length > 0 && (
           <div className="w-full px-side-padding">
             <NewsList items={expandingItems} />

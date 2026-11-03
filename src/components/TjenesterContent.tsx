@@ -9,7 +9,7 @@ export default function TjenesterContent() {
   const isEn = locale === 'en';
 
   return (
-    <div className="w-full px-side-padding pt-content-top mb-42">
+    <div className="w-full px-side-padding pt-content-top mb-[calc(7*var(--fm))] md:mb-42">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
         <div className="md:col-span-12 xl:col-start-3 xl:col-span-8">
           <div className="text-measure flex flex-col text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
@@ -17,7 +17,7 @@ export default function TjenesterContent() {
               {isEn ? 'Services' : 'Tjenester'}
             </h1>
             
-            <div className="mb-10 md:mb-14">
+            <div className="mb-[calc(3.5*var(--fm))]">
               <p>
                 {isEn
                   ? 'Studio Tenev offers comprehensive architectural design for both private and commercial clients – from initial concepts and zoning analysis to detailed construction documents and site supervision.'

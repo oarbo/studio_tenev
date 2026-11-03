@@ -7,7 +7,6 @@ interface LayoutProps {
   children: ReactNode;
   noPadding?: boolean;
   hideHeader?: boolean;
-  stickyHeader?: boolean;
   projectTitle?: ReactNode | string;
   projectTitleEn?: string;
   heroImage?: string;
@@ -20,7 +19,6 @@ export default function Layout({
   children, 
   noPadding = false, 
   hideHeader = false, 
-  stickyHeader = false, 
   projectTitle,
   projectTitleEn,
   heroImage,
@@ -32,7 +30,6 @@ export default function Layout({
     <div className="flex flex-col min-h-screen text-[1rem] bg-white text-black relative w-full min-w-0">
       {!hideHeader && (
         <Header 
-          sticky={stickyHeader} 
           projectTitle={projectTitle} 
           projectTitleEn={projectTitleEn}
           heroImage={heroImage}
@@ -41,7 +38,7 @@ export default function Layout({
           heroTextColor={heroTextColor}
         />
       )}
-      <main className={`${noPadding || hideHeader ? '' : 'pt-24 pb-24'} w-full min-w-0 grow`}>
+      <main className={`${noPadding || hideHeader ? '' : 'pt-24 pb-[calc(7*var(--fm))] md:pb-42'} w-full min-w-0 grow`}>
         {children}
       </main>
       <Footer />

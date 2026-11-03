@@ -57,8 +57,9 @@ export const newsType = defineType({
     }),
     defineField({
       name: 'category',
-      title: 'Type',
+      title: 'Type (Utgått – bruk Tag)',
       type: 'string',
+      hidden: true,
       description: 'F.eks. Publikasjon, Nyheter, Presse, Pris, Podcast',
       options: {
         list: [
@@ -72,20 +73,23 @@ export const newsType = defineType({
     }),
     defineField({
       name: 'source',
-      title: 'Hvem',
+      title: 'Hvem (Utgått)',
       type: 'string',
+      hidden: true,
       description: 'F.eks. Architizer, New Norm, Studio Tenev...',
     }),
     defineField({
       name: 'medium',
-      title: 'Hva',
+      title: 'Hva (Utgått)',
       type: 'string',
+      hidden: true,
       description: 'F.eks. Bok, Artikkel, Intervju, Tidsskrift, Forelesning, Flisworkshop...',
     }),
     defineField({
       name: 'project',
-      title: 'Navn / Prosjekt (Tekst)',
+      title: 'Navn / Prosjekt (Utgått – bruk Tilknyttet prosjekt)',
       type: 'string',
+      hidden: true,
       description: 'F.eks. Torgallmenningen 10, Laserlab, Studio, Geilo hytte...',
     }),
     defineField({

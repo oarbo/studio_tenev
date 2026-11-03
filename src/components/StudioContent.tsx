@@ -40,18 +40,18 @@ function studioImageGridClass(size?: string): { gridClass: string; sizes: string
     return { gridClass: 'col-span-full', sizes: '100vw' };
   }
   if (size === 'large' || size === '8' || size === 'cols8') {
-    return { gridClass: 'md:col-span-12 xl:col-start-3 xl:col-span-8', sizes: '(max-width: 768px) 100vw, 85vw' };
+    return { gridClass: 'md:col-span-12 xl:col-start-3 xl:col-span-8', sizes: '(max-width: 1279px) 100vw, 85vw' };
   }
   if (size === 'medium' || size === '6' || size === 'cols6') {
-    return { gridClass: 'md:col-start-4 md:col-span-6', sizes: '(max-width: 768px) 100vw, 67vw' };
+    return { gridClass: 'md:col-span-12 xl:col-start-4 xl:col-span-6', sizes: '(max-width: 1279px) 100vw, 67vw' };
   }
   if (size === 'small' || size === '4' || size === 'cols4') {
-    return { gridClass: 'md:col-start-5 md:col-span-4', sizes: '(max-width: 768px) 100vw, 50vw' };
+    return { gridClass: 'md:col-span-12 xl:col-start-5 xl:col-span-4', sizes: '(max-width: 1279px) 100vw, 50vw' };
   }
   if (size === 'xsmall' || size === 'x-small' || size === '2' || size === 'cols2') {
-    return { gridClass: 'md:col-start-6 md:col-span-2', sizes: '(max-width: 768px) 100vw, 33vw' };
+    return { gridClass: 'md:col-span-12 xl:col-start-6 xl:col-span-2', sizes: '(max-width: 1279px) 100vw, 33vw' };
   }
-  return { gridClass: 'md:col-start-4 md:col-span-6', sizes: '(max-width: 768px) 100vw, 67vw' };
+  return { gridClass: 'md:col-span-12 xl:col-start-4 xl:col-span-6', sizes: '(max-width: 1279px) 100vw, 67vw' };
 }
 
 function renderTextWithEmail(text: string) {
@@ -92,7 +92,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
     return (
       <div className="border-t border-black pt-1.5 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-        <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+        <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
           {t('contact')}
         </h2>
         <div className="flex flex-col gap-y-[var(--fm)]">
@@ -137,31 +137,50 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
   };
 
   return (
-    <div className="w-full flex flex-col mb-42">
+    <div className="w-full flex flex-col mb-[calc(7*var(--fm))] md:mb-42">
       {contentBlocks && contentBlocks.length > 0 ? (
         <div className="px-side-padding pt-content-top">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-0">
             {contentBlocks.map((block, index) => {
+              const prevBlock = index > 0 ? contentBlocks[index - 1] : null;
+              const isPrevText = prevBlock && (
+                prevBlock._type === 'textBlock' ||
+                prevBlock._type === 'teamBlock' ||
+                prevBlock._type === 'peopleListBlock' ||
+                prevBlock._type === 'applicationsBlock' ||
+                prevBlock._type === 'contactBlock'
+              );
+
               /* Tekstblokk */
               if (block._type === 'textBlock') {
                 const isIntroBlock = index === 0;
                 const displayText = (locale === 'en' && block.textEn) ? block.textEn : block.text;
                 const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : block.title;
+                const altLang = locale === 'en' ? 'nb' : 'en-GB';
+                const altTitle = locale === 'en' ? block.title : block.titleEn;
+                const altText = locale === 'en' ? block.text : block.textEn;
+                const topMarginClass = isIntroBlock ? 'mt-0' : (isPrevText ? 'mt-[calc(3.5*var(--fm))]' : 'mt-[calc(2*var(--fm))]');
 
                 return (
-                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
+                  <div key={block._key} className={`md:col-span-12 xl:col-start-3 xl:col-span-8 ${topMarginClass}`}>
                     <div
                       className={`text-measure ${!isIntroBlock ? 'border-t border-black pt-1.5' : ''}`}
                       lang={locale === 'en' ? 'en-GB' : 'nb'}
                     >
                       {displayTitle && (
-                        <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                        <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                           {displayTitle}
                         </h2>
                       )}
                       {displayText && (
                         <div className="news-content !m-0 !max-w-none text-[1.125rem] md:text-[1.2rem] leading-(--line-height)" lang={locale === 'en' ? 'en-GB' : 'nb'}>
                           <PortableText value={formatPortableText(displayText, locale === 'en' ? 'en-GB' : 'nb') || displayText} components={portableTextComponents} />
+                        </div>
+                      )}
+                      {(altTitle || altText) && (
+                        <div className="sr-only" lang={altLang}>
+                          {altTitle && <h2>{altTitle}</h2>}
+                          {altText && <PortableText value={formatPortableText(altText, altLang) || altText} components={portableTextComponents} />}
                         </div>
                       )}
                       {isIntroBlock && (
@@ -192,9 +211,10 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
               /* Bildeblokk (låst til samme bredde som teksten) */
               if (block._type === 'imageBlock' && block.image) {
                 const displayCaption = (locale === 'en' && block.captionEn) ? block.captionEn : block.caption;
+                const topMarginClass = index === 0 ? 'mt-0' : 'mt-[calc(2*var(--fm))]';
 
                 return (
-                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
+                  <div key={block._key} className={`md:col-span-12 xl:col-start-3 xl:col-span-8 ${topMarginClass}`}>
                     <div className="text-measure group">
                       <div
                         className="relative w-full bg-gray-100"
@@ -212,7 +232,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                       </div>
                       {displayCaption && (
                         <div
-                          className="mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height)"
+                          className="mt-[var(--fm)] text-[calc(1rem-3px)] text-center leading-(--line-height)"
                           style={{ color: 'var(--secondary-color)' }}
                         >
                           {displayCaption}
@@ -226,9 +246,10 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
               /* Videoblokk (låst til samme bredde som teksten) */
               if (block._type === 'videoBlock' && block.videoUrl) {
                 const displayCaption = (locale === 'en' && block.captionEn) ? block.captionEn : block.caption;
+                const topMarginClass = index === 0 ? 'mt-0' : 'mt-[calc(2*var(--fm))]';
 
                 return (
-                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
+                  <div key={block._key} className={`md:col-span-12 xl:col-start-3 xl:col-span-8 ${topMarginClass}`}>
                     <div className="text-measure group">
                       <div className="relative w-full bg-gray-100 aspect-video">
                         <video
@@ -244,7 +265,7 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                       </div>
                       {displayCaption && (
                         <div
-                          className="mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height)"
+                          className="mt-[var(--fm)] text-[calc(1rem-3px)] text-center leading-(--line-height)"
                           style={{ color: 'var(--secondary-color)' }}
                         >
                           {displayCaption}
@@ -259,8 +280,9 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
               if (block._type === 'slideshowBlock' && block.images && block.images.length > 0) {
                 const { gridClass } = studioImageGridClass(block.size);
                 const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : block.title;
+                const topMarginClass = index === 0 ? 'mt-0' : 'mt-[calc(2*var(--fm))]';
                 return (
-                  <div key={block._key} className={gridClass}>
+                  <div key={block._key} className={`${gridClass} ${topMarginClass}`}>
                     <ProjectSlideshow images={block.images} title={displayTitle} size={block.size || 'medium'} />
                   </div>
                 );
@@ -273,12 +295,14 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                   ...((block.members || []).map((m) => m.name).filter(Boolean)),
                 ];
                 if (names.length === 0) return null;
-                const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : (block.title || t('team'));
+                const rawNoTitle = block.title && block.title.toLowerCase() !== 'people' ? block.title : t('team');
+                const displayTitle = locale === 'en' ? (block.titleEn || 'People') : rawNoTitle;
+                const topMarginClass = index === 0 ? 'mt-0' : (isPrevText ? 'mt-[calc(3.5*var(--fm))]' : 'mt-[calc(2*var(--fm))]');
 
                 return (
-                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
+                  <div key={block._key} className={`md:col-span-12 xl:col-start-3 xl:col-span-8 ${topMarginClass}`}>
                     <div className="text-measure border-t border-black pt-1.5 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                      <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <ul className="flex flex-col">
                         {names.map((name, i) => (
                           <li key={i}>{name}</li>
@@ -291,12 +315,14 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
               /* Tidligere ansatte / Personliste */
               if (block._type === 'peopleListBlock' && block.items && block.items.length > 0) {
-                const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : (block.title || t('previousTeam'));
+                const rawNoTitle = block.title && block.title.toLowerCase() !== 'former employees' ? block.title : t('previousTeam');
+                const displayTitle = locale === 'en' ? (block.titleEn || 'Former Employees') : rawNoTitle;
+                const topMarginClass = index === 0 ? 'mt-0' : 'mt-[calc(2*var(--fm))]';
 
                 return (
-                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
+                  <div key={block._key} className={`md:col-span-12 xl:col-start-3 xl:col-span-8 ${topMarginClass}`}>
                     <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                      <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <ul className="flex flex-col">
                         {block.items.map((item, i) => (
                           <li key={i}>{renderTypography(item, locale === 'en' ? 'en-GB' : 'nb')}</li>
@@ -311,11 +337,12 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
               if (block._type === 'applicationsBlock' && (block.text || block.textEn)) {
                 const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : (block.title || t('applications'));
                 const displayText = (locale === 'en' && block.textEn) ? block.textEn : block.text;
+                const topMarginClass = index === 0 ? 'mt-0' : 'mt-[calc(2*var(--fm))]';
 
                 return (
-                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
+                  <div key={block._key} className={`md:col-span-12 xl:col-start-3 xl:col-span-8 ${topMarginClass}`}>
                     <div className="text-measure text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                      <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <p className="whitespace-pre-wrap">
                         {renderTextWithEmail(displayText || '')}
                       </p>
@@ -332,11 +359,12 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                 const ph    = block.phone    || studioData?.contactPhone  || siteSettings?.contactPhone;
                 const insta = block.instagram || studioData?.instagram    || siteSettings?.instagram;
                 const displayTitle = (locale === 'en' && block.titleEn) ? block.titleEn : (block.title || t('contact'));
+                const topMarginClass = index === 0 ? 'mt-0' : (isPrevText ? 'mt-[calc(3.5*var(--fm))]' : 'mt-[calc(2*var(--fm))]');
 
                 return (
-                  <div key={block._key} className="md:col-span-12 xl:col-start-3 xl:col-span-8">
+                  <div key={block._key} className={`md:col-span-12 xl:col-start-3 xl:col-span-8 ${topMarginClass}`}>
                     <div className="text-measure border-t border-black pt-1.5 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-                      <h2 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
+                      <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{displayTitle}</h2>
                       <div className="flex flex-col gap-y-[var(--fm)]">
                         <div className="flex flex-col gap-0">
                           <div>{sName}</div>
@@ -361,23 +389,34 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
 
               return null;
             })}
-            {!contentBlocks.some((b) => b._type === 'contactBlock') && (
-              <div className="md:col-span-12 xl:col-start-3 xl:col-span-8">
-                <div className="text-measure">
-                  {renderStudioContactDetails()}
+            {!contentBlocks.some((b) => b._type === 'contactBlock') && (() => {
+              const lastBlock = contentBlocks[contentBlocks.length - 1];
+              const isLastText = lastBlock && (
+                lastBlock._type === 'textBlock' ||
+                lastBlock._type === 'teamBlock' ||
+                lastBlock._type === 'peopleListBlock' ||
+                lastBlock._type === 'applicationsBlock'
+              );
+              const contactMargin = isLastText ? 'mt-[calc(3.5*var(--fm))]' : 'mt-[calc(2*var(--fm))]';
+
+              return (
+                <div className={`md:col-span-12 xl:col-start-3 xl:col-span-8 ${contactMargin}`}>
+                  <div className="text-measure">
+                    {renderStudioContactDetails()}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         </div>
       ) : (
         /* Fallback-layout i 12-kolonne grid */
         <div className="px-side-padding pt-content-top">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-0">
             <div className="md:col-span-12 xl:col-start-3 xl:col-span-8">
-              <div className="text-measure flex flex-col gap-10 md:gap-14 text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) hyphens-none">
+              <div className="text-measure flex flex-col text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) hyphens-none">
                 <div>
-                  <h1 className="font-normal mb-4 mb-16px text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
+                  <h1 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
                     {locale === 'en' ? 'Studio Tenev — Architects Bergen' : 'Studio Tenev — Arkitekt Bergen'}
                   </h1>
                   <p>
@@ -404,7 +443,9 @@ export default function StudioContent({ studioData, siteSettings }: StudioConten
                     </div>
                   </div>
                 </div>
-                {renderStudioContactDetails()}
+                <div className="mt-[calc(3.5*var(--fm))]">
+                  {renderStudioContactDetails()}
+                </div>
               </div>
             </div>
           </div>

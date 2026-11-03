@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import ProjectList, { ProjectListItem, getProjectTags } from './ProjectList';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { useWorkCategory, WorkCategory } from '@/context/WorkCategoryContext';
+import { useWorkCategory } from '@/context/WorkCategoryContext';
 
 export type SortOption = 'date' | 'name' | 'use' | 'type' | 'size' | 'status';
 export type SortDirection = 'asc' | 'desc';
@@ -14,8 +14,8 @@ interface WorkFilterProps {
 }
 
 export default function WorkFilter({ items, initialTag }: WorkFilterProps) {
-  const { locale, t } = useLanguage();
-  const { activeCategory, setCategory } = useWorkCategory();
+  const { locale } = useLanguage();
+  const { activeCategory } = useWorkCategory();
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [sortDir, setSortDir] = useState<SortDirection>('desc'); // 'desc' default for date (nyeste øverst)
   const [selectedTags, setSelectedTags] = useState<string[]>(() =>
@@ -69,11 +69,6 @@ export default function WorkFilter({ items, initialTag }: WorkFilterProps) {
     scrollToHeaderIfNeeded();
   }, [scrollToHeaderIfNeeded]);
 
-  const handleClearTags = useCallback(() => {
-    setSelectedTags([]);
-    scrollToHeaderIfNeeded();
-  }, [scrollToHeaderIfNeeded]);
-
   // Filter by category first
   const categoryFilteredItems =
     activeCategory === 'all'
@@ -124,25 +119,16 @@ export default function WorkFilter({ items, initialTag }: WorkFilterProps) {
     return sortDir === 'asc' ? result : -result;
   });
 
-  const categories: { key: WorkCategory; label: string }[] = [
-    { key: 'all', label: t('viewAll') },
-    { key: 'bolig', label: t('categoryResidential') },
-    { key: 'naering', label: t('categoryCommercial') },
-    { key: 'destinasjonsutvikling', label: t('categoryDestination') },
-  ];
-
   return (
     <div className="w-full flex flex-col pt-0">
       <div className="w-full min-h-[calc(100vh-10rem)] min-h-[calc(100dvh-10rem)]">
         <ProjectList
           items={sortedItems}
-          totalCount={categoryFilteredItems.length}
           sortBy={sortBy}
           sortDir={sortDir}
           onSort={handleSortClick}
           selectedTags={selectedTags}
           onToggleTag={handleToggleTag}
-          onClearTags={handleClearTags}
         />
       </div>
     </div>

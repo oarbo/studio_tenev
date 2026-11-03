@@ -10,7 +10,6 @@ import { renderTypography } from '@/utils/typography';
 import LanguageSwitcher from './LanguageSwitcher';
 
 interface HeaderProps {
-  sticky?: boolean;
   projectTitle?: ReactNode | string;
   projectTitleEn?: string;
   heroImage?: string;

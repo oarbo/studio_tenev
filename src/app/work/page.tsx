@@ -12,11 +12,26 @@ import type { PortableTextBlock } from '@portabletext/types';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Work — Studio Tenev',
+  title: 'Prosjekter — Enebolig, Hytte, Transformasjon & Kulturbygg | Studio Tenev',
   description:
-    'Utvalgte prosjekter og komplett prosjektoversikt fra Studio Tenev Arkitekter i Bergen. Eneboliger, fritidsboliger, transformasjon, rehabilitering, interiør og kulturbygg.',
+    'Utvalgte arkitekturprosjekter og komplett prosjektoversikt fra Studio Tenev i Bergen. Eneboliger, fritidsboliger, tilbygg, transformasjon, rehabilitering, interiørarkitektur og kulturbygg.',
   alternates: {
     canonical: '/work',
+  },
+  openGraph: {
+    title: 'Prosjekter — Enebolig, Hytte, Transformasjon & Kulturbygg | Studio Tenev',
+    description:
+      'Utvalgte arkitekturprosjekter og komplett prosjektoversikt fra Studio Tenev i Bergen. Eneboliger, fritidsboliger, tilbygg, transformasjon, rehabilitering, interiørarkitektur og kulturbygg.',
+    url: '/work',
+    siteName: 'Studio Tenev',
+    locale: 'nb_NO',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Prosjekter — Enebolig, Hytte, Transformasjon & Kulturbygg | Studio Tenev',
+    description:
+      'Utvalgte arkitekturprosjekter og komplett prosjektoversikt fra Studio Tenev i Bergen. Eneboliger, fritidsboliger, tilbygg, transformasjon, rehabilitering, interiørarkitektur og kulturbygg.',
   },
 };
 
@@ -29,6 +44,7 @@ interface ProjectData {
   summary?: string;
   summaryEn?: string;
   firstTextBlock?: PortableTextBlock[];
+  firstTextBlockEn?: PortableTextBlock[];
   body?: PortableTextBlock[];
   hasProjectPage?: boolean;
   category?: string;
@@ -51,23 +67,26 @@ interface ProjectData {
   coverImageAlt?: string;
 }
 
+function extractPlainText(blocks?: PortableTextBlock[]): string {
+  if (!Array.isArray(blocks)) return '';
+  return blocks
+    .map((block) => {
+      if (block?._type !== 'block' || !Array.isArray(block.children)) return '';
+      return block.children
+        .map((child) => (typeof child?.text === 'string' ? child.text : ''))
+        .join('')
+        .trim();
+    })
+    .filter(Boolean)
+    .join(' ');
+}
+
 export default async function ProjectsPage() {
   const projects: ProjectData[] = await client.fetch(getProjectsQuery).catch(() => []);
 
   const projectItems: ProjectListItem[] = projects.map((p: ProjectData) => {
-    const rawBlocks = p.firstTextBlock || p.body;
-    const extractedText = Array.isArray(rawBlocks)
-      ? rawBlocks
-          .map((block) => {
-            if (block?._type !== 'block' || !Array.isArray(block.children)) return '';
-            return block.children
-              .map((child) => (typeof child?.text === 'string' ? child.text : ''))
-              .join('')
-              .trim();
-          })
-          .filter(Boolean)
-          .join(' ')
-      : '';
+    const extractedText = extractPlainText(p.firstTextBlock || p.body);
+    const extractedTextEn = extractPlainText(p.firstTextBlockEn);
 
     return {
       _id: p._id,
@@ -92,7 +111,7 @@ export default async function ProjectsPage() {
       coverImageAspectRatio: p.coverImageAspectRatio,
       coverImageAlt: p.coverImageAlt,
       summary: p.summary?.trim() || extractedText || undefined,
-      summaryEn: p.summaryEn?.trim() || undefined,
+      summaryEn: p.summaryEn?.trim() || extractedTextEn || undefined,
       hasProjectPage: p.hasProjectPage,
     };
   });
@@ -120,9 +139,39 @@ export default async function ProjectsPage() {
     coverImage: p.coverImage,
   }));
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://studiotenev.com';
+  const workJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Arkitekturprosjekter — Studio Tenev',
+    itemListElement: projectItems.map((p, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      item: {
+        '@type': 'CreativeWork',
+        name: p.title,
+        alternateName: p.titleEn && p.titleEn !== p.title ? p.titleEn : undefined,
+        description: [p.summary, p.summaryEn].filter(Boolean).join(' — ') || undefined,
+        dateCreated: p.completionYear ? String(p.completionYear) : p.startYear ? String(p.startYear) : undefined,
+        locationCreated: p.location
+          ? {
+              '@type': 'Place',
+              name: p.location,
+            }
+          : undefined,
+        url: p.hasProjectPage && p.slug ? `${siteUrl}/work/${p.slug}` : `${siteUrl}/work`,
+        image: p.coverImage ? `${p.coverImage}?w=1200&auto=format` : undefined,
+      },
+    })),
+  };
+
   return (
     <Layout noPadding={true}>
-      <div className="w-full flex flex-col mb-fm-5 relative">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(workJsonLd) }}
+      />
+      <div className="w-full flex flex-col mb-[calc(7*var(--fm))] md:mb-42 relative">
         <h1 className="sr-only">Work — Prosjekter av Studio Tenev</h1>
 
         {/* Category Navigation on Mobile and Tablet (< 1280px):

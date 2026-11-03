@@ -1,14 +1,32 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Layout from '@/components/Layout';
+import ApplicationsContent from '@/components/ApplicationsContent';
 import { client, getApplicationsQuery } from '@/sanity/client';
 
 export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Applications — Studio Tenev',
+  description:
+    'Søknader og ledige stillinger hos Studio Tenev Arkitekter i Bergen. Send gjerne portefølje og CV.',
   alternates: {
     canonical: '/applications',
+  },
+  openGraph: {
+    title: 'Applications — Studio Tenev',
+    description:
+      'Søknader og ledige stillinger hos Studio Tenev Arkitekter i Bergen. Send gjerne portefølje og CV.',
+    url: '/applications',
+    siteName: 'Studio Tenev',
+    locale: 'nb_NO',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Applications — Studio Tenev',
+    description:
+      'Søknader og ledige stillinger hos Studio Tenev Arkitekter i Bergen. Send gjerne portefølje og CV.',
   },
 };
 
@@ -17,27 +35,7 @@ export default async function ApplicationsPage() {
 
   return (
     <Layout noPadding>
-      <div className="w-full px-side-padding pt-content-top mb-42">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1">
-          <div className="md:col-span-12 xl:col-start-3 xl:col-span-8">
-            <div className="text-measure text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">
-              <h1 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">Applications</h1>
-              {applications?.text ? (
-                <p className="whitespace-pre-wrap">{applications.text}</p>
-              ) : (
-                <p>
-                  We appreciate applications from talented architects and interns. Please send your
-                  portfolio and CV to{' '}
-                  <a href="mailto:hello@studiotenev.com" className="underline underline-offset-4 hover:opacity-70 whitespace-nowrap">
-                    hello@studiotenev.com
-                  </a>
-                  .
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <ApplicationsContent text={applications?.text} textEn={applications?.textEn} />
     </Layout>
   );
 }

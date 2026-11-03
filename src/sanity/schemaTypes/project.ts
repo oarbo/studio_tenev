@@ -172,7 +172,14 @@ export const projectType = defineType({
             defineField({
               name: 'caption',
               type: 'string',
-              title: 'Tittel / Bildetekst (Valgfri)',
+              title: 'Bildetekst (Norsk)',
+              components: { input: TranslateStringInput },
+            }),
+            defineField({
+              name: 'captionEn',
+              type: 'string',
+              title: 'Bildetekst (Engelsk)',
+              components: { input: TranslateStringInput },
             }),
           ],
           preview: {
@@ -342,6 +349,7 @@ export const projectType = defineType({
       title: 'Land',
       type: 'string',
       initialValue: 'Norge',
+      hidden: true,
       components: { input: AutocompleteStringInput }
     }),
     defineField({
@@ -488,7 +496,7 @@ export const projectType = defineType({
           fieldsets: [
             {
               name: 'captionGroup',
-              title: 'Bildetekst / Caption (vises på hover)',
+              title: 'Bildetekst / Caption',
               options: { columns: 2 }
             }
           ],
@@ -556,7 +564,7 @@ export const projectType = defineType({
           fieldsets: [
             {
               name: 'captionGroup',
-              title: 'Videotekst / Caption (vises på hover)',
+              title: 'Videotekst / Caption',
               options: { columns: 2 }
             }
           ],
@@ -622,11 +630,27 @@ export const projectType = defineType({
           name: 'carouselBlock',
           title: 'Karusell / Slideshow (Bilder og Video)',
           description: 'Horisontal karusell eller slideshow med bilder og/eller autoplay-videoer (MP4). Kan vise ett bilde om gangen (slideshow) eller rullende bånd (karusell). Størrelse kan styres individuelt per bilde.',
+          fieldsets: [
+            {
+              name: 'titleGroup',
+              title: 'Tittel / Overskrift (Valgfri)',
+              options: { columns: 2 }
+            }
+          ],
           fields: [
             defineField({
               name: 'title',
-              title: 'Tittel / Overskrift (Valgfri)',
+              title: 'Norsk',
               type: 'string',
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
+            }),
+            defineField({
+              name: 'titleEn',
+              title: 'Engelsk',
+              type: 'string',
+              fieldset: 'titleGroup',
+              components: { input: TranslateStringInput },
             }),
             defineField({
               name: 'singleSlide',
@@ -871,7 +895,7 @@ export const projectType = defineType({
                   options: { hotspot: true },
                   fields: [
                     { name: 'alt', type: 'string', title: 'Alt text' },
-                    { name: 'caption', type: 'string', title: 'Bildetekst / Caption (vises på hover)' }
+                    { name: 'caption', type: 'string', title: 'Bildetekst / Caption' }
                   ]
                 }
               ]
@@ -960,7 +984,7 @@ export const projectType = defineType({
                   fieldsets: [
                     {
                       name: 'captionGroup',
-                      title: 'Bildetekst / Caption (vises på hover)',
+                      title: 'Bildetekst / Caption',
                       options: { columns: 2 }
                     }
                   ],
@@ -1019,7 +1043,7 @@ export const projectType = defineType({
                   fieldsets: [
                     {
                       name: 'captionGroup',
-                      title: 'Videotekst / Caption (vises på hover)',
+                      title: 'Videotekst / Caption',
                       options: { columns: 2 }
                     }
                   ],

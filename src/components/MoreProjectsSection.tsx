@@ -23,12 +23,12 @@ interface MoreProjectsSectionProps {
 }
 
 export default function MoreProjectsSection({ projects, categoryTitle }: MoreProjectsSectionProps) {
-  const { locale, t } = useLanguage();
+  const { locale } = useLanguage();
 
   if (!projects || projects.length === 0) return null;
 
   return (
-    <section className="w-full bg-white text-black pt-12 pb-24 mt-24 md:mt-32">
+    <section className="w-full bg-white text-black pt-12 pb-[calc(7*var(--fm))] md:pb-42 mt-24 md:mt-32">
       <div className="px-side-padding">
         <div className="w-full flex flex-col gap-6">
           <h2 className="text-[1.125rem] md:text-[1rem] font-normal leading-tight text-black">

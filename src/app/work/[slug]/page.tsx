@@ -14,7 +14,7 @@ import { ProjectLocalizedTextBlock, ProjectLocalizedCaption } from '@/components
 import { client, getProjectBySlugQuery, getAllProjectsSummaryQuery, getAllProjectSlugsQuery } from '@/sanity/client';
 import { PortableText } from '@portabletext/react';
 import type { PortableTextBlock } from '@portabletext/types';
-import { formatTypography, formatPortableText, formatYearRange, portableTextComponents, renderTypography } from '@/utils/typography';
+import { formatTypography, formatPortableText, portableTextComponents, renderTypography } from '@/utils/typography';
 
 export const revalidate = 60;
 
@@ -114,6 +114,8 @@ interface ProjectData {
   title: string;
   titleEn?: string;
   slug?: string;
+  summary?: string;
+  summaryEn?: string;
   startYear?: number;
   completionYear?: number;
   buildYear?: number;
@@ -158,6 +160,20 @@ interface RelatedNewsItem {
   imageHotspot?: SanityHotspot;
 }
 
+function extractPlainTextFromBlocks(blocks?: PortableTextBlock[]): string {
+  if (!Array.isArray(blocks)) return '';
+  return blocks
+    .map((block) => {
+      if (block?._type !== 'block' || !Array.isArray(block.children)) return '';
+      return block.children
+        .map((child) => (typeof child?.text === 'string' ? child.text : ''))
+        .join('')
+        .trim();
+    })
+    .filter(Boolean)
+    .join(' ');
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -172,27 +188,71 @@ export async function generateMetadata({
     return { title: 'Project Not Found — Studio Tenev' };
   }
 
+  const typeStr = Array.isArray(project.type) ? project.type.join(', ') : project.type;
+  const useStr = Array.isArray(project.use) ? project.use.join(', ') : project.use;
+
   const descriptionParts = [
     project.location,
-    Array.isArray(project.type) ? project.type.join(', ') : project.type,
+    typeStr,
+    useStr,
     project.completionYear || project.startYear,
   ].filter(Boolean);
 
-  const description =
-    descriptionParts.length > 0
-      ? `${project.title} (${descriptionParts.join(' · ')}) — Studio Tenev`
+  const firstTextBlock = (project.contentBlocks || []).find(
+    (b) => !b.disabled && b._type === 'textBlock' && ((Array.isArray(b.text) && b.text.length > 0) || (Array.isArray(b.textEn) && b.textEn.length > 0))
+  );
+  const bodySnippetNo = (
+    project.summary?.trim() ||
+    extractPlainTextFromBlocks(firstTextBlock?.text || project.body)
+  ).slice(0, 140);
+  const bodySnippetEn = (
+    project.summaryEn?.trim() ||
+    extractPlainTextFromBlocks(firstTextBlock?.textEn)
+  ).slice(0, 120);
+
+  const metaFacts = descriptionParts.length > 0 ? `${project.title} (${descriptionParts.join(' · ')})` : project.title;
+  const combinedSnippet = [bodySnippetNo, bodySnippetEn].filter(Boolean).join(' — ');
+  const description = combinedSnippet
+    ? `${metaFacts}: ${combinedSnippet}`
+    : `${metaFacts} — Arkitekturprosjekt av Studio Tenev / Architectural project by Studio Tenev, Norway.`;
+
+  const hasDistinctLocation =
+    project.location &&
+    !project.title.toLowerCase().includes(project.location.toLowerCase());
+  const titleSuffixParts = [
+    project.titleEn && project.titleEn !== project.title ? project.titleEn : undefined,
+    hasDistinctLocation ? project.location : undefined,
+  ].filter(Boolean);
+
+  const pageTitle =
+    titleSuffixParts.length > 0
+      ? `${project.title} (${titleSuffixParts.join(' · ')}) — Studio Tenev`
       : `${project.title} — Studio Tenev`;
 
+  const canonicalPath = `/work/${project.slug || slug}`;
+  const ogImageUrl = project.coverImage ? `${project.coverImage}?w=1600&auto=format` : undefined;
+
   return {
-    title: `${project.title} — Studio Tenev`,
+    title: pageTitle,
     description,
     alternates: {
-      canonical: `/work/${project.slug || slug}`,
+      canonical: canonicalPath,
     },
     openGraph: {
-      title: `${project.title} — Studio Tenev`,
+      title: pageTitle,
       description,
-      images: project.coverImage ? [{ url: `${project.coverImage}?w=1600&auto=format` }] : undefined,
+      url: canonicalPath,
+      siteName: 'Studio Tenev',
+      locale: 'nb_NO',
+      alternateLocale: ['en_GB', 'en_US'],
+      type: 'article',
+      images: ogImageUrl ? [{ url: ogImageUrl, alt: project.coverImageAlt || project.title }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: pageTitle,
+      description,
+      images: ogImageUrl ? [ogImageUrl] : undefined,
     },
   };
 }
@@ -210,12 +270,6 @@ export default async function ProjectDetailPage({
   if (!project) {
     notFound();
   }
-
-  const formatDateRange = () => {
-    return formatYearRange(project.startYear, project.completionYear, project.buildYear);
-  };
-
-  const dateStr = formatDateRange();
 
   // Fetch all projects for related section logic at the bottom
   const allProjectsSummary: RelatedProjectSummary[] = await client
@@ -264,19 +318,22 @@ export default async function ProjectDetailPage({
     selectedProjects = otherProjects.slice(0, 6);
   }
 
-  const combinedTypeTags = Array.from(
-    new Set(
-      [
-        ...(Array.isArray(project.type) ? project.type : project.type ? [project.type] : []),
-        ...(Array.isArray(project.use) ? project.use : project.use ? [project.use] : []),
-      ]
-        .map((t) => (typeof t === 'string' ? t.trim() : ''))
-        .filter(Boolean)
-    )
+  // Ekstra metadata (Oppdragsgiver, Team, Entreprenør, Fotograf, Rendring) under bodytekst på tablet og desktop
+  const renderMetadataBlock = (key?: string, style?: React.CSSProperties) => (
+    <ProjectMetadataBlock
+      key={key || 'project-extra-metadata'}
+      className="hidden md:flex"
+      style={style}
+      projectTitle={project.title}
+      projectTitleEn={project.titleEn}
+      client={project.client}
+      team={project.team}
+      contractor={project.contractor}
+      photographer={project.photographer}
+      renderingFirm={project.renderingFirm}
+      onlyExtra
+    />
   );
-
-  // Helper renderer for Data Table (Metadata Block) - skjules overalt da den nye tabell-inforaden erstatter den
-  const renderMetadataBlock = (_key?: string, _style?: React.CSSProperties) => null;
 
   // Helper for image and video sizing in Sidebygger (Page Builder)
   const getGridClassAndSizes = (size?: string) => {
@@ -284,18 +341,18 @@ export default async function ProjectDetailPage({
       return { gridClass: 'col-span-full md:full-bleed-block', sizes: '100vw' };
     }
     if (size === 'large' || size === '8' || size === 'cols8') {
-      return { gridClass: 'md:col-span-12 xl:col-start-3 xl:col-span-8', sizes: '(max-width: 768px) 100vw, 85vw' };
+      return { gridClass: 'md:col-span-12 xl:col-start-3 xl:col-span-8', sizes: '(max-width: 1279px) 100vw, 85vw' };
     }
     if (size === 'medium' || size === '6' || size === 'cols6') {
-      return { gridClass: 'md:col-start-4 md:col-span-6', sizes: '(max-width: 768px) 100vw, 67vw' };
+      return { gridClass: 'md:col-span-12 xl:col-start-4 xl:col-span-6', sizes: '(max-width: 1279px) 100vw, 67vw' };
     }
     if (size === 'small' || size === '4' || size === 'cols4') {
-      return { gridClass: 'md:col-start-5 md:col-span-4', sizes: '(max-width: 768px) 100vw, 50vw' };
+      return { gridClass: 'md:col-span-12 xl:col-start-5 xl:col-span-4', sizes: '(max-width: 1279px) 100vw, 50vw' };
     }
     if (size === 'xsmall' || size === 'x-small' || size === '2' || size === 'cols2') {
-      return { gridClass: 'md:col-start-6 md:col-span-2', sizes: '(max-width: 768px) 100vw, 33vw' };
+      return { gridClass: 'md:col-span-12 xl:col-start-6 xl:col-span-2', sizes: '(max-width: 1279px) 100vw, 33vw' };
     }
-    return { gridClass: 'md:col-start-4 md:col-span-6', sizes: '(max-width: 768px) 100vw, 67vw' };
+    return { gridClass: 'md:col-span-12 xl:col-start-4 xl:col-span-6', sizes: '(max-width: 1279px) 100vw, 67vw' };
   };
 
   // 1. TOP CAROUSEL: All project photos & videos from carouselMedia ONLY
@@ -330,6 +387,7 @@ export default async function ProjectDetailPage({
           type: 'image',
           alt: item.alt || project.title,
           caption: item.caption,
+          captionEn: item.captionEn,
           aspectRatio: item.aspectRatio || 1.4,
           lqip: item.lqip,
           hotspot: item.hotspot,
@@ -558,8 +616,8 @@ export default async function ProjectDetailPage({
       const colGridClass = block.size === 'large' 
         ? 'md:col-start-1 md:col-span-12' 
         : block.size === 'small' 
-        ? 'md:col-start-4 md:col-span-6' 
-        : 'md:col-start-3 md:col-span-8';
+        ? 'md:col-span-12 xl:col-start-4 xl:col-span-6' 
+        : 'md:col-span-12 xl:col-start-3 xl:col-span-8';
       const alignClass = block.verticalAlign === 'center' 
         ? 'items-center' 
         : block.verticalAlign === 'bottom' 
@@ -668,13 +726,102 @@ export default async function ProjectDetailPage({
     contentSections.push({ type: 'grid', id: currentGridBlocks[0]._key, blocks: currentGridBlocks });
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://studiotenev.com';
+  const projectUrl = `${siteUrl}/work/${project.slug || slug}`;
+  const mainTextNo = project.summary?.trim() || extractPlainTextFromBlocks(firstTextBlock?.text || project.body);
+  const mainTextEn = project.summaryEn?.trim() || extractPlainTextFromBlocks(firstTextBlock?.textEn);
+  const schemaDescription = [mainTextNo, mainTextEn].filter(Boolean).join(' — ') || undefined;
+  const projectKeywords = [
+    project.title,
+    project.titleEn,
+    project.location,
+    project.country || 'Norway',
+    ...(Array.isArray(project.type) ? project.type : project.type ? [project.type] : []),
+    ...(Array.isArray(project.use) ? project.use : project.use ? [project.use] : []),
+    'Studio Tenev',
+    'Daniel Tenev',
+    'Norwegian Architecture',
+  ].filter(Boolean);
+
+  const projectJsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CreativeWork',
+        '@id': `${projectUrl}#project`,
+        name: project.title,
+        alternateName: project.titleEn && project.titleEn !== project.title ? project.titleEn : undefined,
+        description: schemaDescription,
+        inLanguage: ['nb-NO', 'en-GB'],
+        keywords: projectKeywords.join(', '),
+        url: projectUrl,
+        image: project.coverImage ? `${project.coverImage}?w=1600&auto=format` : undefined,
+        dateCreated: project.completionYear
+          ? String(project.completionYear)
+          : project.startYear
+          ? String(project.startYear)
+          : undefined,
+        locationCreated: project.location
+          ? {
+              '@type': 'Place',
+              name: project.country ? `${project.location}, ${project.country}` : `${project.location}, Norway`,
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: project.location,
+                addressCountry: project.country || 'NO',
+              },
+            }
+          : undefined,
+        creator: {
+          '@type': 'Organization',
+          '@id': `${siteUrl}/#organization`,
+          name: 'Studio Tenev',
+          url: siteUrl,
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Studio Tenev',
+            item: siteUrl,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Work',
+            item: `${siteUrl}/work`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: project.title,
+            item: projectUrl,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <Layout 
       noPadding 
       projectTitle={project.title}
       projectTitleEn={project.titleEn}
     >
-      <div className={`w-full flex flex-col ${selectedProjects.length > 0 ? '' : 'mb-35'}`}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectJsonLd) }}
+      />
+      <div className={`w-full flex flex-col ${selectedProjects.length > 0 ? '' : 'mb-[calc(7*var(--fm))] md:mb-42'}`}>
+        <h1 className="sr-only">
+          {project.title}
+          {project.titleEn && project.titleEn !== project.title ? ` (${project.titleEn})` : ''}
+          {project.location ? ` — ${project.location}` : ''}
+          {' — Studio Tenev'}
+        </h1>
         
         {/* 1. TOP CAROUSEL: All project photos & videos from carouselMedia */}
         {photoSlides.length > 0 && (
@@ -720,7 +867,7 @@ export default async function ProjectDetailPage({
                     {block.title && (
                       <div className="px-side-padding mb-4">
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1">
-                          <h3 className="md:col-span-12 xl:col-start-3 xl:col-span-8 text-[1rem] font-medium">{block.title}</h3>
+                          <h3 className="md:col-span-12 xl:col-start-3 xl:col-span-8 text-[1.125rem] md:text-[1.2rem] font-normal leading-(--line-height)">{block.title}</h3>
                         </div>
                       </div>
                     )}
@@ -746,7 +893,7 @@ export default async function ProjectDetailPage({
           </div>
         ) : (
           /* Fallback Layout if contentBlocks array is empty */
-          <div id="project-details" className="px-side-padding mb-[4.75rem] md:mb-[6rem]">
+          <div id="project-details" className="px-side-padding mb-[calc(7*var(--fm))] md:mb-[6rem]">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-x-fm-1 gap-y-fm-2">
               {project.body ? (
                 <div className="md:col-span-12 xl:col-start-3 xl:col-span-8 text-[1rem] text-black">
@@ -788,7 +935,7 @@ export default async function ProjectDetailPage({
                       </div>
                       {(img.caption || img.alt) && (
                         <div
-                          className="mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height)"
+                          className="mt-[var(--fm)] text-[calc(1rem-3px)] text-center leading-(--line-height)"
                           style={{ color: 'var(--secondary-color)' }}
                         >
                           {img.caption || img.alt}

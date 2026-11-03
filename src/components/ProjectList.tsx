@@ -40,14 +40,11 @@ export interface ProjectListItem {
 
 export interface ProjectListProps {
   items: ProjectListItem[];
-  totalCount?: number;
-  forceExpandAll?: boolean;
   sortBy?: string;
   sortDir?: 'asc' | 'desc';
   onSort?: (option: string) => void;
   selectedTags?: string[];
   onToggleTag?: (tag: string) => void;
-  onClearTags?: () => void;
 }
 
 export const getProjectTags = (item: Pick<ProjectListItem, 'type' | 'use'>): string[] => {
@@ -184,14 +181,11 @@ export const isProjectExpandable = (
 
 export default function ProjectList({
   items,
-  totalCount,
-  forceExpandAll,
   sortBy,
   sortDir,
   onSort,
   selectedTags = [],
   onToggleTag,
-  onClearTags,
 }: ProjectListProps) {
   const { locale, t, translateStatus, translateTag } = useLanguage();
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -376,7 +370,7 @@ export default function ProjectList({
         {items.map((item) => {
           const dateStr = formatDateRange(item);
           const isExpandable = isProjectExpandable(item);
-          const isExpanded = Boolean(isExpandable && (forceExpandAll || activeId === item._id));
+          const isExpanded = Boolean(isExpandable && activeId === item._id);
           const canVisitProjectPage = Boolean(item.slug && (item.hasProjectPage ?? item.coverImage));
           const projectHref = item.slug ? `/work/${item.slug}` : undefined;
           const projectTags = getProjectTags(item);

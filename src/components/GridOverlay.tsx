@@ -71,19 +71,20 @@ export default function GridOverlay() {
     const detectedGaps: GapRegion[] = [];
 
     // 1. Toppmarg (fra toppen av vinduet ned til innholdet)
-    const topEl = document.querySelector('.pt-content-top, main.pt-\\[168px\\], .pt-\\[168px\\]') as HTMLElement;
+    const topEl = document.querySelector('.pt-content-top') as HTMLElement;
     if (topEl) {
+      const computedPaddingTop = Math.round(parseFloat(getComputedStyle(topEl).paddingTop) || 168);
       detectedGaps.push({
         id: 'top-gap-system',
         top: 0,
-        height: 168,
-        label: 'Toppmarg: 168px (5 blanklinjer)',
+        height: computedPaddingTop,
+        label: `Toppmarg: ${computedPaddingTop}px`,
       });
     }
 
-    // 2. CSS Grid beholdere med eksplisitt gap-y-[168px]
+    // 2. CSS Grid beholdere med eksplisitt gap-y
     const gridContainers = Array.from(
-      document.querySelectorAll('[class*="gap-y-[168px]"], [class*="gap-y-168"], .gap-y-168')
+      document.querySelectorAll('[class*="gap-y-fm"]')
     ) as HTMLElement[];
     gridContainers.forEach((container, cIdx) => {
       const children = Array.from(container.children).filter((child) => {

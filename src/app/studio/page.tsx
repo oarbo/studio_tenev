@@ -7,11 +7,26 @@ import StudioContent from '@/components/StudioContent';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Studio — Studio Tenev',
+  title: 'Studio — Arkitektkontor i Bergen Sentrum | Studio Tenev',
   description:
-    'Studio Tenev er et arkitektkontor etablert av sivilarkitekt MNAL Daniel Tenev i Bergen sentrum. Les om kontoret, bakgrunn, ansatte og kontaktinformasjon.',
+    'Studio Tenev er et arkitektkontor etablert av sivilarkitekt MNAL Daniel Tenev i Strandgaten 86 i Bergen sentrum. Les om kontoret, bakgrunn, ansatte og kontaktinformasjon.',
   alternates: {
     canonical: '/studio',
+  },
+  openGraph: {
+    title: 'Studio — Arkitektkontor i Bergen Sentrum | Studio Tenev',
+    description:
+      'Studio Tenev er et arkitektkontor etablert av sivilarkitekt MNAL Daniel Tenev i Strandgaten 86 i Bergen sentrum. Les om kontoret, bakgrunn, ansatte og kontaktinformasjon.',
+    url: '/studio',
+    siteName: 'Studio Tenev',
+    locale: 'nb_NO',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Studio — Arkitektkontor i Bergen Sentrum | Studio Tenev',
+    description:
+      'Studio Tenev er et arkitektkontor etablert av sivilarkitekt MNAL Daniel Tenev i Strandgaten 86 i Bergen sentrum. Les om kontoret, bakgrunn, ansatte og kontaktinformasjon.',
   },
 };
 
@@ -22,7 +37,7 @@ export default async function StudioPage() {
   ]);
 
   return (
-    <Layout noPadding stickyHeader={false}>
+    <Layout noPadding>
       <StudioContent studioData={studioData} siteSettings={siteSettings} />
     </Layout>
   );

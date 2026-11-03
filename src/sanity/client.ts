@@ -75,7 +75,9 @@ export const getFrontpageQuery = `
         "crop": coalesce(item->image.crop, @->image.crop)
       }
     )
-  }
+  },
+  "projectLocations": array::unique(*[_type == "project" && hideFromOverview != true && defined(location) && location != ""].location),
+  "projectCountries": array::unique(*[_type == "project" && hideFromOverview != true && defined(country) && country != ""].country)
 }
 `;
 
@@ -150,6 +152,7 @@ export const getProjectBySlugQuery = `
       "videoUrl": select(asset->_type == "sanity.fileAsset" || asset->mimeType match "video/*" => asset->url),
       alt,
       caption,
+      captionEn,
       "aspectRatio": coalesce(asset->metadata.dimensions.aspectRatio, null),
       "lqip": asset->metadata.lqip,
       hotspot,
@@ -165,11 +168,11 @@ export const getProjectBySlugQuery = `
       "filename": video.asset->originalFilename
     }
   },
-  "coverImage": coverImage.asset->url,
-  "coverImageLqip": coverImage.asset->metadata.lqip,
-  "coverImageAspectRatio": coverImage.asset->metadata.dimensions.aspectRatio,
-  "coverImageHotspot": coverImage.hotspot,
-  "coverImageAlt": coverImage.alt,
+  "coverImage": coalesce(coverImage.asset->url, carouselMedia[_type == "image"][0].asset->url, carouselMedia[defined(asset)][0].asset->url, carouselMedia[_type == "carouselVideo"][0].poster.asset->url, contentBlocks[_type == "carouselBlock"][0].items[defined(asset)][0].asset->url, contentBlocks[_type == "imageBlock"][0].image.asset->url),
+  "coverImageLqip": coalesce(coverImage.asset->metadata.lqip, carouselMedia[_type == "image"][0].asset->metadata.lqip, carouselMedia[defined(asset)][0].asset->metadata.lqip, contentBlocks[_type == "carouselBlock"][0].items[defined(asset)][0].asset->metadata.lqip, contentBlocks[_type == "imageBlock"][0].image.asset->metadata.lqip),
+  "coverImageAspectRatio": coalesce(coverImage.asset->metadata.dimensions.aspectRatio, carouselMedia[_type == "image"][0].asset->metadata.dimensions.aspectRatio, carouselMedia[defined(asset)][0].asset->metadata.dimensions.aspectRatio, contentBlocks[_type == "carouselBlock"][0].items[defined(asset)][0].asset->metadata.dimensions.aspectRatio, contentBlocks[_type == "imageBlock"][0].image.asset->metadata.dimensions.aspectRatio),
+  "coverImageHotspot": coalesce(coverImage.hotspot, carouselMedia[_type == "image"][0].hotspot, carouselMedia[defined(asset)][0].hotspot, contentBlocks[_type == "carouselBlock"][0].items[defined(asset)][0].hotspot, contentBlocks[_type == "imageBlock"][0].image.hotspot),
+  "coverImageAlt": coalesce(coverImage.alt, carouselMedia[_type == "image"][0].alt, carouselMedia[defined(asset)][0].alt, contentBlocks[_type == "carouselBlock"][0].items[defined(asset)][0].alt, contentBlocks[_type == "imageBlock"][0].image.alt),
   "coverImageFilename": coverImage.asset->originalFilename,
   gallery[] {
     "url": asset->url,
@@ -283,23 +286,23 @@ export const getProjectBySlugQuery = `
 
 // Spørring for oppsummering av alle prosjekter (for relaterte prosjekter nederst)
 export const getAllProjectsSummaryQuery = `
-*[_type == "project" && hideFromOverview != true && defined(coverImage.asset)] | order(_createdAt desc) {
+*[_type == "project" && hideFromOverview != true && (defined(coverImage.asset) || count(carouselMedia) > 0)] | order(_createdAt desc) {
   _id,
   title,
   titleEn,
   "slug": slug.current,
   use,
   type,
-  "coverImage": coverImage.asset->url,
-  "coverImageLqip": coverImage.asset->metadata.lqip,
-  "coverImageAspectRatio": coverImage.asset->metadata.dimensions.aspectRatio,
-  "coverImageHotspot": coverImage.hotspot
+  "coverImage": coalesce(coverImage.asset->url, carouselMedia[_type == "image"][0].asset->url, carouselMedia[defined(asset)][0].asset->url, carouselMedia[_type == "carouselVideo"][0].poster.asset->url),
+  "coverImageLqip": coalesce(coverImage.asset->metadata.lqip, carouselMedia[_type == "image"][0].asset->metadata.lqip, carouselMedia[defined(asset)][0].asset->metadata.lqip),
+  "coverImageAspectRatio": coalesce(coverImage.asset->metadata.dimensions.aspectRatio, carouselMedia[_type == "image"][0].asset->metadata.dimensions.aspectRatio, carouselMedia[defined(asset)][0].asset->metadata.dimensions.aspectRatio),
+  "coverImageHotspot": coalesce(coverImage.hotspot, carouselMedia[_type == "image"][0].hotspot, carouselMedia[defined(asset)][0].hotspot)
 }
 `;
 
 // Spørring for alle prosjekt-slugs (for umiddelbar statisk forhåndsgenerering og prefetching)
 export const getAllProjectSlugsQuery = `
-*[_type == "project" && defined(slug.current)] {
+*[_type == "project" && hideFromOverview != true && defined(slug.current)] {
   "slug": slug.current
 }
 `;
@@ -335,18 +338,6 @@ export const getStudioQuery = `
   contactEmail,
   contactPhone,
   instagram,
-  team[] {
-    name
-  },
-  showroomImages[] {
-    "url": asset->url,
-    alt,
-    "aspectRatio": asset->metadata.dimensions.aspectRatio,
-    "lqip": asset->metadata.lqip,
-    hotspot
-  },
-  applicationsText,
-  applicationsTextEn,
   contentBlocks[] {
     _key,
     _type,
@@ -385,7 +376,8 @@ export const getStudioQuery = `
 // Spørring for Applications-siden
 export const getApplicationsQuery = `
 *[_type == "studio"][0] {
-  "text": applicationsText
+  "text": coalesce(contentBlocks[_type == "applicationsBlock"][0].text, applicationsText),
+  "textEn": coalesce(contentBlocks[_type == "applicationsBlock"][0].textEn, applicationsTextEn)
 }
 `;
 
@@ -414,8 +406,15 @@ export const getSiteSettingsQuery = `
   },
   "studioName": coalesce(*[_type == "studio"][0].studioName, studioName),
   "address": coalesce(*[_type == "studio"][0].address, address),
+  "orgNumber": *[_type == "studio"][0].orgNumber,
   "contactEmail": coalesce(*[_type == "studio"][0].contactEmail, contactEmail),
   "contactPhone": coalesce(*[_type == "studio"][0].contactPhone, contactPhone),
-  "instagram": coalesce(*[_type == "studio"][0].instagram, instagram)
+  "instagram": coalesce(*[_type == "studio"][0].instagram, instagram),
+  "teamItems": *[_type == "studio"][0].contentBlocks[_type == "teamBlock"][0].items,
+  "teamMembers": *[_type == "studio"][0].contentBlocks[_type == "teamBlock"][0].members[].name,
+  "projectLocations": array::unique(*[_type == "project" && hideFromOverview != true && defined(location) && location != ""].location),
+  "projectCountries": array::unique(*[_type == "project" && hideFromOverview != true && defined(country) && country != ""].country),
+  "projectTypes": array::unique(*[_type == "project" && hideFromOverview != true && defined(type)].type[]),
+  "projectUses": array::unique(*[_type == "project" && hideFromOverview != true && defined(use)].use[])
 }
 `;

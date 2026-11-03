@@ -20,16 +20,29 @@ export function ProjectLocalizedTextBlock({
 }) {
   const { locale } = useLanguage();
   const lang = locale === 'en' ? 'en-GB' : 'nb';
+  const altLang = locale === 'en' ? 'nb' : 'en-GB';
   const rawTitle = locale === 'en' ? (titleEn || title) : title;
   const rawText = locale === 'en' && Array.isArray(textEn) && textEn.length > 0 ? textEn : text;
   const currentText = rawText ? (formatPortableText(rawText, lang) || rawText) : undefined;
 
+  const altRawTitle = locale === 'en' ? title : titleEn;
+  const altRawText = locale === 'en'
+    ? (Array.isArray(text) && text.length > 0 ? text : undefined)
+    : (Array.isArray(textEn) && textEn.length > 0 ? textEn : undefined);
+  const altFormattedText = altRawText ? (formatPortableText(altRawText, altLang) || altRawText) : undefined;
+
   return (
     <div className="text-measure" lang={lang}>
-      {rawTitle && <h2 className="font-normal mb-4 text-[1.33rem]">{renderTypography(rawTitle, lang)}</h2>}
+      {rawTitle && <h2 className="font-normal mb-4 text-[1.125rem] md:text-[1.2rem] leading-(--line-height)">{renderTypography(rawTitle, lang)}</h2>}
       {currentText && (
         <div className="news-content !m-0 !max-w-none text-[1.125rem] md:text-[1.2rem] leading-(--line-height)" lang={lang}>
           <PortableText value={currentText} components={portableTextComponents} />
+        </div>
+      )}
+      {(altRawTitle || altFormattedText) && (
+        <div className="sr-only" lang={altLang}>
+          {altRawTitle && <h2>{renderTypography(altRawTitle, altLang)}</h2>}
+          {altFormattedText && <PortableText value={altFormattedText} components={portableTextComponents} />}
         </div>
       )}
       {metadataNode && (
@@ -59,7 +72,7 @@ export function ProjectLocalizedCaption({
   return (
     <div
       lang={lang}
-      className={className || "mt-[calc(1em*var(--line-height))] text-[calc(1rem-3px)] text-center leading-(--line-height)"}
+      className={className || "mt-[var(--fm)] text-[calc(1rem-3px)] text-center leading-(--line-height)"}
       style={{ color: 'var(--secondary-color)' }}
     >
       {renderTypography(rawCaption, lang)}

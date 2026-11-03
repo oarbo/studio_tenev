@@ -73,24 +73,55 @@ html {
   --fm: calc(1em * var(--line-height));  /* 1 linjehøyde */
   --fm-half: calc(0.5 * var(--fm));
   --fm-1: calc(1 * var(--fm));
+  --fm-1-5: calc(1.5 * var(--fm));      /* 1.5 linjehøyde */
   --fm-2: calc(2 * var(--fm));
   --fm-3: calc(3 * var(--fm));
+  --fm-3-5: calc(3.5 * var(--fm));      /* 3.5 linjehøyder */
   --fm-4: calc(4 * var(--fm));
   --fm-5: calc(5 * var(--fm));           /* Blokkavstand: ~5 linjehøyder */
   --fm-6: calc(6 * var(--fm));
+  --fm-7: calc(7 * var(--fm));           /* 7 blanklinjer over footer på mobil */
   --fm-8: calc(8 * var(--fm));
   /* Tekstmål: proporsjonalt skalert med skriftstørrelsen (42rem ~ 882px ved 21px skrift, ~80–87 tegn per linje) */
   --text-width-desktop: 42rem;
   /* Tekstmål for forkortet tekst i lister (~15 tegn kortere linjelengde for behagelig lesing) */
   --text-width-list: 34rem;
-  --container-wide: 57rem;
   --secondary-color: rgba(0, 0, 0, 0.62);
   --color: #000;
   --background-color: #fff;
 }
 
+/* Mobil og tablet (< 1280px): All body text ned 1px i leading og blanklinjer */
+@media (max-width: 1279.98px) {
+  :root {
+    --line-height: calc(1.35em - 1px);
+    --fm: calc(1.35em - 1px);
+    --fm-half: calc(0.5 * var(--fm));
+    --fm-1: calc(1 * var(--fm));
+    --fm-1-5: calc(1.5 * var(--fm));
+    --fm-2: calc(2 * var(--fm));
+    --fm-3: calc(3 * var(--fm));
+    --fm-3-5: calc(3.5 * var(--fm));
+    --fm-4: calc(4 * var(--fm));
+    --fm-5: calc(5 * var(--fm));
+    --fm-6: calc(6 * var(--fm));
+    --fm-7: calc(7 * var(--fm));
+    --fm-8: calc(8 * var(--fm));
+  }
+
+  body,
+  p,
+  li,
+  h1, h2, h3, h4, h5, h6,
+  .text-measure,
+  .text-measure-left,
+  .prose,
+  .news-content {
+    line-height: calc(1.35em - 1px);
+  }
+}
+
 body {
-  --fm-medium: calc(1rem * var(--line-height));
   font-family: "neue-haas-unica", sans-serif;
   font-size: 1rem;
   font-style: normal;
@@ -173,17 +204,6 @@ a[href^="tel:"],
   hyphens: none !important;
   word-break: keep-all !important;
   overflow-wrap: normal !important;
-}
-
-/* Faste 16px avstandsklasser */
-.mt-16px {
-  margin-top: 16px !important;
-}
-.mb-16px {
-  margin-bottom: 16px !important;
-}
-.gap-y-16px {
-  row-gap: 16px !important;
 }
 
 /* -------------------------------------------------------
@@ -282,19 +302,32 @@ article p,
   margin-bottom: var(--fm-half);
 }
 
-/* Zak Group Content Wrapper modeller */
-.cw {
-  width: 100%;
-  max-width: var(--text-width-desktop);
-  margin-left: auto;
-  margin-right: auto;
+/* -------------------------------------------------------
+   TITLER MED LINJE OVER
+   3.5 blanklinjer (calc(3.5 * var(--fm))) over linjen etter foregående tekst
+   Gjelder alle sidevisninger inkl. desktop
+   ------------------------------------------------------- */
+
+.news-content h2.border-t,
+.news-content h3.border-t,
+.news-content h4.border-t,
+.prose h2.border-t,
+.prose h3.border-t,
+.prose h4.border-t {
+  margin-top: calc(3.5 * var(--fm));
+  padding-top: 0.375rem; /* pt-1.5 */
 }
 
-.cw--wide {
-  width: 100%;
-  max-width: var(--container-wide);
-  margin-left: auto;
-  margin-right: auto;
+/* -------------------------------------------------------
+   MELLOMROM OVER FOOTER PÅ MOBILSIDEN
+   7 blanklinjer bodytekst over footer til innhold over (< 768px)
+   ------------------------------------------------------- */
+
+@media (max-width: 767.98px) {
+  .mb-42,
+  .mb-fm-5 {
+    margin-bottom: calc(7 * var(--fm)) !important;
+  }
 }
 
 .px-side-padding {
@@ -330,17 +363,7 @@ article p,
   }
 }
 
-/* -------------------------------------------------------
-   BILDESTØRRELSER (Zak Group / container-basert)
-   ------------------------------------------------------- */
-.img-size-full    { width: 100%; max-width: var(--container-wide); margin-left: auto; margin-right: auto; }
-.img-size-large   { width: 100%; max-width: var(--container-wide); margin-left: auto; margin-right: auto; }
-.img-size-medium  { width: 100%; max-width: var(--container-wide); margin-left: auto; margin-right: auto; }
-.img-size-small   { width: 100%; max-width: var(--text-width-desktop); margin-left: auto; margin-right: auto; }
-.img-size-xsmall  { width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; }
-
 /* Full-bleed: bryter ut av px-side-padding */
-.img-size-bleed,
 .full-bleed-block {
   width: 100vw;
   position: relative;
@@ -385,6 +408,16 @@ article p,
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpolyline points='18 12 30 24 18 36' stroke='%23000000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") 24 24, pointer !important;
 }
 
+.cursor-carousel-prev-white,
+.cursor-carousel-prev-white * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpolyline points='30 12 18 24 30 36' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") 24 24, pointer !important;
+}
+
+.cursor-carousel-next-white,
+.cursor-carousel-next-white * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpolyline points='18 12 30 24 18 36' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") 24 24, pointer !important;
+}
+
 /* Sørg for at bildetekst under karusell forblir lesbar og har normal tekstpeker */
 .carousel-caption,
 .carousel-caption * {
@@ -415,17 +448,6 @@ article p,
     --carousel-space: clamp(4.5rem, 12dvh, 8rem);
     --carousel-h: max(220px, calc(100vh - (2 * var(--carousel-space)) - 3.5rem));
     --carousel-h: max(220px, calc(100dvh - (2 * var(--carousel-space)) - 3.5rem));
-  }
-}
-
-.carousel-hero-container {
-  --carousel-space: clamp(4.5rem, 12vh, 8rem);
-  --carousel-h: 54vh;
-}
-
-@media (min-width: 640px) {
-  .carousel-hero-container {
-    --carousel-h: 64vh;
   }
 }
 

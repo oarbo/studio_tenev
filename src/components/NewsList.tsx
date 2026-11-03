@@ -85,7 +85,7 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
               <button
                 onClick={() => toggleItem(item._id)}
                 aria-expanded={isActive}
-                className="w-full grid grid-cols-1 md:grid-cols-12 xl:grid-cols-8 gap-x-fm-1 text-left items-start pt-1.5 pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-black group"
+                className="w-full grid grid-cols-1 md:grid-cols-12 xl:grid-cols-8 gap-x-fm-1 text-left items-start pt-1.5 pb-[calc(1*var(--fm))] md:pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-black group"
               >
                 {/* Date + Tag: Kolonne 1-3 på iPad, 1-2 på stor desktop. På mobil: dato til venstre, tag helt til høyre */}
                 <div className="news-date-col flex md:flex justify-between md:justify-start items-baseline md:col-span-3 xl:col-span-2 text-black text-[calc(1rem-3px)] md:text-[1rem] group-hover:opacity-70 transition-opacity mb-[1px] md:mb-0">
@@ -105,8 +105,13 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
                 </div>
 
                 {/* Title (Kolonne 4-12 på iPad, 3-8 på stor desktop) */}
-                <div className="md:col-span-9 xl:col-span-6 text-black text-[1.125rem] md:text-[1rem] leading-[calc(1em*var(--line-height)-1px)] md:leading-(--line-height) group-hover:opacity-70 transition-opacity">
+                <div className="md:col-span-9 xl:col-span-6 text-black text-[1.125rem] md:text-[1rem] leading-(--line-height) group-hover:opacity-70 transition-opacity">
                   {renderTypography((locale === 'en' && item.titleEn) ? item.titleEn : item.title, locale === 'en' ? 'en-GB' : 'nb')}
+                  {item.titleEn && item.titleEn !== item.title && (
+                    <span className="sr-only" lang={locale === 'en' ? 'nb' : 'en-GB'}>
+                      {locale === 'en' ? item.title : item.titleEn}
+                    </span>
+                  )}
                 </div>
               </button>
 
@@ -167,6 +172,11 @@ export default function NewsList({ items, initialActiveId }: NewsListProps) {
                     >
                       <div className="text-measure-left">
                         {(locale === 'en' && item.contentEn) ? item.contentEn : item.content}
+                        {item.contentEn && (
+                          <div className="sr-only" lang={locale === 'en' ? 'nb' : 'en-GB'}>
+                            {locale === 'en' ? item.content : item.contentEn}
+                          </div>
+                        )}
                       </div>
                       
                       {item.link && (

@@ -8,8 +8,25 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Imprint and Privacy policy — Studio Tenev',
+  description:
+    'Kolofon, opphavsrett, fotografkrediteringer og personvernerklæring for Studio Tenev AS i Bergen.',
   alternates: {
     canonical: '/imprint-and-privacy-policy',
+  },
+  openGraph: {
+    title: 'Imprint and Privacy policy — Studio Tenev',
+    description:
+      'Kolofon, opphavsrett, fotografkrediteringer og personvernernerklæring for Studio Tenev AS i Bergen.',
+    url: '/imprint-and-privacy-policy',
+    siteName: 'Studio Tenev',
+    locale: 'nb_NO',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Imprint and Privacy policy — Studio Tenev',
+    description:
+      'Kolofon, opphavsrett, fotografkrediteringer og personvernerklæring for Studio Tenev AS i Bergen.',
   },
 };
 

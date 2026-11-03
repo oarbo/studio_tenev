@@ -160,7 +160,7 @@ export default function ServicesList() {
             className="w-full scroll-mt-32"
           >
             <div
-              className={`border-black ${
+              className={`border-black ${index === 0 ? 'border-t' : ''} ${
                 index === PHASES.length - 1 ? '' : 'border-b'
               }`}
             >
@@ -168,7 +168,7 @@ export default function ServicesList() {
               <button
                 onClick={() => toggleItem(phase.id)}
                 aria-expanded={isActive}
-                className="w-full text-left pt-1.5 pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none group"
+                className="w-full text-left pt-1.5 pb-[calc(1*var(--fm))] md:pb-[calc(0.5*var(--fm))] cursor-pointer focus:outline-none group"
               >
                 <div className="text-black text-[1.125rem] md:text-[1.2rem] leading-(--line-height) group-hover:opacity-70 transition-opacity">
                   {title}
