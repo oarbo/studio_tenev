@@ -203,7 +203,7 @@ export default function FooterClient({
 
         {/* Col 2: Information */}
         <div className="col-start-4 col-span-2">
-          <h3 className="mb-[0.7em]">{t('information')}</h3>
+          <h2 className="mb-[0.7em] font-normal text-[1rem] leading-(--line-height)">{t('information')}</h2>
           <ul className="flex flex-col gap-0">
             <li>
               <Link href="/imprint-and-privacy-policy" prefetch={true} className="hover:opacity-70 transition-opacity">
@@ -247,7 +247,7 @@ export default function FooterClient({
 
         {/* Col 3: Address */}
         <div className="col-start-6 col-span-2">
-          <h3 className="mb-[0.7em]">{t('address')}</h3>
+          <h2 className="mb-[0.7em] font-normal text-[1rem] leading-(--line-height)">{t('address')}</h2>
           <ul className="flex flex-col gap-0">
             <li>{studioName}</li>
             {address ? (
@@ -263,7 +263,7 @@ export default function FooterClient({
 
         {/* Col 4: Contact */}
         <div className="col-start-8 col-span-2">
-          <h3 className="mb-[0.7em]">{t('contact')}</h3>
+          <h2 className="mb-[0.7em] font-normal text-[1rem] leading-(--line-height)">{t('contact')}</h2>
           <ul className="flex flex-col gap-0">
             <li className="whitespace-nowrap">
               <a href={`mailto:${contactEmail}`} className="hover:opacity-70 transition-opacity whitespace-nowrap">
